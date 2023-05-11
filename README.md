@@ -1,4 +1,4 @@
-Skywalking Extensions for Scala
+Skywalking Extensions for Scala 3
 ---
 
 - [ ] caliban
@@ -8,4 +8,4 @@ Skywalking Extensions for Scala
 - [ ] cats4redis
 - [ ] zio-redis
 
-Repository NOT Available
+Repository NOT Available!
