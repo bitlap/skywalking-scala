@@ -1,5 +1,4 @@
 ThisBuild / resolvers ++= Seq(
-  Resolver.mavenLocal,
   "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots",
   "Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/releases"
 )
@@ -60,7 +59,7 @@ lazy val `caliban-v2x-plugin` = (project in file("caliban-v2x-plugin"))
     commands ++= Commands.value,
     name := "caliban-v2x-plugin",
     libraryDependencies ++= Seq(
-      "com.github.ghostdogpr" %% "caliban"        % calibanVersion    % Provided,
+      "com.github.ghostdogpr" %% "caliban"        % calibanVersion    % Provided withSources (),
       "org.apache.skywalking"  % "apm-agent-core" % skywalkingVersion % Provided,
       "org.apache.skywalking"  % "apm-test-tools" % skywalkingVersion % Test,
       "org.scalatest"         %% "scalatest"      % scalatestVersion  % Test,

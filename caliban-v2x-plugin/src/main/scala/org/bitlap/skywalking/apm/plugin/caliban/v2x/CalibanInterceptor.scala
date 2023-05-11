@@ -30,21 +30,21 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     result: MethodInterceptResult
   ): Unit = {
-    val parameters = allArguments(0).asInstanceOf[GraphQLRequest]
-    if (parameters == null || parameters.query.isEmpty) return
+    val graphQLRequest = allArguments(0).asInstanceOf[GraphQLRequest]
+    if (graphQLRequest == null || graphQLRequest.query.isEmpty) return
 
     // FIXME
     val opName = Try(
       Unsafe.unsafe { implicit runtime =>
         val doc: Document =
-          zio.Runtime.default.unsafe.run(Parser.parseQuery(parameters.query.get)).getOrThrowFiberFailure()
+          zio.Runtime.default.unsafe.run(Parser.parseQuery(graphQLRequest.query.get)).getOrThrowFiberFailure()
         val docOpName = doc.operationDefinitions
           .map(_.selectionSet.collectFirst {
             case Selection.Field(alias, name, arguments, directives, selectionSet, index) => alias.getOrElse(name)
           })
           .headOption
           .flatten
-        parameters.operationName.orElse(docOpName) getOrElse ("Unknown")
+        graphQLRequest.operationName.orElse(docOpName) getOrElse ("Unknown")
       }
     ).getOrElse("Unknown")
 
@@ -60,8 +60,8 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object = {
-    val parameters = allArguments(0).asInstanceOf[GraphQLRequest]
-    if (parameters == null || parameters.query.isEmpty) return ret
+    val graphQLRequest = allArguments(0).asInstanceOf[GraphQLRequest]
+    if (graphQLRequest == null || graphQLRequest.query.isEmpty) return ret
     ContextManager.stopSpan()
     ret
   }
@@ -73,8 +73,8 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     t: Throwable
   ): Unit = {
-    val parameters = allArguments(0).asInstanceOf[GraphQLRequest]
-    if (parameters == null || parameters.query.isEmpty || parameters.operationName.isEmpty) return
+    val graphQLRequest = allArguments(0).asInstanceOf[GraphQLRequest]
+    if (graphQLRequest == null || graphQLRequest.query.isEmpty || graphQLRequest.operationName.isEmpty) return
     dealException(t)
   }
 

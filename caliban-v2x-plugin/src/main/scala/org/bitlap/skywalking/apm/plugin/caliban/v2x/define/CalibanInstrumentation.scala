@@ -35,9 +35,9 @@ final class CalibanInstrumentation extends ClassInstanceMethodsEnhancePluginDefi
 end CalibanInstrumentation
 
 object CalibanInstrumentation:
-  val INTERCEPTOR_CLASS = "org.bitlap.skywalking.apm.plugin.caliban.v2x.CalibanInterceptor"
-  val ENHANCE_CLASS     = "caliban.GraphQL$$anon$2"
-  val ENHANCE_METHOD    = "executeRequest"
+  private final val INTERCEPTOR_CLASS = "org.bitlap.skywalking.apm.plugin.caliban.v2x.CalibanInterceptor"
+  private final val ENHANCE_CLASS     = "caliban.GraphQL$$anon$2"
+  private final val ENHANCE_METHOD    = "executeRequest"
 
   def getCalibanExecuteRequestMethod: ElementMatcher[MethodDescription] =
     named(ENHANCE_METHOD).and(ReturnTypeNameMatch.returnsWithType("zio.ZIO"))
