@@ -5,7 +5,7 @@ ThisBuild / resolvers ++= Seq(
 
 lazy val scala3Version     = "3.2.0"
 lazy val scalatestVersion  = "3.2.15"
-lazy val calibanVersion    = "2.1.0"
+lazy val calibanVersion    = "2.0.1"
 lazy val skywalkingVersion = "8.13.0"
 lazy val junitVersion      = "4.12"
 lazy val mockitoVersion    = "5.0.0"

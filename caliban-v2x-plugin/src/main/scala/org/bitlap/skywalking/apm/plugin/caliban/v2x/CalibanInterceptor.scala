@@ -84,8 +84,8 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
   }
 
   private def getOperationName(graphQLRequest: GraphQLRequest) =
-    Try(
-      Unsafe.unsafe { implicit runtime =>
+    val tryOp: Try[String] = Try(
+      Unsafe.unsafe { runtime ?=>
         val doc: Document =
           zio.Runtime.default.unsafe.run(Parser.parseQuery(graphQLRequest.query.get)).getOrThrowFiberFailure()
         val docOpName = doc.operationDefinitions
@@ -96,7 +96,8 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
           .flatten
         graphQLRequest.operationName.orElse(docOpName).getOrElse("Unknown")
       }
-    ) match
+    )
+    tryOp match
       case Failure(e) =>
         dealException(e)
         "Unknown"

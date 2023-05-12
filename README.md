@@ -18,6 +18,7 @@ Repository NOT Available!
 
 - Java 11
 - Scala 3.2.0
+- Skywalking 8.13.0
 
 ## How to use?
 
