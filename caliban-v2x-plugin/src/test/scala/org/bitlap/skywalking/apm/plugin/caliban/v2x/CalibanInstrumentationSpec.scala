@@ -16,7 +16,7 @@ import org.scalatest.matchers.should.Matchers
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-class Caliban2xInstrumentationSpec extends AnyFlatSpec with Matchers {
+class CalibanInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch" should "ok" in {
     val matcher = CalibanInstrumentation.getCalibanExecuteRequestMethod

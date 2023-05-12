@@ -9,6 +9,7 @@ lazy val calibanVersion    = "2.1.0"
 lazy val skywalkingVersion = "8.13.0"
 lazy val junitVersion      = "4.12"
 lazy val mockitoVersion    = "5.0.0"
+lazy val zioGrpcVersion    = "0.6.0-test4"
 
 inThisBuild(
   List(
@@ -40,12 +41,20 @@ lazy val commonSettings =
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     assembly / assemblyShadeRules := Seq(
       ShadeRule.rename("net.bytebuddy.**" -> s"org.apache.skywalking.apm.dependencies.net.bytebuddy.@1").inAll
+    ),
+    libraryDependencies ++= Seq(
+      "org.scalatest"        %% "scalatest"      % scalatestVersion  % Test,
+      "junit"                 % "junit"          % junitVersion      % Test,
+      "org.mockito"           % "mockito-core"   % mockitoVersion    % Test,
+      "org.apache.skywalking" % "apm-test-tools" % skywalkingVersion % Test,
+      "org.apache.skywalking" % "apm-agent-core" % skywalkingVersion % Provided
     )
   )
 
 lazy val `skywalking-scala` = (project in file("."))
   .aggregate(
-    `caliban-v2x-plugin`
+    `caliban-v2x-plugin`,
+    `ziogrpc-v06x-plugin`
   )
   .settings(
     publish / skip := true,
@@ -59,11 +68,16 @@ lazy val `caliban-v2x-plugin` = (project in file("caliban-v2x-plugin"))
     commands ++= Commands.value,
     name := "caliban-v2x-plugin",
     libraryDependencies ++= Seq(
-      "com.github.ghostdogpr" %% "caliban"        % calibanVersion    % Provided withSources (),
-      "org.apache.skywalking"  % "apm-agent-core" % skywalkingVersion % Provided,
-      "org.apache.skywalking"  % "apm-test-tools" % skywalkingVersion % Test,
-      "org.scalatest"         %% "scalatest"      % scalatestVersion  % Test,
-      "junit"                  % "junit"          % junitVersion      % Test,
-      "org.mockito"            % "mockito-core"   % mockitoVersion    % Test
+      "com.github.ghostdogpr" %% "caliban" % calibanVersion % Provided withSources ()
+    )
+  )
+
+lazy val `ziogrpc-v06x-plugin` = (project in file("ziogrpc-v06x-plugin"))
+  .settings(
+    commonSettings,
+    commands ++= Commands.value,
+    name := "ziogrpc-v06x-plugin",
+    libraryDependencies ++= Seq(
+      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcVersion % Provided withSources ()
     )
   )

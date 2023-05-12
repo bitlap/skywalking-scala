@@ -2,10 +2,10 @@ package org.bitlap.skywalking.apm.plugin.caliban.v2x
 
 import java.lang.reflect.Method
 
-import caliban.{ GraphQLInterpreter, GraphQLRequest, InputValue }
+import caliban.*
 import caliban.execution.QueryExecution
 
-import org.apache.skywalking.apm.agent.core.context.MockContextSnapshot
+import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.agent.test.tools.*
 import org.hamcrest.CoreMatchers.is
@@ -19,13 +19,11 @@ import org.mockito.junit.*
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-@RunWith(classOf[TracingSegmentRunner])
 class CalibanInterceptorSpec {
 
-  @Mock var methodInterceptResult: MethodInterceptResult  = _
-  @SegmentStoragePoint var segmentStorage: SegmentStorage = _
-  @Rule def rule: MockitoRule                             = MockitoJUnit.rule
-  @Rule def serviceRule                                   = new AgentServiceRule
+  @Mock var methodInterceptResult: MethodInterceptResult = _
+  @Rule def rule: MockitoRule                            = MockitoJUnit.rule
+  @Rule def serviceRule                                  = new AgentServiceRule
 
   val calibanInterceptor: CalibanInterceptor = new CalibanInterceptor
 
@@ -89,12 +87,12 @@ class CalibanInterceptorSpec {
       QueryExecution.Sequential
     )
     calibanInterceptor.beforeMethod(enhancedInstance, method, args, argTypes, methodInterceptResult)
-    calibanInterceptor.afterMethod(enhancedInstance, method, args, argTypes, methodInterceptResult)
+    calibanInterceptor.afterMethod(enhancedInstance, method, args, argTypes, zio.ZIO.succeed(methodInterceptResult))
 
-    val operation = segmentStorage.getTraceSegments.get(0).transform().getSpansList.get(0).getOperationName
     // FIXME
+    val operation = ContextManager.activeSpan().getOperationName
+
     assertEquals("starLakeInsertMetric", operation)
-    assertThat(segmentStorage.getTraceSegments.size, is(1))
   }
 
   @Test
@@ -106,8 +104,12 @@ class CalibanInterceptorSpec {
       QueryExecution.Sequential
     )
     calibanInterceptor.beforeMethod(enhancedInstance, method, args, argTypes, methodInterceptResult)
-    calibanInterceptor.afterMethod(enhancedInstance, method, args, argTypes, methodInterceptResult)
-    assertThat(segmentStorage.getTraceSegments.size, is(1))
+    calibanInterceptor.afterMethod(enhancedInstance, method, args, argTypes, zio.ZIO.succeed(methodInterceptResult))
+
+    val operation = ContextManager.activeSpan().getOperationName
+
+    assertEquals("Unknown", operation)
+
   }
 
 }

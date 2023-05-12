@@ -1,0 +1,1 @@
+zio-grpc-0.6.x=org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.define.ZioGrpcClientInstrumentation
