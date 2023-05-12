@@ -34,8 +34,6 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
     span.setComponent(ComponentsDefine.GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
     span.prepareForAsync()
-    span.tag(Tags.ofKey("UNARY_CALL"), method.getName)
-
   }
 
   override def afterMethod(
@@ -55,7 +53,7 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
           ContextManager.activeSpan().asyncFinish()
           ContextManager.stopSpan()
         }
-          .catchAllCause(t => ZIO.attempt(ContextManager.activeSpan.log(t.squash)).ignore)
+          .catchAllCause(t => ZIO.attempt(dealException(t.squash)).ignore)
       )
   }
 

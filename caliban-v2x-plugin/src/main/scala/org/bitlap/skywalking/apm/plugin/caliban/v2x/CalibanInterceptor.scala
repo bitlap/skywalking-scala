@@ -5,7 +5,7 @@ import java.util
 import java.util.{ HashMap, Map }
 import java.util.function.BiConsumer
 
-import scala.util.Try
+import scala.util.{ Failure, Success, Try }
 
 import caliban.*
 import caliban.execution.QueryExecution
@@ -51,8 +51,10 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object = {
+    val span = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
+    if (span == null) return ret
+
     val graphQLRequest = allArguments(0).asInstanceOf[GraphQLRequest]
-    val span           = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
     if (graphQLRequest == null || graphQLRequest.query.isEmpty) {
       ContextManager.stopSpan(span)
       return ret
@@ -65,7 +67,7 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
           ContextManager.activeSpan().asyncFinish()
           ContextManager.stopSpan()
         }
-          .catchAllCause(t => ZIO.attempt(ContextManager.activeSpan.log(t.squash)).ignore)
+          .catchAllCause(t => ZIO.attempt(dealException(t.squash)).ignore)
       )
   }
 
@@ -94,7 +96,11 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
           .flatten
         graphQLRequest.operationName.orElse(docOpName).getOrElse("Unknown")
       }
-    ).getOrElse("Unknown")
+    ) match
+      case Failure(e) =>
+        dealException(e)
+        "Unknown"
+      case Success(value) => value
 
   private def dealException(t: Throwable): Unit =
     ContextManager.activeSpan.errorOccurred.log(t)
