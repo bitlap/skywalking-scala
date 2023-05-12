@@ -2,8 +2,15 @@ package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
 
 import java.lang.reflect.Method
 
+import scalapb.zio_grpc.*
+import scalapb.zio_grpc.client.ClientCalls
+
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
+
+import io.grpc.{ CallOptions, MethodDescriptor, Status }
+import io.grpc.binarylog.v1.Address
+import io.grpc.protobuf.lite.ProtoLiteUtils
 
 import zio.Trace
 import zio.ZIO
@@ -23,12 +30,6 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import com.google.protobuf.*
-
-import io.grpc.{ CallOptions, MethodDescriptor, Status }
-import io.grpc.binarylog.v1.Address
-import io.grpc.protobuf.lite.ProtoLiteUtils
-import scalapb.zio_grpc.*
-import scalapb.zio_grpc.client.ClientCalls
 
 /** @author
  *    梦境迷离
@@ -105,7 +106,7 @@ class ZIoGrpcClientInterceptorSpec {
     )
 
     val operation = ContextManager.activeSpan().getOperationName
-    assertEquals("session.SessionService.getUserInfoByToken", operation)
+    assertEquals("session.SessionService.getUserInfoByToken/client", operation)
 
   }
 

@@ -4,6 +4,8 @@ import java.lang.reflect.Method
 
 import scala.util.Try
 
+import io.grpc.*
+
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
@@ -11,8 +13,6 @@ import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.{ AbstractSpan, SpanLayer }
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
-
-import io.grpc.*
 
 /** @author
  *    梦境迷离
@@ -30,7 +30,7 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
     val methodDescriptor = allArguments(1).asInstanceOf[MethodDescriptor[_, _]]
     val serviceName      = OperationNameFormatUtil.formatOperationName(methodDescriptor)
     val remotePeer       = "No Peer"
-    val span             = ContextManager.createExitSpan(serviceName, remotePeer)
+    val span             = ContextManager.createExitSpan(serviceName + "/client", remotePeer)
     span.setComponent(ComponentsDefine.GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
     span.prepareForAsync()
