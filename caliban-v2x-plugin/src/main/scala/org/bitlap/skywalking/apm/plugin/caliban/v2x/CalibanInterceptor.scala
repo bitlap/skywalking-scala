@@ -4,12 +4,12 @@ import java.lang.reflect.Method
 
 import scala.util.Try
 
-import caliban.{ GraphQLRequest, InputValue }
+import caliban.{ CalibanError, GraphQLRequest, GraphQLResponse, InputValue }
 import caliban.execution.QueryExecution
 import caliban.parsing.Parser
 import caliban.parsing.adt.{ Document, Selection }
 
-import zio.Unsafe
+import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
@@ -49,7 +49,9 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     ).getOrElse("Unknown")
 
     val span = ContextManager.createLocalSpan(opName)
+    span.prepareForAsync()
     Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
+    SpanLayer.asHttp(span)
     span.setComponent(ComponentsDefine.GRAPHQL)
   }
 
@@ -62,8 +64,14 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
   ): Object = {
     val graphQLRequest = allArguments(0).asInstanceOf[GraphQLRequest]
     if (graphQLRequest == null || graphQLRequest.query.isEmpty) return ret
-    ContextManager.stopSpan()
-    ret
+    val result = ret.asInstanceOf[URIO[_, GraphQLResponse[CalibanError]]]
+    result
+      .catchAllCause(c => ZIO.attempt(dealException(c.squash)) *> ZIO.done(Exit.Failure(c)))
+      .ensuring(
+        ZIO
+          .attempt(ContextManager.activeSpan().asyncFinish())
+          .catchAllCause(t => ZIO.attempt(ContextManager.activeSpan.log(t.squash)).ignore)
+      ) <* ZIO.attempt(ContextManager.stopSpan())
   }
 
   override def handleMethodException(

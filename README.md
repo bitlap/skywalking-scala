@@ -1,7 +1,7 @@
 Skywalking Extensions for Scala 3
 ---
 
-- [ ] caliban
+- [x] caliban
 - [ ] zio-grpc
 - [ ] scalikejdbc
 - [ ] zio-pulsar
