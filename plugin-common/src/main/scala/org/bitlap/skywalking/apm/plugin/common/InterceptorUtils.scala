@@ -47,12 +47,17 @@ object InterceptorUtils:
     if (!retObject.isInstanceOf[ZIO[_, _, _]])
       return retObject
 
-    retObject
+    val result = retObject
       .ensuring(
         ZIO.attempt {
-          span.asyncFinish()
-          ContextManager.stopSpan(span)
+          try span.asyncFinish
+          catch {
+            case t: Throwable =>
+              ContextManager.activeSpan.log(t)
+          }
         }
           .catchAllCause(t => InterceptorUtils.dealExceptionF(t.squash))
       )
+    ContextManager.stopSpan(span)
+    result
   }
