@@ -8,7 +8,8 @@ Repository NOT Available!
 
 - [x] caliban: 2.0.1
 - [ ] zio-grpc: 0.6.0-test
-  - [x] client unary
+  - [x] client unary call
+  - [ ] server unary call
 - [ ] scalikejdbc
 - [ ] zio-pulsar
 - [ ] cats4redis
