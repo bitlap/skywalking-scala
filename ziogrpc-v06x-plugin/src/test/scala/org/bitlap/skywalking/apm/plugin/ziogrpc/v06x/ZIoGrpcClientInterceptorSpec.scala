@@ -9,6 +9,7 @@ import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
 
 import io.grpc.{ CallOptions, MethodDescriptor, Status }
+import io.grpc.Metadata
 import io.grpc.binarylog.v1.Address
 import io.grpc.protobuf.lite.ProtoLiteUtils
 
@@ -18,6 +19,7 @@ import zio.ZIO
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.agent.test.tools.*
+import org.bitlap.skywalking.apm.plugin.common.InterceptorUtils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.ZioGrpcClientInterceptor
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.define.ZioGrpcClientInstrumentation
 import org.hamcrest.CoreMatchers.is
@@ -87,7 +89,7 @@ class ZIoGrpcClientInterceptorSpec {
         )
         .build(),
       CallOptions.DEFAULT,
-      null.asInstanceOf[SafeMetadata],
+      InterceptorUtils.unsafeRunZIO(SafeMetadata.fromMetadata(new Metadata)),
       null
     )
     zioGrpcClientUnaryCallInterceptor.beforeMethod(

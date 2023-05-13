@@ -6,7 +6,7 @@ import io.grpc.MethodDescriptor
  *    梦境迷离
  *  @version 1.0,2023/5/12
  */
-object OperationNameFormatUtil:
+object OperationNameFormatUtils:
 
   def formatOperationName(methodDescriptor: MethodDescriptor[_, _]): String = {
     val fullMethodName = methodDescriptor.getFullMethodName

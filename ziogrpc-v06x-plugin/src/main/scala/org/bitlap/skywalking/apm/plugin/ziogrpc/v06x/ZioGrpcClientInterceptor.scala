@@ -2,7 +2,9 @@ package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
 
 import java.lang.reflect.Method
 
+import scala.collection.mutable.ListBuffer
 import scala.util.Try
+import scalapb.zio_grpc.SafeMetadata
 
 import io.grpc.*
 
@@ -10,9 +12,10 @@ import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
-import org.apache.skywalking.apm.agent.core.context.trace.{ AbstractSpan, SpanLayer }
+import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
+import org.bitlap.skywalking.apm.plugin.common.*
 
 /** @author
  *    梦境迷离
@@ -28,12 +31,25 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
     result: MethodInterceptResult
   ): Unit = {
     val methodDescriptor = allArguments(1).asInstanceOf[MethodDescriptor[_, _]]
-    val serviceName      = OperationNameFormatUtil.formatOperationName(methodDescriptor)
+    val safeMetadata     = allArguments(3).asInstanceOf[SafeMetadata]
+    val serviceName      = OperationNameFormatUtils.formatOperationName(methodDescriptor)
     val remotePeer       = "No Peer"
-    val span             = ContextManager.createExitSpan(serviceName + "/client", remotePeer)
+    val contextCarrier   = new ContextCarrier
+    val span             = ContextManager.createExitSpan(serviceName + "/client", contextCarrier, remotePeer)
+    val items            = ListBuffer[(Metadata.Key[String], String)]()
+    var contextItem      = contextCarrier.items
+    while (contextItem.hasNext) {
+      contextItem = contextItem.next
+      val headerKey = Metadata.Key.of(contextItem.getHeadKey, Metadata.ASCII_STRING_MARSHALLER)
+      items.append(headerKey -> contextItem.getHeadValue)
+    }
+    val updateMetadata = ZIO.foreach(items.result())(kv => safeMetadata.put(kv._1, kv._2))
+    InterceptorUtils.unsafeRunZIO(updateMetadata)
+
     span.setComponent(ComponentsDefine.GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
     span.prepareForAsync()
+    objInst.setSkyWalkingDynamicField(span)
   }
 
   override def afterMethod(
@@ -42,20 +58,14 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[_]],
     ret: Object
-  ): Object = {
-    val result = ret.asInstanceOf[ZIO[_, Status, _]]
-    result
-      .mapError(s => s.asException())
-      .catchAllCause(c => ZIO.attempt(dealException(c.squash)) *> ZIO.done(Exit.Failure(c)))
-      .mapError(t => Status.fromThrowable(t))
-      .ensuring(
-        ZIO.attempt {
-          ContextManager.activeSpan().asyncFinish()
-          ContextManager.stopSpan()
-        }
-          .catchAllCause(t => ZIO.attempt(dealException(t.squash)).ignore)
-      )
-  }
+  ): Object =
+    InterceptorUtils.handleMethodExit(objInst, ret) { ret =>
+      ret
+        .asInstanceOf[ZIO[_, Status, _]]
+        .mapError(s => s.asException())
+        .catchAllCause(c => InterceptorUtils.dealExceptionF(c.squash) *> ZIO.done(Exit.Failure(c)))
+        .mapError(t => Status.fromThrowable(t))
+    }
 
   override def handleMethodException(
     objInst: EnhancedInstance,
@@ -64,7 +74,6 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     t: Throwable
   ): Unit =
-    dealException(t)
+    InterceptorUtils.handleMethodException(objInst, allArguments, t)(_ => ())
 
-  private def dealException(t: Throwable): Unit =
-    ContextManager.activeSpan.errorOccurred.log(t)
+end ZioGrpcClientInterceptor
