@@ -71,7 +71,7 @@ lazy val `caliban-v2x-plugin` = (project in file("caliban-v2x-plugin"))
     name                       := "caliban-v2x-plugin",
     assembly / assemblyJarName := s"apm-caliban-v2x-plugin-${(ThisBuild / version).value}.jar",
     libraryDependencies ++= Seq(
-      "com.github.ghostdogpr" %% "caliban" % calibanVersion % Provided withSources ()
+      "com.github.ghostdogpr" %% "caliban" % calibanVersion % Provided
     )
   )
   .dependsOn(`plugin-common`)
@@ -83,7 +83,7 @@ lazy val `ziogrpc-v06x-plugin` = (project in file("ziogrpc-v06x-plugin"))
     assembly / assemblyJarName := s"apm-ziogrpc-v06x-plugin-${(ThisBuild / version).value}.jar",
     name                       := "ziogrpc-v06x-plugin",
     libraryDependencies ++= Seq(
-      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcVersion % Provided withSources ()
+      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcVersion % Provided
     )
   )
   .dependsOn(`plugin-common`)
@@ -94,6 +94,6 @@ lazy val `plugin-common` = (project in file("plugin-common"))
     commands ++= Commands.value,
     name := "plugin-common",
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % zioVersion % Provided withSources ()
+      "dev.zio" %% "zio" % zioVersion % Provided
     )
   )

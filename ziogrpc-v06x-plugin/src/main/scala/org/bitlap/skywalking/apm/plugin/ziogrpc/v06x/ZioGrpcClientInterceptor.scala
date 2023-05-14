@@ -2,26 +2,29 @@ package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
 
 import java.lang.reflect.Method
 
-import scala.collection.mutable.ListBuffer
-import scala.util.Try
-import scalapb.zio_grpc.SafeMetadata
+import scalapb.zio_grpc.*
+import scalapb.zio_grpc.client.*
 
 import io.grpc.*
 
-import zio.*
+import zio.ZIO
 
-import org.apache.skywalking.apm.agent.core.context.*
-import org.apache.skywalking.apm.agent.core.context.tag.Tags
-import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
-import org.bitlap.skywalking.apm.plugin.common.*
+import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward.*
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
+final class ZioGrpcClientInterceptor extends InstanceConstructorInterceptor, InstanceMethodsAroundInterceptor:
+  import ZioGrpcClientInterceptor.*
+
+  override def onConstruct(objInst: EnhancedInstance, allArguments: Array[Object]): Unit = {
+    val interceptors = allArguments(1).asInstanceOf[Seq[ZClientInterceptor[?]]]
+    allArguments(1) = interceptors ++ Seq(new ZTraceClientInterceptor[Any])
+    objInst.setSkyWalkingDynamicField(allArguments)
+  }
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -29,28 +32,7 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[_]],
     result: MethodInterceptResult
-  ): Unit = {
-    val methodDescriptor = allArguments(1).asInstanceOf[MethodDescriptor[_, _]]
-    val safeMetadata     = allArguments(3).asInstanceOf[SafeMetadata]
-    val serviceName      = OperationNameFormatUtils.formatOperationName(methodDescriptor)
-    val remotePeer       = "No Peer"
-    val contextCarrier   = new ContextCarrier
-    val span             = ContextManager.createExitSpan(serviceName + "/client", contextCarrier, remotePeer)
-    val items            = ListBuffer[(Metadata.Key[String], String)]()
-    var contextItem      = contextCarrier.items
-    while (contextItem.hasNext) {
-      contextItem = contextItem.next
-      val headerKey = Metadata.Key.of(contextItem.getHeadKey, Metadata.ASCII_STRING_MARSHALLER)
-      items.append(headerKey -> contextItem.getHeadValue)
-    }
-    val updateMetadata = ZIO.foreach(items.result())(kv => safeMetadata.put(kv._1, kv._2))
-    InterceptorUtils.unsafeRunZIO(updateMetadata)
-
-    span.setComponent(ComponentsDefine.GRPC)
-    span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    span.prepareForAsync()
-    objInst.setSkyWalkingDynamicField(span)
-  }
+  ): Unit = {}
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -59,13 +41,20 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object =
-    InterceptorUtils.handleMethodExit(objInst, ret) { ret =>
-      ret
-        .asInstanceOf[ZIO[_, Status, _]]
-        .mapError(s => s.asException())
-        .catchAllCause(c => InterceptorUtils.dealExceptionF(c.squash) *> ZIO.done(Exit.Failure(c)))
-        .mapError(t => Status.fromThrowable(t))
-    }
+    if (objInst.getSkyWalkingDynamicField == null || !objInst.getSkyWalkingDynamicField.isInstanceOf[Array[?]])
+      return ret
+    val constructorParams = objInst.getSkyWalkingDynamicField.asInstanceOf[Array[Object]]
+    val channel           = constructorParams(0).asInstanceOf[ManagedChannel]
+    val interceptors      = constructorParams(1).asInstanceOf[Seq[ZClientInterceptor[Any]]]
+    val methodDescriptor  = allArguments(0).asInstanceOf[MethodDescriptor[Any, Any]]
+    val options           = allArguments(1).asInstanceOf[CallOptions]
+    ZIO.succeed(
+      interceptors.foldLeft[ZClientCall[Any, Any, Any]](
+        ZClientCall(channel.newCall(methodDescriptor, options))
+      )((call: ZClientCall[Any, Any, Any], interceptor) =>
+        interceptor.interceptCall[Any, Any](methodDescriptor, options, call)
+      )
+    )
 
   override def handleMethodException(
     objInst: EnhancedInstance,
@@ -73,7 +62,19 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[_]],
     t: Throwable
-  ): Unit =
-    InterceptorUtils.handleMethodException(objInst, allArguments, t)(_ => ())
+  ): Unit = {}
 
 end ZioGrpcClientInterceptor
+
+object ZioGrpcClientInterceptor:
+
+  final class ZTraceClientInterceptor[R] extends ZClientInterceptor[R] {
+
+    def interceptCall[REQUEST, RESPONSE](
+      methodDescriptor: MethodDescriptor[REQUEST, RESPONSE],
+      call: CallOptions,
+      clientCall: ZClientCall[R, REQUEST, RESPONSE]
+    ): ZClientCall[R, REQUEST, RESPONSE] =
+      new TracingClientCall[R, REQUEST, RESPONSE](clientCall, methodDescriptor)
+
+  }

@@ -10,7 +10,7 @@ import io.grpc.*
 
 import zio.{ Trace, ZLayer }
 
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.define.ZioGrpcServerInstrumentation
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.define.ZioGrpcServerNativeInstrumentation
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -21,7 +21,7 @@ import org.scalatest.matchers.should.Matchers
 class ZioGrpcServerInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch" should "ok" in {
-    val matcher = ZioGrpcServerInstrumentation.getUnaryMethod
+    val matcher = ZioGrpcServerNativeInstrumentation.getUnaryMethod
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ServerLayer.type].getMethod(
         "fromServiceList",

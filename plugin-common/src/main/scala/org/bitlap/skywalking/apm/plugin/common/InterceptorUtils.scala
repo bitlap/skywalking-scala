@@ -34,7 +34,7 @@ object InterceptorUtils:
   }
 
   def handleMethodExit(objInst: EnhancedInstance, ret: Object)(
-    handler: Object => AbstractSpan ?=> ZIO[_, _, _]
+    handler: Object => AbstractSpan ?=> ZIO[?, ?, ?]
   ): Object = {
     if (objInst.getSkyWalkingDynamicField == null || !objInst.getSkyWalkingDynamicField.isInstanceOf[AbstractSpan])
       return ret
@@ -44,7 +44,7 @@ object InterceptorUtils:
     implicit val span = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
     val retObject     = handler(ret)
 
-    if (!retObject.isInstanceOf[ZIO[_, _, _]])
+    if (!retObject.isInstanceOf[ZIO[?, ?, ?]])
       return retObject
 
     val result = retObject
@@ -61,3 +61,10 @@ object InterceptorUtils:
     ContextManager.stopSpan(span)
     result
   }
+
+  def closeAsyncSpan(asyncSpan: AbstractSpan): Unit =
+    try asyncSpan.asyncFinish
+    catch {
+      case e: Throwable =>
+        ContextManager.activeSpan.log(e)
+    } finally ContextManager.stopSpan()
