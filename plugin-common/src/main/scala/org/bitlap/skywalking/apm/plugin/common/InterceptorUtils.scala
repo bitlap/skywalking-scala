@@ -15,7 +15,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedI
 object InterceptorUtils:
 
   def unsafeRunZIO[A](z: ZIO[Any, Any, A]): A =
-    Try(Unsafe.unsafe { runtime ?=>
+    Try(Unsafe.unsafeCompat { implicit u =>
       Runtime.default.unsafe.run(z).getOrThrowFiberFailure()
     }).getOrElse(null.asInstanceOf[A])
 
