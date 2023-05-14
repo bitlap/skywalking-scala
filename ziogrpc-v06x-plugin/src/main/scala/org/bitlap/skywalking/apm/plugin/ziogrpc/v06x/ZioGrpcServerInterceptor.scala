@@ -27,7 +27,7 @@ import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward.*
  *    梦境迷离
  *  @version 1.0,2023/5/13
  */
-class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor, InstanceConstructorInterceptor:
+final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor, InstanceConstructorInterceptor:
 
   override def onConstruct(objInst: EnhancedInstance, allArguments: Array[Object]): Unit =
     objInst.setSkyWalkingDynamicField(Map(RUNTIME -> allArguments(0), MK_DRIVER -> allArguments(1)))

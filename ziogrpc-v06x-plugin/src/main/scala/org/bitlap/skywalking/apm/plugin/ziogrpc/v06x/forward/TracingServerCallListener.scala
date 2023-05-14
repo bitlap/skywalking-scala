@@ -28,6 +28,7 @@ final class TracingServerCallListener[REQUEST](
   contextSnapshot: ContextSnapshot,
   asyncSpan: AbstractSpan
 ) extends ForwardingServerCallListener.SimpleForwardingServerCallListener[REQUEST](delegate):
+
   private val operationPrefix = OperationNameFormatUtils.formatOperationName(method) + SERVER
 
   override def onMessage(message: REQUEST): Unit =

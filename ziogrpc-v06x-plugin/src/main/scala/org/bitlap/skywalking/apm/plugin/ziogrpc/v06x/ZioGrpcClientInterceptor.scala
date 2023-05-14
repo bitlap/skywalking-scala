@@ -53,7 +53,7 @@ end ZioGrpcClientInterceptor
 
 object ZioGrpcClientInterceptor:
 
-  final class ZTraceClientInterceptor[R] extends ZClientInterceptor[R] {
+  private final class ZTraceClientInterceptor[R] extends ZClientInterceptor[R] {
 
     def interceptCall[REQUEST, RESPONSE](
       methodDescriptor: MethodDescriptor[REQUEST, RESPONSE],
