@@ -1,5 +1,6 @@
 package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward
 
+import scala.collection.mutable.ListBuffer
 import scalapb.zio_grpc.SafeMetadata
 import scalapb.zio_grpc.client.ZClientCall
 
@@ -39,11 +40,16 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
     ContextManager.inject(contextCarrier)
     var contextItem = contextCarrier.items
+    val unsafePut   = ListBuffer[(Metadata.Key[String], String)]()
     while (contextItem.hasNext) {
       contextItem = contextItem.next
       val headerKey = Metadata.Key.of(contextItem.getHeadKey, Metadata.ASCII_STRING_MARSHALLER)
-      headers.put(headerKey, contextItem.getHeadValue)
+      unsafePut.append(headerKey -> contextItem.getHeadValue)
     }
+    val putInto = unsafePut.result().map(kv => headers.put(kv._1, kv._2))
+
+    InterceptorUtils.unsafeRunZIO(ZIO.collectAll(putInto))
+
     snapshot = ContextManager.capture
     span.prepareForAsync()
     ContextManager.stopSpan(span)

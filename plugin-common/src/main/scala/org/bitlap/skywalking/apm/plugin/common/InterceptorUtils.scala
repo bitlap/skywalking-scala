@@ -1,5 +1,7 @@
 package org.bitlap.skywalking.apm.plugin.common
 
+import scala.util.Try
+
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
@@ -13,9 +15,9 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedI
 object InterceptorUtils:
 
   def unsafeRunZIO[A](z: ZIO[Any, Any, A]): A =
-    Unsafe.unsafe { runtime ?=>
+    Try(Unsafe.unsafe { runtime ?=>
       Runtime.default.unsafe.run(z).getOrThrowFiberFailure()
-    }
+    }).getOrElse(null.asInstanceOf[A])
 
   def dealExceptionF(t: Throwable)(implicit span: AbstractSpan): UIO[Unit] =
     ZIO.attempt(span.errorOccurred.log(t)).ignore
