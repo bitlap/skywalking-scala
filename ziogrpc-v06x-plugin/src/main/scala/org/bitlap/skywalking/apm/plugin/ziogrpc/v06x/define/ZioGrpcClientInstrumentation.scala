@@ -19,25 +19,14 @@ final class ZioGrpcClientInstrumentation extends ClassInstanceMethodsEnhancePlug
 
   override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
 
-  override def getInstanceMethodsInterceptPoints: Array[InstanceMethodsInterceptPoint] =
-    Array(new InstanceMethodsInterceptPoint() {
-
-      override def getMethodsMatcher: ElementMatcher[MethodDescription] =
-        getUnaryMethod
-
-      override def getMethodsInterceptor: String =
-        INTERCEPTOR_CLASS
-
-      override def isOverrideArgs: Boolean =
-        false
-    })
-
-  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = Array(
-    new ConstructorInterceptPoint() {
-      override def getConstructorMatcher: ElementMatcher[MethodDescription] = takesArguments(2)
-      override def getConstructorInterceptor: String                        = INTERCEPTOR_CLASS
-    }
+  override def getInstanceMethodsInterceptPoints: Array[InstanceMethodsInterceptPoint] = Array(
+    new InstanceMethodsInterceptPoint:
+      override def getMethodsMatcher: ElementMatcher[MethodDescription] = getUnaryMethod
+      override def getMethodsInterceptor: String                        = INTERCEPTOR_CLASS
+      override def isOverrideArgs: Boolean                              = false
   )
+
+  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
 
 end ZioGrpcClientInstrumentation
 

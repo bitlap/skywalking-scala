@@ -7,7 +7,7 @@ import scalapb.zio_grpc.client.*
 
 import io.grpc.*
 
-import zio.ZIO
+import zio.{ UIO, ZIO }
 
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance
@@ -17,14 +17,8 @@ import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward.*
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-final class ZioGrpcClientInterceptor extends InstanceConstructorInterceptor, InstanceMethodsAroundInterceptor:
+final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
   import ZioGrpcClientInterceptor.*
-
-  override def onConstruct(objInst: EnhancedInstance, allArguments: Array[Object]): Unit = {
-    val interceptors = allArguments(1).asInstanceOf[Seq[ZClientInterceptor[?]]]
-    allArguments(1) = interceptors ++ Seq(new ZTraceClientInterceptor[Any])
-    objInst.setSkyWalkingDynamicField(allArguments)
-  }
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -41,20 +35,11 @@ final class ZioGrpcClientInterceptor extends InstanceConstructorInterceptor, Ins
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object =
-    if (objInst.getSkyWalkingDynamicField == null || !objInst.getSkyWalkingDynamicField.isInstanceOf[Array[?]])
-      return ret
-    val constructorParams = objInst.getSkyWalkingDynamicField.asInstanceOf[Array[Object]]
-    val channel           = constructorParams(0).asInstanceOf[ManagedChannel]
-    val interceptors      = constructorParams(1).asInstanceOf[Seq[ZClientInterceptor[Any]]]
-    val methodDescriptor  = allArguments(0).asInstanceOf[MethodDescriptor[Any, Any]]
-    val options           = allArguments(1).asInstanceOf[CallOptions]
-    ZIO.succeed(
-      interceptors.foldLeft[ZClientCall[Any, Any, Any]](
-        ZClientCall(channel.newCall(methodDescriptor, options))
-      )((call: ZClientCall[Any, Any, Any], interceptor) =>
-        interceptor.interceptCall[Any, Any](methodDescriptor, options, call)
-      )
-    )
+    val interceptor      = new ZTraceClientInterceptor[Any]
+    val methodDescriptor = allArguments(0).asInstanceOf[MethodDescriptor[Any, Any]]
+    val options          = allArguments(1).asInstanceOf[CallOptions]
+    val result           = ret.asInstanceOf[UIO[ZClientCall[Any, Any, Any]]]
+    result.map(r => interceptor.interceptCall(methodDescriptor, options, r))
 
   override def handleMethodException(
     objInst: EnhancedInstance,
