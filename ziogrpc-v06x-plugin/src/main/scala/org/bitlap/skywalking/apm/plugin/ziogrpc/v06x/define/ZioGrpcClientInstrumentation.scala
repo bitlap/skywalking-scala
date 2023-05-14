@@ -23,7 +23,7 @@ final class ZioGrpcClientInstrumentation extends ClassInstanceMethodsEnhancePlug
     Array(new InstanceMethodsInterceptPoint() {
 
       override def getMethodsMatcher: ElementMatcher[MethodDescription] =
-        named("newCall")
+        getUnaryMethod
 
       override def getMethodsInterceptor: String =
         INTERCEPTOR_CLASS
@@ -45,6 +45,10 @@ object ZioGrpcClientInstrumentation:
 
   private final val INTERCEPTOR_CLASS =
     "org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.ZioGrpcClientInterceptor"
-  private final val ENHANCE_CLASS = "scalapb.zio_grpc.ZChannel"
+  private final val ENHANCE_CLASS  = "scalapb.zio_grpc.ZChannel"
+  private final val ENHANCE_METHOD = "newCall"
+
+  def getUnaryMethod: ElementMatcher[MethodDescription] =
+    named(ENHANCE_METHOD)
 
 end ZioGrpcClientInstrumentation

@@ -1,16 +1,16 @@
 package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
 
 import scalapb.zio_grpc.*
-import scalapb.zio_grpc.client.ClientCalls
+import scalapb.zio_grpc.server.*
 
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
 
 import io.grpc.*
 
-import zio.{ Trace, ZLayer }
+import zio.*
 
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.define.ZioGrpcServerNativeInstrumentation
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.define.ZioGrpcServerInstrumentation
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -21,12 +21,12 @@ import org.scalatest.matchers.should.Matchers
 class ZioGrpcServerInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch" should "ok" in {
-    val matcher = ZioGrpcServerNativeInstrumentation.getUnaryMethod
+    val matcher = ZioGrpcServerInstrumentation.getUnaryMethod
     val method = new MethodDescription.ForLoadedMethod(
-      classOf[ServerLayer.type].getMethod(
-        "fromServiceList",
-        classOf[() => ServerBuilder[_]],
-        classOf[ServiceList[_]]
+      classOf[ZServerCallHandler[_, _, _]].getMethod(
+        "startCall",
+        classOf[ServerCall[_, _]],
+        classOf[Metadata]
       )
     )
     matcher.matches(method) shouldEqual true
