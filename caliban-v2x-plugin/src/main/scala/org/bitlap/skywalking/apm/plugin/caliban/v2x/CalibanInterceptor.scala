@@ -39,6 +39,7 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
     SpanLayer.asHttp(span)
     span.setComponent(ComponentsDefine.GRAPHQL)
+    objInst.setSkyWalkingDynamicField(span)
   }
 
   override def afterMethod(
@@ -48,16 +49,16 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object =
-    val result = ret.asInstanceOf[URIO[_, GraphQLResponse[CalibanError]]]
+    val result    = ret.asInstanceOf[URIO[_, GraphQLResponse[CalibanError]]]
+    val asyncSpan = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
     result
       .catchAllCause(c =>
         ZIO.attempt(InterceptorDSL.handleException(c.squash)(ContextManager.activeSpan())) *> ZIO.done(Exit.Failure(c))
       )
       .ensuring(
-        ZIO
-          .attempt(ContextManager.activeSpan().asyncFinish())
+        ZIO.attempt { asyncSpan.asyncFinish(); ContextManager.stopSpan() }
           .catchAllCause(t => ZIO.attempt(ContextManager.activeSpan.log(t.squash)).ignore)
-      ) <* ZIO.attempt(ContextManager.stopSpan())
+      )
 
   override def handleMethodException(
     objInst: EnhancedInstance,
