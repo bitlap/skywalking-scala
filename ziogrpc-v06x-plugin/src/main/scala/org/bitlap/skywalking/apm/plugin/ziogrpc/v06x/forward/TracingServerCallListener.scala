@@ -39,27 +39,21 @@ final class TracingServerCallListener[REQUEST](
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_MESSAGE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan) {
-      delegate.onMessage(message)
-    }
+    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan)(delegate.onMessage(message))
   end onMessage
 
   override def onCancel(): Unit =
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_CANCEL_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan) {
-      delegate.onCancel()
-    }
+    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan)(delegate.onCancel())
   end onCancel
 
   override def onHalfClose(): Unit =
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_HALF_CLOSE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan) {
-      delegate.onHalfClose()
-    }
+    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan)(delegate.onHalfClose())
   end onHalfClose
 
   override def onComplete(): Unit =

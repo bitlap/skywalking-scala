@@ -7,7 +7,7 @@ import scalapb.zio_grpc.client.*
 
 import io.grpc.*
 
-import zio.{ UIO, ZIO }
+import zio.*
 
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance

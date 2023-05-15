@@ -28,7 +28,7 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
 
   private var snapshot: ContextSnapshot = _
   private val serviceName               = OperationNameFormatUtils.formatOperationName(method)
-  private val operationPrefix           = OperationNameFormatUtils.formatOperationName(method) + CLIENT
+  private val operationPrefix           = serviceName + CLIENT
 
   override def start(
     responseListener: Listener[RESPONSE],
@@ -66,31 +66,27 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_MESSAGE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    continuedSnapshotF(snapshot) {
-      delegate.sendMessage(message)
-    }
+    continuedSnapshotF(snapshot)(delegate.sendMessage(message))
   end sendMessage
 
   override def halfClose(): ZIO[R, Status, Unit] =
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_COMPLETE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    continuedSnapshotF(snapshot) {
-      delegate.halfClose()
-    }
+    continuedSnapshotF(snapshot)(delegate.halfClose())
   end halfClose
 
   override def cancel(message: String): ZIO[R, Status, Unit] =
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_CANCEL_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    continuedSnapshotF(snapshot) {
-      delegate.cancel(message)
-    }
+    continuedSnapshotF(snapshot)(delegate.cancel(message))
 
   end cancel
 
-  def continuedSnapshotF[A](contextSnapshot: ContextSnapshot)(effect: => ZIO[A, Status, Unit]): ZIO[A, Status, Unit] =
+  private def continuedSnapshotF[A](contextSnapshot: ContextSnapshot)(
+    effect: => ZIO[A, Status, Unit]
+  ): ZIO[A, Status, Unit] =
     val result = ZIO.attempt(ContextManager.continued(contextSnapshot)) *>
       effect.mapError { a =>
         ContextManager.activeSpan.log(a.asException())

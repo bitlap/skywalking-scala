@@ -87,6 +87,6 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[_]],
     t: Throwable
-  ): Unit = InterceptorDSL.handleMethodException(objInst, allArguments, t)(_ => ())
+  ): Unit = {}
 
 end ZioGrpcServerInterceptor

@@ -42,9 +42,7 @@ final class TracingServerCall[REQUEST, RESPONSE](
       return
     }
 
-    InterceptorDSL.continuedSnapshot(contextSnapshot) {
-      delegate.sendMessage(message)
-    }
+    InterceptorDSL.continuedSnapshot(contextSnapshot)(delegate.sendMessage(message))
   end sendMessage
 
   override def close(status: Status, trailers: Metadata): Unit =

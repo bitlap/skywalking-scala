@@ -33,9 +33,7 @@ final class TracingClientCallListener[RESPONSE](
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
 
-    InterceptorDSL.continuedSnapshot(contextSnapshot) {
-      delegate.onMessage(message)
-    }
+    InterceptorDSL.continuedSnapshot(contextSnapshot)(delegate.onMessage(message))
   end onMessage
 
   override def onClose(status: Status, trailers: Metadata): Unit =
