@@ -19,11 +19,12 @@ import org.mockito.junit.*
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
+@RunWith(classOf[TracingSegmentRunner])
 class CalibanInterceptorSpec {
-
-  @Mock var methodInterceptResult: MethodInterceptResult = _
-  @Rule def rule: MockitoRule                            = MockitoJUnit.rule
-  @Rule def serviceRule                                  = new AgentServiceRule
+  @SegmentStoragePoint var segmentStorage: SegmentStorage = _
+  @Mock var methodInterceptResult: MethodInterceptResult  = _
+  @Rule def rule: MockitoRule                             = MockitoJUnit.rule
+  @Rule def serviceRule                                   = new AgentServiceRule
 
   val calibanInterceptor: CalibanInterceptor = new CalibanInterceptor
 
@@ -92,7 +93,7 @@ class CalibanInterceptorSpec {
     // FIXME
     val operation = ContextManager.activeSpan().getOperationName
 
-    assertEquals("starLakeInsertMetric", operation)
+    assertEquals("GraphQL/starLakeInsertMetric", operation)
   }
 
   @Test
@@ -108,7 +109,7 @@ class CalibanInterceptorSpec {
 
     val operation = ContextManager.activeSpan().getOperationName
 
-    assertEquals("Unknown", operation)
+    assertEquals("GraphQL/Unknown", operation)
 
   }
 

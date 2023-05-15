@@ -3,7 +3,9 @@ package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.call
 import io.grpc.*
 import io.grpc.ServerCall.Listener
 import io.grpc.Status.*
+
 import zio.*
+
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
@@ -27,7 +29,7 @@ object ChannelActions:
     val span            = ContextManager.createLocalSpan(operationPrefix + RESPONSE_ON_MESSAGE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot(contextSnapshot) (())
+    InterceptorDSL.continuedSnapshot(contextSnapshot)(())
     span
   end beforeSendMessage
 
@@ -36,7 +38,7 @@ object ChannelActions:
     val span            = ContextManager.createLocalSpan(operationPrefix + RESPONSE_ON_CLOSE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot(contextSnapshot) (())
+    InterceptorDSL.continuedSnapshot(contextSnapshot)(())
     span
 
   def afterClose(status: Status, asyncSpan: AbstractSpan, span: AbstractSpan)(action: => Unit): Unit =

@@ -33,13 +33,12 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
   ): Unit = {
     val graphQLRequest = allArguments(0).asInstanceOf[GraphQLRequest]
     if (graphQLRequest == null || graphQLRequest.query.isEmpty) return
-    val opName = getOperationName(graphQLRequest)
+    val opName = "GraphQL/" + getOperationName(graphQLRequest)
     val span   = ContextManager.createLocalSpan(opName)
     span.prepareForAsync()
     Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
     SpanLayer.asHttp(span)
     span.setComponent(ComponentsDefine.GRAPHQL)
-    objInst.setSkyWalkingDynamicField(span)
   }
 
   override def afterMethod(
@@ -49,9 +48,16 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object =
-    InterceptorUtils.handleMethodExit(objInst, ret) { ret =>
-      ret.asInstanceOf[URIO[_, GraphQLResponse[CalibanError]]]
-    }
+    val result = ret.asInstanceOf[URIO[_, GraphQLResponse[CalibanError]]]
+    result
+      .catchAllCause(c =>
+        ZIO.attempt(InterceptorDSL.handleException(c.squash)(ContextManager.activeSpan())) *> ZIO.done(Exit.Failure(c))
+      )
+      .ensuring(
+        ZIO
+          .attempt(ContextManager.activeSpan().asyncFinish())
+          .catchAllCause(t => ZIO.attempt(ContextManager.activeSpan.log(t.squash)).ignore)
+      ) <* ZIO.attempt(ContextManager.stopSpan())
 
   override def handleMethodException(
     objInst: EnhancedInstance,
@@ -60,12 +66,12 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     t: Throwable
   ): Unit =
-    InterceptorUtils.handleMethodException(objInst, allArguments, t)(_ => ())
+    InterceptorDSL.handleMethodException(objInst, allArguments, t)(_ => ())
 
   private def getOperationName(graphQLRequest: GraphQLRequest) =
     val tryOp: Try[String] = Try {
-      val docOpName = InterceptorUtils
-        .unsafeRunZIO(Parser.parseQuery(graphQLRequest.query.get))
+      val docOpName = InterceptorDSL
+        .unsafeRun(Parser.parseQuery(graphQLRequest.query.get))
         .operationDefinitions
         .map(_.selectionSet.collectFirst {
           case Selection.Field(alias, name, arguments, directives, selectionSet, index) => alias.getOrElse(name)
