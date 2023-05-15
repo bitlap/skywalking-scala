@@ -10,6 +10,7 @@ lazy val skywalkingVersion = "8.13.0"
 lazy val junitVersion      = "4.12"
 lazy val mockitoVersion    = "5.0.0"
 lazy val zioGrpcVersion    = "0.6.0-test4"
+lazy val zioVersion        = "2.0.0"
 
 inThisBuild(
   List(
@@ -54,7 +55,8 @@ lazy val commonSettings =
 lazy val `skywalking-scala` = (project in file("."))
   .aggregate(
     `caliban-v2x-plugin`,
-    `ziogrpc-v06x-plugin`
+    `ziogrpc-v06x-plugin`,
+    `plugin-common`
   )
   .settings(
     publish / skip := true,
@@ -69,9 +71,10 @@ lazy val `caliban-v2x-plugin` = (project in file("caliban-v2x-plugin"))
     name                       := "caliban-v2x-plugin",
     assembly / assemblyJarName := s"apm-caliban-v2x-plugin-${(ThisBuild / version).value}.jar",
     libraryDependencies ++= Seq(
-      "com.github.ghostdogpr" %% "caliban" % calibanVersion % Provided withSources ()
+      "com.github.ghostdogpr" %% "caliban" % calibanVersion % Provided
     )
   )
+  .dependsOn(`plugin-common`)
 
 lazy val `ziogrpc-v06x-plugin` = (project in file("ziogrpc-v06x-plugin"))
   .settings(
@@ -80,6 +83,17 @@ lazy val `ziogrpc-v06x-plugin` = (project in file("ziogrpc-v06x-plugin"))
     assembly / assemblyJarName := s"apm-ziogrpc-v06x-plugin-${(ThisBuild / version).value}.jar",
     name                       := "ziogrpc-v06x-plugin",
     libraryDependencies ++= Seq(
-      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcVersion % Provided withSources ()
+      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcVersion % Provided
+    )
+  )
+  .dependsOn(`plugin-common`)
+
+lazy val `plugin-common` = (project in file("plugin-common"))
+  .settings(
+    commonSettings,
+    commands ++= Commands.value,
+    name := "plugin-common",
+    libraryDependencies ++= Seq(
+      "dev.zio" %% "zio" % zioVersion % Provided
     )
   )

@@ -1,0 +1,102 @@
+package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward
+
+import scala.collection.mutable.ListBuffer
+import scalapb.zio_grpc.SafeMetadata
+import scalapb.zio_grpc.client.ZClientCall
+
+import io.grpc.*
+import io.grpc.ClientCall.Listener
+
+import zio.ZIO
+
+import org.apache.skywalking.apm.agent.core.context.*
+import org.apache.skywalking.apm.agent.core.context.tag.Tags
+import org.apache.skywalking.apm.agent.core.context.trace.*
+import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
+import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.Constants.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.OperationNameFormatUtils
+
+/** @author
+ *    梦境迷离
+ *  @version 1.0,2023/5/14
+ */
+final class TracingClientCall[R, REQUEST, RESPONSE](
+  delegate: ZClientCall[R, REQUEST, RESPONSE],
+  method: MethodDescriptor[REQUEST, RESPONSE]
+) extends ZClientCall[R, REQUEST, RESPONSE]:
+
+  private var snapshot: ContextSnapshot = _
+  private val serviceName               = OperationNameFormatUtils.formatOperationName(method)
+  private val operationPrefix           = OperationNameFormatUtils.formatOperationName(method) + CLIENT
+
+  override def start(
+    responseListener: Listener[RESPONSE],
+    headers: SafeMetadata
+  ): ZIO[R, Status, Unit] =
+    val contextCarrier = new ContextCarrier
+    val span           = ContextManager.createExitSpan(serviceName, "No Peer")
+    span.setComponent(ZIO_GRPC)
+    span.setLayer(SpanLayer.RPC_FRAMEWORK)
+    ContextManager.inject(contextCarrier)
+    var contextItem = contextCarrier.items
+    val unsafePut   = ListBuffer[(Metadata.Key[String], String)]()
+    while (contextItem.hasNext) {
+      contextItem = contextItem.next
+      val headerKey = Metadata.Key.of(contextItem.getHeadKey, Metadata.ASCII_STRING_MARSHALLER)
+      unsafePut.append(headerKey -> contextItem.getHeadValue)
+    }
+    val putInto = unsafePut.result().map(kv => headers.put(kv._1, kv._2))
+
+    InterceptorDSL.unsafeRun(ZIO.collectAll(putInto))
+
+    snapshot = ContextManager.capture
+    span.prepareForAsync()
+    ContextManager.stopSpan(span)
+    delegate.start(new TracingClientCallListener(responseListener, method, snapshot, span), headers)
+  end start
+
+  override def request(numMessages: Int): ZIO[R, Status, Unit] = delegate.request(numMessages)
+
+  override def sendMessage(message: REQUEST): ZIO[R, Status, Unit] =
+    if (method.getType.clientSendsOneMessage) {
+      return delegate.sendMessage(message)
+    }
+
+    val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_MESSAGE_OPERATION_NAME)
+    span.setComponent(ZIO_GRPC)
+    span.setLayer(SpanLayer.RPC_FRAMEWORK)
+    continuedSnapshotF(snapshot) {
+      delegate.sendMessage(message)
+    }
+  end sendMessage
+
+  override def halfClose(): ZIO[R, Status, Unit] =
+    val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_COMPLETE_OPERATION_NAME)
+    span.setComponent(ZIO_GRPC)
+    span.setLayer(SpanLayer.RPC_FRAMEWORK)
+    continuedSnapshotF(snapshot) {
+      delegate.halfClose()
+    }
+  end halfClose
+
+  override def cancel(message: String): ZIO[R, Status, Unit] =
+    val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_CANCEL_OPERATION_NAME)
+    span.setComponent(ZIO_GRPC)
+    span.setLayer(SpanLayer.RPC_FRAMEWORK)
+    continuedSnapshotF(snapshot) {
+      delegate.cancel(message)
+    }
+
+  end cancel
+
+  def continuedSnapshotF[A](contextSnapshot: ContextSnapshot)(effect: => ZIO[A, Status, Unit]): ZIO[A, Status, Unit] =
+    val result = ZIO.attempt(ContextManager.continued(contextSnapshot)) *>
+      effect.mapError { a =>
+        ContextManager.activeSpan.log(a.asException())
+        a.asException()
+      }.ensuring(ZIO.attempt(ContextManager.stopSpan()).ignore)
+
+    result.mapError(e => Status.fromThrowable(e))
+
+end TracingClientCall

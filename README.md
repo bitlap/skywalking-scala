@@ -7,8 +7,9 @@ Repository NOT Available!
 ## Features
 
 - [x] caliban: 2.0.1
-- [ ] zio-grpc: 0.6.0-test
-  - [x] client unary
+- [x] zio-grpc: 0.6.0-test
+  - [x] client
+  - [x] server
 - [ ] scalikejdbc
 - [ ] zio-pulsar
 - [ ] cats4redis
