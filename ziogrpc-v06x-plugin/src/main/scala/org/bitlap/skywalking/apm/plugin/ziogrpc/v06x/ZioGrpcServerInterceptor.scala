@@ -2,8 +2,8 @@ package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
 
 import java.lang.reflect.Method
 
-import scalapb.zio_grpc.{ RequestContext, SafeMetadata }
-import scalapb.zio_grpc.server.{ CallDriver, ZServerCall }
+import scalapb.zio_grpc.*
+import scalapb.zio_grpc.server.*
 
 import io.grpc.*
 import io.grpc.ServerCall.Listener
@@ -19,7 +19,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.language.agent.v3.MeterData
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
-import org.bitlap.skywalking.apm.plugin.common.InterceptorUtils
+import org.bitlap.skywalking.apm.plugin.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward.*
 
@@ -27,10 +27,7 @@ import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward.*
  *    梦境迷离
  *  @version 1.0,2023/5/13
  */
-final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor, InstanceConstructorInterceptor:
-
-  override def onConstruct(objInst: EnhancedInstance, allArguments: Array[Object]): Unit =
-    objInst.setSkyWalkingDynamicField(Map(RUNTIME -> allArguments(0), MK_DRIVER -> allArguments(1)))
+final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -52,18 +49,13 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor, I
       OperationNameFormatUtils.formatOperationName(call.getMethodDescriptor),
       contextCarrier
     )
-    span.setComponent(ComponentsDefine.GRPC)
+    span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
 
     val contextSnapshot = ContextManager.capture
     span.prepareForAsync()
+    ZioGrpcContext.offer(ZioGrpcContext(contextSnapshot, span, call.getMethodDescriptor))
     ContextManager.stopSpan(span)
-
-    val originField = objInst.getSkyWalkingDynamicField.asInstanceOf[Map[String, Any]]
-
-    objInst.setSkyWalkingDynamicField(
-      originField ++ Seq(CONTEXT_SNAPSHOT -> contextSnapshot, ACTIVE_SPAN -> span).toMap
-    )
 
   end beforeMethod
 
@@ -74,35 +66,19 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor, I
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object =
-    if (objInst.getSkyWalkingDynamicField == null || !objInst.getSkyWalkingDynamicField.isInstanceOf[Map[?, ?]])
+    if (ZioGrpcContext.peek == null)
       return ret
-    val map             = objInst.getSkyWalkingDynamicField.asInstanceOf[Map[String, Any]]
     val call            = allArguments(0).asInstanceOf[ServerCall[Any, Any]]
-    val headers         = allArguments(1).asInstanceOf[Metadata]
-    val contextSnapshot = map.get(CONTEXT_SNAPSHOT).orNull.asInstanceOf[ContextSnapshot]
-    val asyncSpan       = map.get(ACTIVE_SPAN).orNull.asInstanceOf[AbstractSpan]
-    // TODO copy from zio-grpc
-    // zio-grpc not support grpc interceptor
-    val mkDriver =
-      map.get(MK_DRIVER).orNull.asInstanceOf[(ZServerCall[Any], RequestContext) => URIO[Any, CallDriver[Any, Any]]]
-    val runtime = map.get(RUNTIME).orNull.asInstanceOf[Runtime[Any]]
-    val zioCall = new ZServerCall(new TracingServerCall(call, contextSnapshot, asyncSpan))
-    val runner = for {
-      responseMetadata <- SafeMetadata.make
-      driver <- SafeMetadata.fromMetadata(headers).flatMap { md =>
-        mkDriver(zioCall, RequestContext.fromServerCall(md, responseMetadata, call))
-      }
-      _ <- driver.run.forkDaemon
-    } yield new TracingServerCallListener(
-      driver.listener,
+    val context         = ZioGrpcContext.peek
+    val contextSnapshot = context.contextSnapshot
+    val asyncSpan       = context.asyncSpan
+    val listener        = ret.asInstanceOf[Listener[Any]]
+    new TracingServerCallListener(
+      listener,
       call.getMethodDescriptor,
       contextSnapshot,
       asyncSpan
     )
-    Unsafe.unsafeCompat { implicit u =>
-      runtime.unsafe.run(runner).getOrThrowFiberFailure()
-    }
-
   end afterMethod
 
   override def handleMethodException(
@@ -111,6 +87,6 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor, I
     allArguments: Array[Object],
     argumentsTypes: Array[Class[_]],
     t: Throwable
-  ): Unit = InterceptorUtils.handleMethodException(objInst, allArguments, t)(_ => ())
+  ): Unit = InterceptorDSL.handleMethodException(objInst, allArguments, t)(_ => ())
 
 end ZioGrpcServerInterceptor

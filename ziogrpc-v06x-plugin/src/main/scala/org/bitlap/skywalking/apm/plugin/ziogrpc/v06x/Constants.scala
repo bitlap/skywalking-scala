@@ -4,6 +4,7 @@ import io.grpc.Context
 
 import org.apache.skywalking.apm.agent.core.context.ContextSnapshot
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
+import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 
 /** @author
  *    梦境迷离
@@ -41,10 +42,10 @@ object Constants:
   final val SERVER: String = "/server"
   final val CLIENT: String = "/client"
 
-  final val CONTEXT_SNAPSHOT = "skywalking-grpc-context-snapshot"
-  final val ACTIVE_SPAN      = "skywalking-grpc-active-span"
+  final val CONTEXT_SNAPSHOT  = "skywalking-zio-grpc-context-snapshot"
+  final val ACTIVE_SPAN       = "skywalking-zio-grpc-active-span"
+  final val METHOD_DESCRIPTOR = "skywalking-zio-grpc-method-descriptor"
 
-  final val RUNTIME   = "runtime"
-  final val MK_DRIVER = "mkDriver"
+  final val ZIO_GRPC = ComponentsDefine.GRPC
 
 end Constants

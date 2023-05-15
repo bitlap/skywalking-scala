@@ -14,7 +14,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedI
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.InstanceMethodsAroundInterceptor
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.MethodInterceptResult
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
-import org.bitlap.skywalking.apm.plugin.common.InterceptorUtils
+import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.OperationNameFormatUtils
 
@@ -37,42 +37,30 @@ final class TracingServerCallListener[REQUEST](
       return
     }
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_MESSAGE_OPERATION_NAME)
-    span.setComponent(ComponentsDefine.GRPC)
+    span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    try
-      ContextManager.continued(contextSnapshot)
+    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan) {
       delegate.onMessage(message)
-    catch {
-      case t: Throwable =>
-        ContextManager.activeSpan.log(t)
-        throw t
-    } finally ContextManager.stopSpan()
+    }
+  end onMessage
 
   override def onCancel(): Unit =
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_CANCEL_OPERATION_NAME)
-    span.setComponent(ComponentsDefine.GRPC)
+    span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    try
-      ContextManager.continued(contextSnapshot)
+    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan) {
       delegate.onCancel()
-    catch {
-      case t: Throwable =>
-        ContextManager.activeSpan.log(t)
-        throw t
-    } finally InterceptorUtils.closeAsyncSpan(asyncSpan)
+    }
+  end onCancel
 
   override def onHalfClose(): Unit =
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_HALF_CLOSE_OPERATION_NAME)
-    span.setComponent(ComponentsDefine.GRPC)
+    span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    try
-      ContextManager.continued(contextSnapshot)
+    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan) {
       delegate.onHalfClose()
-    catch {
-      case t: Throwable =>
-        ContextManager.activeSpan.log(t)
-        throw t
-    } finally ContextManager.stopSpan()
+    }
+  end onHalfClose
 
   override def onComplete(): Unit =
     delegate.onComplete()

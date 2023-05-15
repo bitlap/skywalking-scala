@@ -21,7 +21,7 @@ import org.scalatest.matchers.should.Matchers
 class ZioGrpcServerInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch" should "ok" in {
-    val matcher = ZioGrpcServerInstrumentation.getUnaryMethod
+    val matcher = ZioGrpcServerInstrumentation.getMethod
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ZServerCallHandler[_, _, _]].getMethod(
         "startCall",

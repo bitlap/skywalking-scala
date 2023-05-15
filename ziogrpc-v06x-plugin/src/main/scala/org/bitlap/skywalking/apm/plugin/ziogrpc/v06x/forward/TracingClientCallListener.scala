@@ -6,7 +6,7 @@ import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
-import org.bitlap.skywalking.apm.plugin.common.InterceptorUtils
+import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.OperationNameFormatUtils
 
@@ -23,37 +23,33 @@ final class TracingClientCallListener[RESPONSE](
 
   private val operationPrefix = OperationNameFormatUtils.formatOperationName(method) + CLIENT
 
-  override def onMessage(message: RESPONSE): Unit = {
+  override def onMessage(message: RESPONSE): Unit =
     if (method.getType.serverSendsOneMessage) {
       delegate.onMessage(message)
       return
     }
 
     val span = ContextManager.createLocalSpan(operationPrefix + RESPONSE_ON_MESSAGE_OPERATION_NAME)
-    span.setComponent(ComponentsDefine.GRPC)
+    span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    try
-      ContextManager.continued(contextSnapshot)
-      delegate.onMessage(message)
-    catch {
-      case t: Throwable =>
-        ContextManager.activeSpan.log(t)
-    } finally ContextManager.stopSpan()
-  }
 
-  override def onClose(status: Status, trailers: Metadata): Unit = {
+    InterceptorDSL.continuedSnapshot(contextSnapshot) {
+      delegate.onMessage(message)
+    }
+  end onMessage
+
+  override def onClose(status: Status, trailers: Metadata): Unit =
     val span = ContextManager.createLocalSpan(operationPrefix + RESPONSE_ON_CLOSE_OPERATION_NAME)
-    span.setComponent(ComponentsDefine.GRPC)
+    span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    try
-      ContextManager.continued(contextSnapshot)
+
+    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan) {
       if (!status.isOk) {
         span.log(status.asRuntimeException)
         Tags.RPC_RESPONSE_STATUS_CODE.set(span, status.getCode.name)
       }
       delegate.onClose(status, trailers)
-    catch {
-      case t: Throwable =>
-        ContextManager.activeSpan.log(t)
-    } finally InterceptorUtils.closeAsyncSpan(asyncSpan)
-  }
+    }
+  end onClose
+
+end TracingClientCallListener

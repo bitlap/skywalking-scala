@@ -21,7 +21,7 @@ final class ZioGrpcClientInstrumentation extends ClassInstanceMethodsEnhancePlug
 
   override def getInstanceMethodsInterceptPoints: Array[InstanceMethodsInterceptPoint] = Array(
     new InstanceMethodsInterceptPoint:
-      override def getMethodsMatcher: ElementMatcher[MethodDescription] = getUnaryMethod
+      override def getMethodsMatcher: ElementMatcher[MethodDescription] = getMethod
       override def getMethodsInterceptor: String                        = INTERCEPTOR_CLASS
       override def isOverrideArgs: Boolean                              = false
   )
@@ -37,7 +37,7 @@ object ZioGrpcClientInstrumentation:
   private final val ENHANCE_CLASS  = "scalapb.zio_grpc.ZChannel"
   private final val ENHANCE_METHOD = "newCall"
 
-  def getUnaryMethod: ElementMatcher[MethodDescription] =
+  def getMethod: ElementMatcher[MethodDescription] =
     named(ENHANCE_METHOD)
 
 end ZioGrpcClientInstrumentation

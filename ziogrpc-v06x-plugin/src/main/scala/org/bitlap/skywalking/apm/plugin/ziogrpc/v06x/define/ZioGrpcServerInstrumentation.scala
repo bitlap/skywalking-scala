@@ -19,16 +19,11 @@ final class ZioGrpcServerInstrumentation extends ClassInstanceMethodsEnhancePlug
 
   override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
 
-  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] =
-    Array(new ConstructorInterceptPoint() {
-      override def getConstructorMatcher: ElementMatcher[MethodDescription] = takesArguments(2)
-
-      override def getConstructorInterceptor: String = INTERCEPTOR_CLASS
-    })
+  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
 
   override def getInstanceMethodsInterceptPoints: Array[InstanceMethodsInterceptPoint] = Array(
     new InstanceMethodsInterceptPoint:
-      override def getMethodsMatcher: ElementMatcher[MethodDescription] = getUnaryMethod
+      override def getMethodsMatcher: ElementMatcher[MethodDescription] = getMethod
 
       override def getMethodsInterceptor: String = INTERCEPTOR_CLASS
 
@@ -45,7 +40,7 @@ object ZioGrpcServerInstrumentation:
   private final val ENHANCE_METHOD     = "startCall"
   private final val ARGUMENT_TYPE_NAME = "io.grpc.Metadata"
 
-  def getUnaryMethod: ElementMatcher[MethodDescription] =
+  def getMethod: ElementMatcher[MethodDescription] =
     named(ENHANCE_METHOD).and(takesArgumentWithType(1, ARGUMENT_TYPE_NAME))
 
 end ZioGrpcServerInstrumentation
