@@ -15,7 +15,7 @@ import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.ZioGrpcContext
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.{ InterceptorCloseThreadContext, InterceptorThreadContext }
 
 /** @author
  *    梦境迷离
@@ -30,13 +30,12 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     argumentsTypes: Array[Class[_]],
     result: MethodInterceptResult
   ): Unit =
-    val context = ZioGrpcContext.peek
+    val context = InterceptorCloseThreadContext.poll
     if (context == null) return
-
     val contextSnapshot = context.contextSnapshot
     val method          = context.methodDescriptor
     val span            = ChannelActions.beforeClose(contextSnapshot, method)
-    objInst.setSkyWalkingDynamicField(span)
+    objInst.setSkyWalkingDynamicField(context.copy(activeSpan = Option(span)))
   end beforeMethod
 
   override def afterMethod(
@@ -46,18 +45,15 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object =
-    val context = ZioGrpcContext.poll
+    val context = objInst.getSkyWalkingDynamicField
     if (context == null) return ret
-
-    val span = objInst.getSkyWalkingDynamicField
+    val ctx  = context.asInstanceOf[InterceptorThreadContext]
+    val span = ctx.activeSpan.orNull
     if (span == null || !span.isInstanceOf[AbstractSpan]) return ret
-
     val status = allArguments(1).asInstanceOf[Status]
     ret
       .asInstanceOf[GIO[Unit]]
-      .ensuring(
-        ZIO.attempt(ChannelActions.afterClose(status, context.asyncSpan, span.asInstanceOf[AbstractSpan])(())).ignore
-      )
+      .ensuring(ZIO.attempt(ChannelActions.afterClose(status, ctx.asyncSpan, span)(())).ignore)
   end afterMethod
 
   override def handleMethodException(
@@ -66,4 +62,6 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     allArguments: Array[Object],
     argumentsTypes: Array[Class[_]],
     t: Throwable
-  ): Unit = InterceptorDSL.handleMethodException(objInst, allArguments, t)(_ => ())
+  ): Unit = {}
+
+end ZioGrpcServerCloseInterceptor

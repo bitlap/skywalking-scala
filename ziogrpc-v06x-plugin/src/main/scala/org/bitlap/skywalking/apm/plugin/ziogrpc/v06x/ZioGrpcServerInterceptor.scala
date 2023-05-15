@@ -54,8 +54,11 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
 
     val contextSnapshot = ContextManager.capture
     span.prepareForAsync()
-    ZioGrpcContext.offer(ZioGrpcContext(contextSnapshot, span, call.getMethodDescriptor))
     ContextManager.stopSpan(span)
+    val context = InterceptorThreadContext(contextSnapshot, span, call.getMethodDescriptor)
+    InterceptorSendMessageThreadContext.offer(context)
+    InterceptorCloseThreadContext.offer(context)
+    objInst.setSkyWalkingDynamicField(context)
 
   end beforeMethod
 
@@ -66,12 +69,13 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object =
-    if (ZioGrpcContext.peek == null)
+    val context = objInst.getSkyWalkingDynamicField
+    if (context == null)
       return ret
     val call            = allArguments(0).asInstanceOf[ServerCall[Any, Any]]
-    val context         = ZioGrpcContext.peek
-    val contextSnapshot = context.contextSnapshot
-    val asyncSpan       = context.asyncSpan
+    val ctx             = context.asInstanceOf[InterceptorThreadContext]
+    val contextSnapshot = ctx.contextSnapshot
+    val asyncSpan       = ctx.asyncSpan
     val listener        = ret.asInstanceOf[Listener[Any]]
     new TracingServerCallListener(
       listener,

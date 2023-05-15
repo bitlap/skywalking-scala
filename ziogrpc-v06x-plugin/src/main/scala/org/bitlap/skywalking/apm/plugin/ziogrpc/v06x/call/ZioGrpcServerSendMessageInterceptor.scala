@@ -15,7 +15,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.InstanceMethodsAroundInterceptor
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.ZioGrpcContext
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.{ InterceptorSendMessageThreadContext, InterceptorThreadContext }
 
 /** @author
  *    梦境迷离
@@ -30,9 +30,8 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     argumentsTypes: Array[Class[_]],
     result: MethodInterceptResult
   ): Unit =
-    val context = ZioGrpcContext.peek
+    val context = InterceptorSendMessageThreadContext.poll
     if (context == null) return
-
     val contextSnapshot = context.contextSnapshot
     val method          = context.methodDescriptor
     val span            = ChannelActions.beforeSendMessage(contextSnapshot, method)
@@ -46,12 +45,8 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object =
-    val context = ZioGrpcContext.peek
-    if (context == null) return ret
-
     val span = objInst.getSkyWalkingDynamicField
     if (span == null || !span.isInstanceOf[AbstractSpan]) return ret
-
     ret
       .asInstanceOf[GIO[Unit]]
       .ensuring(ZIO.attempt(ContextManager.stopSpan(span.asInstanceOf[AbstractSpan])).ignore)
@@ -63,4 +58,6 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     allArguments: Array[Object],
     argumentsTypes: Array[Class[_]],
     t: Throwable
-  ): Unit = InterceptorDSL.handleMethodException(objInst, allArguments, t)(_ => ())
+  ): Unit = {}
+
+end ZioGrpcServerSendMessageInterceptor
