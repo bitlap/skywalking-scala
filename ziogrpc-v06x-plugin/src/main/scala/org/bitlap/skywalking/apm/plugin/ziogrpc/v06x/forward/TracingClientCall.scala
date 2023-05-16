@@ -14,14 +14,15 @@ import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.Constants.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.OperationNameFormatUtils
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/5/14
  */
 final class TracingClientCall[R, REQUEST, RESPONSE](
+  peer: Option[String],
   delegate: ZClientCall[R, REQUEST, RESPONSE],
   method: MethodDescriptor[REQUEST, RESPONSE]
 ) extends ZClientCall[R, REQUEST, RESPONSE]:
@@ -35,7 +36,7 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
     headers: SafeMetadata
   ): ZIO[R, Status, Unit] =
     val contextCarrier = new ContextCarrier
-    val span           = ContextManager.createExitSpan(serviceName, "No Peer")
+    val span           = ContextManager.createExitSpan(serviceName, peer.getOrElse("No Peer"))
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
     ContextManager.inject(contextCarrier)

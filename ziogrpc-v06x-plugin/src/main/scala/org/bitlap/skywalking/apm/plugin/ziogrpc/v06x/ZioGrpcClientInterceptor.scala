@@ -17,8 +17,13 @@ import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward.*
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
+final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor, InstanceConstructorInterceptor:
   import ZioGrpcClientInterceptor.*
+
+  override def onConstruct(objInst: EnhancedInstance, allArguments: Array[Object]): Unit = {
+    val channel = allArguments(0).asInstanceOf[ManagedChannel]
+    objInst.setSkyWalkingDynamicField(channel.authority())
+  }
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -35,7 +40,8 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object =
-    val interceptor      = new ZTraceClientInterceptor[Any]
+    val peer             = objInst.getSkyWalkingDynamicField.asInstanceOf[String]
+    val interceptor      = new ZTraceClientInterceptor[Any](Option(peer))
     val methodDescriptor = allArguments(0).asInstanceOf[MethodDescriptor[Any, Any]]
     val options          = allArguments(1).asInstanceOf[CallOptions]
     val result           = ret.asInstanceOf[UIO[ZClientCall[Any, Any, Any]]]
@@ -53,13 +59,13 @@ end ZioGrpcClientInterceptor
 
 object ZioGrpcClientInterceptor:
 
-  private final class ZTraceClientInterceptor[R] extends ZClientInterceptor[R] {
+  private final class ZTraceClientInterceptor[R](peer: Option[String]) extends ZClientInterceptor[R] {
 
     def interceptCall[REQUEST, RESPONSE](
       methodDescriptor: MethodDescriptor[REQUEST, RESPONSE],
       call: CallOptions,
       clientCall: ZClientCall[R, REQUEST, RESPONSE]
     ): ZClientCall[R, REQUEST, RESPONSE] =
-      new TracingClientCall[R, REQUEST, RESPONSE](clientCall, methodDescriptor)
+      new TracingClientCall[R, REQUEST, RESPONSE](peer, clientCall, methodDescriptor)
 
   }

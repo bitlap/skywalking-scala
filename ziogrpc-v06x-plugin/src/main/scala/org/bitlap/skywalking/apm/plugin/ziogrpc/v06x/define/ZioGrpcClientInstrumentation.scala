@@ -26,7 +26,11 @@ final class ZioGrpcClientInstrumentation extends ClassInstanceMethodsEnhancePlug
       override def isOverrideArgs: Boolean                              = false
   )
 
-  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
+  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = Array(
+    new ConstructorInterceptPoint:
+      override def getConstructorMatcher: ElementMatcher[MethodDescription] = takesArguments(2)
+      override def getConstructorInterceptor: String                        = INTERCEPTOR_CLASS
+  )
 
 end ZioGrpcClientInstrumentation
 
