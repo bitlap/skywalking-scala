@@ -21,9 +21,10 @@ import org.scalatest.matchers.should.Matchers
 class ZioGrpcServerCallInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "test sendMessage$extension MethodMatch" should "ok" in {
-    val matcher = ZioGrpcServerCallInstrumentation.methodInterceptors(
-      "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcServerSendMessageInterceptor"
-    )
+    val matcher =
+      ZioGrpcServerCallInstrumentation.methodInterceptors(
+        ZioGrpcServerCallInstrumentation.INTERCEPTOR_SEND_MESSAGE_CLASS
+      )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ZServerCall[_]].getMethod(
         "sendMessage$extension",
@@ -37,7 +38,7 @@ class ZioGrpcServerCallInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "test close$extension MethodMatch" should "ok" in {
     val matcher = ZioGrpcServerCallInstrumentation.methodInterceptors(
-      "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcServerCloseInterceptor"
+      ZioGrpcServerCallInstrumentation.INTERCEPTOR_CLOSE_CLASS
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ZServerCall[_]].getMethod(

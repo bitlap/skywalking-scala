@@ -56,6 +56,7 @@ lazy val `skywalking-scala` = (project in file("."))
   .aggregate(
     `caliban-v2x-plugin`,
     `ziogrpc-v06x-plugin`,
+    `zio-v2x-plugin`,
     `plugin-common`
   )
   .settings(
@@ -80,8 +81,8 @@ lazy val `ziogrpc-v06x-plugin` = (project in file("ziogrpc-v06x-plugin"))
   .settings(
     commonSettings,
     commands ++= Commands.value,
-    assembly / assemblyJarName := s"apm-ziogrpc-v06x-plugin-${(ThisBuild / version).value}.jar",
     name                       := "ziogrpc-v06x-plugin",
+    assembly / assemblyJarName := s"apm-ziogrpc-v06x-plugin-${(ThisBuild / version).value}.jar",
     libraryDependencies ++= Seq(
       "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcVersion % Provided
     )
@@ -97,3 +98,15 @@ lazy val `plugin-common` = (project in file("plugin-common"))
       "dev.zio" %% "zio" % zioVersion % Provided
     )
   )
+
+lazy val `zio-v2x-plugin` = (project in file("zio-v2x-plugin"))
+  .settings(
+    commonSettings,
+    commands ++= Commands.value,
+    name                       := "zio-v2x-plugin",
+    assembly / assemblyJarName := s"apm-zio-v2x-plugin-${(ThisBuild / version).value}.jar",
+    libraryDependencies ++= Seq(
+      "dev.zio" %% "zio" % zioVersion % Provided
+    )
+  )
+  .dependsOn(`plugin-common`)

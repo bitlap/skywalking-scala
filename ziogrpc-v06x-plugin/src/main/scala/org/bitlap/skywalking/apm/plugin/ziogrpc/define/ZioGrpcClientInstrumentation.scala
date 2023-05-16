@@ -36,10 +36,10 @@ end ZioGrpcClientInstrumentation
 
 object ZioGrpcClientInstrumentation:
 
-  private final val INTERCEPTOR_CLASS =
+  private final val INTERCEPTOR_CLASS: String =
     "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcClientInterceptor"
-  private final val ENHANCE_CLASS  = "scalapb.zio_grpc.ZChannel"
-  private final val ENHANCE_METHOD = "newCall"
+  private final val ENHANCE_CLASS: String  = "scalapb.zio_grpc.ZChannel"
+  private final val ENHANCE_METHOD: String = "newCall"
 
   def getMethod: ElementMatcher[MethodDescription] =
     named(ENHANCE_METHOD)

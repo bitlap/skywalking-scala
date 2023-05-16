@@ -53,7 +53,7 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     val asyncSpan = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
     result
       .catchAllCause(c =>
-        ZIO.attempt(InterceptorDSL.handleException(c.squash)(ContextManager.activeSpan())) *> ZIO.done(Exit.Failure(c))
+        ZIO.attempt(if (ContextManager.isActive) ContextManager.activeSpan.log(c.squash)) *> ZIO.done(Exit.Failure(c))
       )
       .ensuring(
         ZIO.attempt { asyncSpan.asyncFinish(); ContextManager.stopSpan() }
@@ -67,7 +67,7 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[_]],
     t: Throwable
   ): Unit =
-    InterceptorDSL.handleMethodException(objInst, allArguments, t)(_ => ())
+    if (ContextManager.isActive) ContextManager.activeSpan.log(t)
 
   private def getOperationName(graphQLRequest: GraphQLRequest) =
     val tryOp: Try[String] = Try {

@@ -19,21 +19,6 @@ object InterceptorDSL:
       Runtime.default.unsafe.run(z).getOrThrowFiberFailure()
     }).getOrElse(null.asInstanceOf[A])
 
-  def handleExceptionF(t: Throwable)(implicit span: AbstractSpan): UIO[Unit] =
-    ZIO.attempt(span.errorOccurred.log(t)).ignore
-
-  def handleException(t: Throwable)(implicit span: AbstractSpan): Unit = span.errorOccurred.log(t)
-
-  def handleMethodException(objInst: EnhancedInstance, allArguments: Array[Object], t: Throwable)(
-    handler: Array[Object] => Unit
-  ): Unit = {
-    if (objInst.getSkyWalkingDynamicField == null || !objInst.getSkyWalkingDynamicField.isInstanceOf[AbstractSpan])
-      return
-    implicit val span: AbstractSpan = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
-    handleException(t)
-    handler(allArguments)
-  }
-
   def continuedSnapshot(contextSnapshot: ContextSnapshot)(effect: => Unit): Unit =
     try
       ContextManager.continued(contextSnapshot)
