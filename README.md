@@ -10,6 +10,7 @@ Repository NOT Available!
 - [x] zio-grpc: 0.6.0-test4
   - [x] client
   - [x] server
+- [ ] zio
 
 ## Environment
 
