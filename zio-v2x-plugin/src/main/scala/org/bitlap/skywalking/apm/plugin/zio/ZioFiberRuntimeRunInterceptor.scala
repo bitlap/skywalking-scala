@@ -17,7 +17,7 @@ import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundInterceptor:
 
   private def generateOperationName(objInst: EnhancedInstance, method: Method, id: Int) =
-    s"ZIOFiber/${objInst.getClass.getName}/${method.getName}/$id"
+    s"ZIO/${objInst.getClass.getName}/${method.getName}#$id"
 
   override def beforeMethod(
     objInst: EnhancedInstance,
