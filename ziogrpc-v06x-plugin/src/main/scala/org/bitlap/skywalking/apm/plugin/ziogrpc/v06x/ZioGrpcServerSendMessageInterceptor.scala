@@ -1,13 +1,12 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.call
+package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
 
 import java.lang.reflect.Method
 
-import scala.util.*
 import scalapb.zio_grpc.*
 
 import io.grpc.*
 
-import zio.*
+import zio.ZIO
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
@@ -21,7 +20,7 @@ import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.*
  *    梦境迷离
  *  @version 1.0,2023/5/15
  */
-final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundInterceptor:
+final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -30,13 +29,13 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     argumentsTypes: Array[Class[_]],
     result: MethodInterceptResult
   ): Unit =
-    val context = InterceptorCloseThreadContext.poll
+    val context = InterceptorSendMessageThreadContext.poll
     if (context == null) return
     val contextSnapshot = context.contextSnapshot
     val method          = context.methodDescriptor
-    val span            = ChannelActions.beforeClose(contextSnapshot, method)
-    objInst.setSkyWalkingDynamicField(context.copy(activeSpan = Option(span)))
+    val span            = ChannelActions.beforeSendMessage(contextSnapshot, method)
     span.prepareForAsync()
+    objInst.setSkyWalkingDynamicField(span)
   end beforeMethod
 
   override def afterMethod(
@@ -46,15 +45,11 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     argumentsTypes: Array[Class[_]],
     ret: Object
   ): Object =
-    val context = objInst.getSkyWalkingDynamicField
-    if (context == null) return ret
-    val ctx  = context.asInstanceOf[InterceptorThreadContext]
-    val span = ctx.activeSpan.orNull
+    val span = objInst.getSkyWalkingDynamicField
     if (span == null || !span.isInstanceOf[AbstractSpan]) return ret
-    val status = allArguments(1).asInstanceOf[Status]
     ret
       .asInstanceOf[GIO[Unit]]
-      .ensuring(ZIO.attempt(ChannelActions.afterClose(status, ctx.asyncSpan, span)(())).ignore)
+      .ensuring(ZIO.attempt(ContextManager.stopSpan(span.asInstanceOf[AbstractSpan])).ignore)
   end afterMethod
 
   override def handleMethodException(
@@ -65,4 +60,4 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     t: Throwable
   ): Unit = {}
 
-end ZioGrpcServerCloseInterceptor
+end ZioGrpcServerSendMessageInterceptor

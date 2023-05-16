@@ -15,9 +15,8 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.InstanceM
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.MethodInterceptResult
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.{ ChannelActions, OperationNameFormatUtils }
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.Constants.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.OperationNameFormatUtils
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.call.ChannelActions
 
 /** TODO
  *

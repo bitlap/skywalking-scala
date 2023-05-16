@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.call
+package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
 
 import io.grpc.*
 import io.grpc.ServerCall.Listener

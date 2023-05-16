@@ -93,11 +93,14 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
     effect: => ZIO[A, Status, Unit]
   )(using AbstractSpan): ZIO[A, Status, Unit] =
     ContextManager.continued(contextSnapshot)
-    val result = 
-      effect.mapError { a =>
-        ContextManager.activeSpan.log(a.asException())
-        a.asException()
-      }.ensuring(ZIO.attempt { summon[AbstractSpan].asyncFinish(); ContextManager.stopSpan()}.ignore)
+    val result = effect.mapError { a =>
+      ContextManager.activeSpan.log(a.asException())
+      a.asException()
+    }.ensuring(ZIO.attempt {
+      summon[AbstractSpan].asyncFinish()
+    }.ignore)
+
+    ContextManager.stopSpan()
 
     result.mapError(e => Status.fromThrowable(e))
 

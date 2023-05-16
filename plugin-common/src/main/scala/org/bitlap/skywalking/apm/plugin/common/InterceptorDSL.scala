@@ -50,7 +50,7 @@ object InterceptorDSL:
       catch {
         case e: Throwable =>
           if (ContextManager.isActive) ContextManager.activeSpan.log(e)
-      } 
+      }
       effect
     catch {
       case t: Throwable =>
