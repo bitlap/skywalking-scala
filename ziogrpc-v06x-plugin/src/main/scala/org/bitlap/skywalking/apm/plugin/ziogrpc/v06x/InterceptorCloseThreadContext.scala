@@ -29,7 +29,6 @@ object InterceptorSendMessageThreadContext:
 
   def poll: InterceptorThreadContext = Try(cache.poll()).getOrElse(null.asInstanceOf[InterceptorThreadContext])
 
-  def peek: InterceptorThreadContext = Try(cache.peek()).getOrElse(null.asInstanceOf[InterceptorThreadContext])
 end InterceptorSendMessageThreadContext
 
 object InterceptorCloseThreadContext:
@@ -40,5 +39,4 @@ object InterceptorCloseThreadContext:
 
   def poll: InterceptorThreadContext = Try(cache.poll()).getOrElse(null.asInstanceOf[InterceptorThreadContext])
 
-  def peek: InterceptorThreadContext = Try(cache.peek()).getOrElse(null.asInstanceOf[InterceptorThreadContext])
 end InterceptorCloseThreadContext
