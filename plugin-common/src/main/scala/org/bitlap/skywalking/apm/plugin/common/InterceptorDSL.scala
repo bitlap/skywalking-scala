@@ -34,13 +34,6 @@ object InterceptorDSL:
     handler(allArguments)
   }
 
-  def closeAsyncSpan(asyncSpan: AbstractSpan): Unit =
-    try asyncSpan.asyncFinish
-    catch {
-      case e: Throwable =>
-        if (ContextManager.isActive) ContextManager.activeSpan.log(e)
-    } finally ContextManager.stopSpan()
-
   def continuedSnapshot(contextSnapshot: ContextSnapshot)(effect: => Unit): Unit =
     try
       ContextManager.continued(contextSnapshot)
@@ -53,8 +46,13 @@ object InterceptorDSL:
   def continuedSnapshot(contextSnapshot: ContextSnapshot, asyncSpan: AbstractSpan)(effect: => Unit): Unit =
     try
       ContextManager.continued(contextSnapshot)
+      try asyncSpan.asyncFinish
+      catch {
+        case e: Throwable =>
+          if (ContextManager.isActive) ContextManager.activeSpan.log(e)
+      } 
       effect
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
-    } finally closeAsyncSpan(asyncSpan)
+    } finally ContextManager.stopSpan()

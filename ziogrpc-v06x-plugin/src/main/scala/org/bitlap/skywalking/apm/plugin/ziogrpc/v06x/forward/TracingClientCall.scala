@@ -63,35 +63,41 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
       return delegate.sendMessage(message)
     }
 
-    val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_MESSAGE_OPERATION_NAME)
+    implicit val span: AbstractSpan =
+      ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_MESSAGE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
+    span.prepareForAsync()
     continuedSnapshotF(snapshot)(delegate.sendMessage(message))
   end sendMessage
 
   override def halfClose(): ZIO[R, Status, Unit] =
-    val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_COMPLETE_OPERATION_NAME)
+    implicit val span: AbstractSpan =
+      ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_COMPLETE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
+    span.prepareForAsync()
     continuedSnapshotF(snapshot)(delegate.halfClose())
   end halfClose
 
   override def cancel(message: String): ZIO[R, Status, Unit] =
-    val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_CANCEL_OPERATION_NAME)
+    implicit val span: AbstractSpan = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_CANCEL_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
+    span.prepareForAsync()
     continuedSnapshotF(snapshot)(delegate.cancel(message))
 
   end cancel
 
   private def continuedSnapshotF[A](contextSnapshot: ContextSnapshot)(
     effect: => ZIO[A, Status, Unit]
-  ): ZIO[A, Status, Unit] =
-    val result = ZIO.attempt(ContextManager.continued(contextSnapshot)) *>
+  )(using AbstractSpan): ZIO[A, Status, Unit] =
+    ContextManager.continued(contextSnapshot)
+    val result = 
       effect.mapError { a =>
         ContextManager.activeSpan.log(a.asException())
         a.asException()
-      }.ensuring(ZIO.attempt(ContextManager.stopSpan()).ignore)
+      }.ensuring(ZIO.attempt { summon[AbstractSpan].asyncFinish(); ContextManager.stopSpan()}.ignore)
 
     result.mapError(e => Status.fromThrowable(e))
 
