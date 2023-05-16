@@ -5,9 +5,10 @@ import net.bytebuddy.matcher.ElementMatcher
 
 import caliban.{ GraphQLInterpreter, GraphQLRequest, InputValue }
 import caliban.execution.QueryExecution
-import org.bitlap.skywalking.apm.plugin.caliban.define.CalibanInstrumentation
+
 import zio.Trace
 
+import org.bitlap.skywalking.apm.plugin.caliban.define.CalibanInstrumentation
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
