@@ -35,6 +35,7 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     val contextSnapshot = context.contextSnapshot
     val method          = context.methodDescriptor
     val span            = ChannelActions.beforeSendMessage(contextSnapshot, method)
+    span.prepareForAsync()
     objInst.setSkyWalkingDynamicField(span)
   end beforeMethod
 

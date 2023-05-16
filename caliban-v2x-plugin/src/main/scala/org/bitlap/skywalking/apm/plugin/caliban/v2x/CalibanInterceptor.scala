@@ -83,7 +83,7 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     }
     tryOp match
       case Failure(e) =>
-        ContextManager.activeSpan().log(e)
+        if (ContextManager.isActive) ContextManager.activeSpan().log(e)
         "Unknown"
       case Success(value) => value
 

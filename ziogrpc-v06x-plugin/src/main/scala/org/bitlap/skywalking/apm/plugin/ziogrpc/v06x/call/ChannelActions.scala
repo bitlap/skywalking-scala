@@ -58,6 +58,6 @@ object ChannelActions:
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
-    } finally ContextManager.stopSpan()
+    } finally ContextManager.stopSpan(span)
 
 end ChannelActions
