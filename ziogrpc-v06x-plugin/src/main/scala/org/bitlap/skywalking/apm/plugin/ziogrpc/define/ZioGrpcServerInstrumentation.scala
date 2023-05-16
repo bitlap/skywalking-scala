@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.define
+package org.bitlap.skywalking.apm.plugin.ziogrpc.define
 
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
@@ -35,7 +35,7 @@ end ZioGrpcServerInstrumentation
 object ZioGrpcServerInstrumentation:
 
   private final val INTERCEPTOR_CLASS =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.ZioGrpcServerInterceptor"
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcServerInterceptor"
   private final val ENHANCE_CLASS      = "scalapb.zio_grpc.server.ZServerCallHandler"
   private final val ENHANCE_METHOD     = "startCall"
   private final val ARGUMENT_TYPE_NAME = "io.grpc.Metadata"

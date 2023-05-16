@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward
+package org.bitlap.skywalking.apm.plugin.ziogrpc.forward
 
 import scala.collection.mutable.ListBuffer
 import scalapb.zio_grpc.SafeMetadata
@@ -14,8 +14,8 @@ import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.Constants.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.Constants.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.OperationNameFormatUtils
 
 /** @author
  *    梦境迷离

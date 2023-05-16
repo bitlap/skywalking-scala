@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward
+package org.bitlap.skywalking.apm.plugin.ziogrpc.forward
 
 import io.grpc.*
 import io.grpc.ServerCall.Listener
@@ -15,8 +15,8 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.InstanceM
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.MethodInterceptResult
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.Constants.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.OperationNameFormatUtils
+import org.bitlap.skywalking.apm.plugin.ziogrpc.Constants.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.OperationNameFormatUtils
 
 /** @author
  *    梦境迷离

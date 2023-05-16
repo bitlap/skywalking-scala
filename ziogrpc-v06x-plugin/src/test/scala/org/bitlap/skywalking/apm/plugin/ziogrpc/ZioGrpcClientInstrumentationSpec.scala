@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
+package org.bitlap.skywalking.apm.plugin.ziogrpc
 
 import scalapb.zio_grpc.*
 import scalapb.zio_grpc.client.*
@@ -10,7 +10,7 @@ import io.grpc.*
 
 import zio.Trace
 
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.define.ZioGrpcClientInstrumentation
+import org.bitlap.skywalking.apm.plugin.ziogrpc.define.ZioGrpcClientInstrumentation
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

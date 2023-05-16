@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.caliban.v2x.define
+package org.bitlap.skywalking.apm.plugin.caliban.define
 
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
@@ -35,7 +35,7 @@ final class CalibanInstrumentation extends ClassInstanceMethodsEnhancePluginDefi
 end CalibanInstrumentation
 
 object CalibanInstrumentation:
-  private final val INTERCEPTOR_CLASS = "org.bitlap.skywalking.apm.plugin.caliban.v2x.CalibanInterceptor"
+  private final val INTERCEPTOR_CLASS = "org.bitlap.skywalking.apm.plugin.caliban.CalibanInterceptor"
   private final val ENHANCE_CLASS     = "caliban.GraphQL$$anon$2"
   private final val ENHANCE_METHOD    = "executeRequest"
 

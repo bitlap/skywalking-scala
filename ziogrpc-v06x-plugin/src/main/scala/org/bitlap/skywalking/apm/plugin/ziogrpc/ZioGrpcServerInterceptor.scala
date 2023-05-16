@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
+package org.bitlap.skywalking.apm.plugin.ziogrpc
 
 import java.lang.reflect.Method
 
@@ -20,8 +20,9 @@ import org.apache.skywalking.apm.network.language.agent.v3.MeterData
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.Constants.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.forward.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.forward.TracingServerCallListener
+
+import Constants.*
 
 /** @author
  *    梦境迷离

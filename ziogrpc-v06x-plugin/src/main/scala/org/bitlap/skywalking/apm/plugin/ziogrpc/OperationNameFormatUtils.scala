@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
+package org.bitlap.skywalking.apm.plugin.ziogrpc
 
 import io.grpc.MethodDescriptor
 

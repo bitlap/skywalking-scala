@@ -1,14 +1,13 @@
-package org.bitlap.skywalking.apm.plugin.caliban.v2x
+package org.bitlap.skywalking.apm.plugin.caliban
 
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
 
 import caliban.{ GraphQLInterpreter, GraphQLRequest, InputValue }
 import caliban.execution.QueryExecution
-
+import org.bitlap.skywalking.apm.plugin.caliban.define.CalibanInstrumentation
 import zio.Trace
 
-import org.bitlap.skywalking.apm.plugin.caliban.v2x.define.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

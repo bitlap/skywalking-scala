@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.define
+package org.bitlap.skywalking.apm.plugin.ziogrpc.define
 
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
@@ -36,10 +36,10 @@ end ZioGrpcServerCallInstrumentation
 object ZioGrpcServerCallInstrumentation:
 
   private final val INTERCEPTOR_CLOSE_CLASS =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.ZioGrpcServerCloseInterceptor"
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcServerCloseInterceptor"
 
   private final val INTERCEPTOR_SEND_MESSAGE_CLASS =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.ZioGrpcServerSendMessageInterceptor"
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcServerSendMessageInterceptor"
 
   private final val ENHANCE_CLASS = "scalapb.zio_grpc.server.ZServerCall$"
 

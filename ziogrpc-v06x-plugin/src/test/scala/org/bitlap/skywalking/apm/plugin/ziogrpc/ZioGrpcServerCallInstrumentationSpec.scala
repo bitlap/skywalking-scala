@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06x
+package org.bitlap.skywalking.apm.plugin.ziogrpc
 
 import scalapb.zio_grpc.*
 import scalapb.zio_grpc.server.*
@@ -10,7 +10,7 @@ import io.grpc.*
 
 import zio.Trace
 
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.define.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.define.ZioGrpcServerCallInstrumentation
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -22,7 +22,7 @@ class ZioGrpcServerCallInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "test sendMessage$extension MethodMatch" should "ok" in {
     val matcher = ZioGrpcServerCallInstrumentation.methodInterceptors(
-      "org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.ZioGrpcServerSendMessageInterceptor"
+      "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcServerSendMessageInterceptor"
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ZServerCall[_]].getMethod(
@@ -37,7 +37,7 @@ class ZioGrpcServerCallInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "test close$extension MethodMatch" should "ok" in {
     val matcher = ZioGrpcServerCallInstrumentation.methodInterceptors(
-      "org.bitlap.skywalking.apm.plugin.ziogrpc.v06x.ZioGrpcServerCloseInterceptor"
+      "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcServerCloseInterceptor"
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ZServerCall[_]].getMethod(
