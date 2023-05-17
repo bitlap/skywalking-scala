@@ -28,11 +28,11 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit = {
     val graphQLRequest = allArguments(0).asInstanceOf[GraphQLRequest]
-    if (graphQLRequest == null || graphQLRequest.query.isEmpty) return
+    if graphQLRequest == null || graphQLRequest.query.isEmpty then return
     val opName = "GraphQL/" + getOperationName(graphQLRequest)
     val span   = ContextManager.createLocalSpan(opName)
     span.prepareForAsync()
@@ -46,14 +46,16 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
-    val result    = ret.asInstanceOf[URIO[_, GraphQLResponse[CalibanError]]]
+    val result    = ret.asInstanceOf[URIO[?, GraphQLResponse[CalibanError]]]
     val asyncSpan = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
     result
       .catchAllCause(c =>
-        ZIO.attempt(if (ContextManager.isActive) ContextManager.activeSpan.log(c.squash)) *> ZIO.done(Exit.Failure(c))
+        ZIO.attempt(if ContextManager.isActive then ContextManager.activeSpan.log(c.squash)) *> ZIO.done(
+          Exit.Failure(c)
+        )
       )
       .ensuring(
         ZIO.attempt { asyncSpan.asyncFinish(); ContextManager.stopSpan() }
@@ -64,10 +66,10 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     t: Throwable
   ): Unit =
-    if (ContextManager.isActive) ContextManager.activeSpan.log(t)
+    if ContextManager.isActive then ContextManager.activeSpan.log(t)
 
   private def getOperationName(graphQLRequest: GraphQLRequest) =
     val tryOp: Try[String] = Try {
@@ -83,7 +85,7 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     }
     tryOp match
       case Failure(e) =>
-        if (ContextManager.isActive) ContextManager.activeSpan().log(e)
+        if ContextManager.isActive then ContextManager.activeSpan().log(e)
         "Unknown"
       case Success(value) => value
 

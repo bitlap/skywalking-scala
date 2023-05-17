@@ -22,7 +22,7 @@ import Constants.*
 object ChannelActions:
 
   def beforeSendMessage(contextSnapshot: ContextSnapshot, method: MethodDescriptor[?, ?]): AbstractSpan =
-    if (method.getType.serverSendsOneMessage) {
+    if method.getType.serverSendsOneMessage then {
       return null
     }
     val operationPrefix = OperationNameFormatUtils.formatOperationName(method) + SERVER
@@ -46,10 +46,10 @@ object ChannelActions:
       case OK      =>
       case UNKNOWN =>
       case INTERNAL =>
-        if (status.getCause == null) span.log(status.asRuntimeException)
+        if status.getCause == null then span.log(status.asRuntimeException)
         else span.log(status.getCause)
       case _ =>
-        if (status.getCause != null) span.log(status.getCause)
+        if status.getCause != null then span.log(status.getCause)
     }
     Tags.RPC_RESPONSE_STATUS_CODE.set(span, status.getCode.name)
     try

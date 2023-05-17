@@ -11,6 +11,7 @@ lazy val junitVersion      = "4.12"
 lazy val mockitoVersion    = "5.0.0"
 lazy val zioGrpcVersion    = "0.6.0-test4"
 lazy val zioVersion        = "2.0.0"
+lazy val zioHttpVersion    = "2.0.0-RC10"
 
 inThisBuild(
   List(
@@ -57,7 +58,8 @@ lazy val `skywalking-scala` = (project in file("."))
     `caliban-v2x-plugin`,
     `ziogrpc-v06x-plugin`,
     `zio-v2x-plugin`,
-    `plugin-common`
+    `plugin-common`,
+    `ziohttp-v2RC10-plugin`
   )
   .settings(
     publish / skip := true,
@@ -107,6 +109,18 @@ lazy val `zio-v2x-plugin` = (project in file("zio-v2x-plugin"))
     assembly / assemblyJarName := s"apm-zio-v2x-plugin-${(ThisBuild / version).value}.jar",
     libraryDependencies ++= Seq(
       "dev.zio" %% "zio" % zioVersion % Provided
+    )
+  )
+  .dependsOn(`plugin-common`)
+
+lazy val `ziohttp-v2RC10-plugin` = (project in file("ziohttp-v2RC10-plugin"))
+  .settings(
+    commonSettings,
+    commands ++= Commands.value,
+    name                       := "ziohttp-v2RC10-plugin",
+    assembly / assemblyJarName := s"apm-ziohttp-v2RC10-plugin-${(ThisBuild / version).value}.jar",
+    libraryDependencies ++= Seq(
+      "io.d11" %% "zhttp" % zioHttpVersion % Provided
     )
   )
   .dependsOn(`plugin-common`)

@@ -32,7 +32,7 @@ final class TracingServerCallListener[REQUEST](
   private val operationPrefix = OperationNameFormatUtils.formatOperationName(method) + SERVER
 
   override def onMessage(message: REQUEST): Unit =
-    if (method.getType.clientSendsOneMessage) {
+    if method.getType.clientSendsOneMessage then {
       delegate.onMessage(message)
       return
     }

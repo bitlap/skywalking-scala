@@ -8,7 +8,7 @@ import io.grpc.MethodDescriptor
  */
 object OperationNameFormatUtils:
 
-  def formatOperationName(methodDescriptor: MethodDescriptor[_, _]): String = {
+  def formatOperationName(methodDescriptor: MethodDescriptor[?, ?]): String = {
     val fullMethodName = methodDescriptor.getFullMethodName
     formatServiceName(fullMethodName) + "." + formatMethodName(fullMethodName)
   }

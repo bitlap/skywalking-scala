@@ -34,7 +34,7 @@ object InterceptorDSL:
       try asyncSpan.asyncFinish
       catch {
         case e: Throwable =>
-          if (ContextManager.isActive) ContextManager.activeSpan.log(e)
+          if ContextManager.isActive then ContextManager.activeSpan.log(e)
       }
       effect
     catch {

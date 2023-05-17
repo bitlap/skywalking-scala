@@ -10,4 +10,4 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 final class ZioFiberRuntimeInitialInterceptor extends InstanceConstructorInterceptor:
 
   override def onConstruct(objInst: EnhancedInstance, allArguments: Array[Object]): Unit =
-    if (ContextManager.isActive) objInst.setSkyWalkingDynamicField(ContextManager.capture)
+    if ContextManager.isActive then objInst.setSkyWalkingDynamicField(ContextManager.capture)

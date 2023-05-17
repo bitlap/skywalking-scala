@@ -36,7 +36,7 @@ class CalibanInterceptorSpec {
       obj = value
   }
 
-  val argTypes: Array[Class[_]] = Array(
+  val argTypes: Array[Class[?]] = Array(
     classOf[GraphQLRequest],
     classOf[Boolean],
     classOf[Boolean],
@@ -44,9 +44,9 @@ class CalibanInterceptorSpec {
     classOf[Any]
   )
 
-  val method = classOf[GraphQLInterpreter[_, _]].getMethod(
+  val method = classOf[GraphQLInterpreter[?, ?]].getMethod(
     "executeRequest",
-    argTypes: _*
+    argTypes*
   )
 
   @Test

@@ -25,11 +25,11 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
     val context = InterceptorSendMessageThreadContext.poll
-    if (context == null) return
+    if context == null then return
     val contextSnapshot = context.contextSnapshot
     val method          = context.methodDescriptor
     val span            = ChannelActions.beforeSendMessage(contextSnapshot, method)
@@ -41,11 +41,11 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
     val span = objInst.getSkyWalkingDynamicField
-    if (span == null || !span.isInstanceOf[AbstractSpan]) return ret
+    if span == null || !span.isInstanceOf[AbstractSpan] then return ret
     ret
       .asInstanceOf[GIO[Unit]]
       .ensuring(ZIO.attempt(ContextManager.stopSpan(span.asInstanceOf[AbstractSpan])).ignore)
@@ -55,7 +55,7 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     t: Throwable
   ): Unit = {}
 

@@ -8,13 +8,11 @@ Repository NOT Available!
 
 - [x] caliban: 2.0.1
 - [x] zio-grpc: 0.6.0-test4
-  - [x] client
-  - [x] server
-- [ ] zio: 2.0.0
-  - [x] `FiberRuntime`
-    - [x] `run`
-  - [x] `blockingExecutor`
-    - [x] `submit`
+- [x] zio-http(zhttp): 2.0.0-RC10
+  - [x] `Http.collectHttp`
+- [x] zio: 2.0.0
+  - [x] `FiberRuntime#run`
+  - [x] `blockingExecutor#submit`
 
 ## Environment
 

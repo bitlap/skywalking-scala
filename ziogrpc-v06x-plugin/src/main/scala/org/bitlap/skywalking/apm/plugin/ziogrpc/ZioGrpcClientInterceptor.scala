@@ -29,7 +29,7 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor, I
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit = {}
 
@@ -37,7 +37,7 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor, I
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
     val peer             = objInst.getSkyWalkingDynamicField.asInstanceOf[String]
@@ -51,7 +51,7 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor, I
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     t: Throwable
   ): Unit = {}
 

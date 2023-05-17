@@ -34,17 +34,17 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
     val call           = allArguments(0).asInstanceOf[ServerCall[?, ?]]
     val headers        = allArguments(1).asInstanceOf[Metadata]
     val contextCarrier = new ContextCarrier
     var next           = contextCarrier.items
-    while (next.hasNext) {
+    while next.hasNext do {
       next = next.next
       val contextValue = headers.get(Metadata.Key.of(next.getHeadKey, Metadata.ASCII_STRING_MARSHALLER))
-      if (!StringUtil.isEmpty(contextValue)) next.setHeadValue(contextValue)
+      if !StringUtil.isEmpty(contextValue) then next.setHeadValue(contextValue)
     }
     val span = ContextManager.createEntrySpan(
       OperationNameFormatUtils.formatOperationName(call.getMethodDescriptor),
@@ -66,12 +66,11 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
     val context = objInst.getSkyWalkingDynamicField
-    if (context == null)
-      return ret
+    if context == null then return ret
     val call            = allArguments(0).asInstanceOf[ServerCall[Any, Any]]
     val ctx             = context.asInstanceOf[InterceptorThreadContext]
     val contextSnapshot = ctx.contextSnapshot
@@ -92,7 +91,7 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     t: Throwable
   ): Unit = {}
 

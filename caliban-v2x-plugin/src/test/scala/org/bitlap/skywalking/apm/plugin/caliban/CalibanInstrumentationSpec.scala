@@ -21,7 +21,7 @@ class CalibanInstrumentationSpec extends AnyFlatSpec with Matchers {
   "testMethodMatch" should "ok" in {
     val matcher = CalibanInstrumentation.getCalibanExecuteRequestMethod
     val method = new MethodDescription.ForLoadedMethod(
-      classOf[GraphQLInterpreter[_, _]].getMethod(
+      classOf[GraphQLInterpreter[?, ?]].getMethod(
         "executeRequest",
         classOf[GraphQLRequest],
         classOf[Boolean],

@@ -26,11 +26,11 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
     val context = InterceptorCloseThreadContext.poll
-    if (context == null) return
+    if context == null then return
     val contextSnapshot = context.contextSnapshot
     val method          = context.methodDescriptor
     val span            = ChannelActions.beforeClose(contextSnapshot, method)
@@ -42,14 +42,14 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
     val context = objInst.getSkyWalkingDynamicField
-    if (context == null) return ret
+    if context == null then return ret
     val ctx  = context.asInstanceOf[InterceptorThreadContext]
     val span = ctx.activeSpan.orNull
-    if (span == null || !span.isInstanceOf[AbstractSpan]) return ret
+    if span == null || !span.isInstanceOf[AbstractSpan] then return ret
     val status = allArguments(1).asInstanceOf[Status]
     ret
       .asInstanceOf[GIO[Unit]]
@@ -60,7 +60,7 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     t: Throwable
   ): Unit = {}
 

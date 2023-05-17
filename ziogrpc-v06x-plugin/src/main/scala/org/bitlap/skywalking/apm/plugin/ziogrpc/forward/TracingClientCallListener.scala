@@ -24,7 +24,7 @@ final class TracingClientCallListener[RESPONSE](
   private val operationPrefix = OperationNameFormatUtils.formatOperationName(method) + CLIENT
 
   override def onMessage(message: RESPONSE): Unit =
-    if (method.getType.serverSendsOneMessage) {
+    if method.getType.serverSendsOneMessage then {
       delegate.onMessage(message)
       return
     }
@@ -42,7 +42,7 @@ final class TracingClientCallListener[RESPONSE](
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
 
     InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan) {
-      if (!status.isOk) {
+      if !status.isOk then {
         span.log(status.asRuntimeException)
         Tags.RPC_RESPONSE_STATUS_CODE.set(span, status.getCode.name)
       }

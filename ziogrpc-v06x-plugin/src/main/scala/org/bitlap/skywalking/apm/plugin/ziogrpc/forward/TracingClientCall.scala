@@ -42,7 +42,7 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
     ContextManager.inject(contextCarrier)
     var contextItem = contextCarrier.items
     val unsafePut   = ListBuffer[(Metadata.Key[String], String)]()
-    while (contextItem.hasNext) {
+    while contextItem.hasNext do {
       contextItem = contextItem.next
       val headerKey = Metadata.Key.of(contextItem.getHeadKey, Metadata.ASCII_STRING_MARSHALLER)
       unsafePut.append(headerKey -> contextItem.getHeadValue)
@@ -61,7 +61,7 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
   override def request(numMessages: Int): ZIO[R, Status, Unit] = delegate.request(numMessages)
 
   override def sendMessage(message: REQUEST): ZIO[R, Status, Unit] =
-    if (method.getType.clientSendsOneMessage) {
+    if method.getType.clientSendsOneMessage then {
       return delegate.sendMessage(message)
     }
 

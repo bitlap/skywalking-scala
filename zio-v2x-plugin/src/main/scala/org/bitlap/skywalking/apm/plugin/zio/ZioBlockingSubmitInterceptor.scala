@@ -19,11 +19,11 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit = {
-    if (!ContextManager.isActive) { return }
-    if (allArguments == null || allArguments.length < 1) {
+    if !ContextManager.isActive then { return }
+    if allArguments == null || allArguments.length < 1 then {
       return
     }
     val span: AbstractSpan = ContextManager.createLocalSpan(getOperationName)
@@ -32,7 +32,7 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
       case fiber: FiberRuntime[?, ?] =>
         ZioTag.setZioTags(span, fiber.id)
         val storedField = objInst.getSkyWalkingDynamicField
-        if (storedField != null) {
+        if storedField != null then {
           val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
           ContextManager.continued(contextSnapshot)
         }
@@ -47,7 +47,7 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
     ContextManager.stopSpan()
@@ -57,7 +57,7 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
-    argumentsTypes: Array[Class[_]],
+    argumentsTypes: Array[Class[?]],
     t: Throwable
   ): Unit =
-    if (ContextManager.isActive) ContextManager.activeSpan.log(t)
+    if ContextManager.isActive then ContextManager.activeSpan.log(t)
