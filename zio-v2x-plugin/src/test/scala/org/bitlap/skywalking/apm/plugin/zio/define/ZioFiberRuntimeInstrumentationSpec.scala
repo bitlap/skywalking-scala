@@ -6,7 +6,7 @@ import net.bytebuddy.matcher.ElementMatcher
 import zio.*
 import zio.internal.FiberRuntime
 
-import org.bitlap.skywalking.apm.plugin.zio.define.ZioInstrumentation
+import org.bitlap.skywalking.apm.plugin.zio.define.ZioFiberRuntimeInstrumentation
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -14,10 +14,12 @@ import org.scalatest.matchers.should.Matchers
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-class ZioInstrumentationSpec extends AnyFlatSpec with Matchers {
+class ZioFiberRuntimeInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch" should "ok" in {
-    val matcher = ZioInstrumentation.methodInterceptors(ZioInstrumentation.FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR)
+    val matcher = ZioFiberRuntimeInstrumentation.methodInterceptors(
+      ZioFiberRuntimeInstrumentation.FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR
+    )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[FiberRuntime[Any, Any]].getMethod(
         "run"

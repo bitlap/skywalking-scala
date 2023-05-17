@@ -13,9 +13,9 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.ClassInst
  *    梦境迷离
  *  @version 1.0,2023/5/16
  */
-final class ZioInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
+final class ZioFiberRuntimeInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
-  import ZioInstrumentation.*
+  import ZioFiberRuntimeInstrumentation.*
 
   override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
 
@@ -38,9 +38,9 @@ final class ZioInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
   end getInstanceMethodsInterceptPoints
 
-end ZioInstrumentation
+end ZioFiberRuntimeInstrumentation
 
-object ZioInstrumentation:
+object ZioFiberRuntimeInstrumentation:
 
   final val ENHANCE_CLASS: String = "zio.internal.FiberRuntime"
 
