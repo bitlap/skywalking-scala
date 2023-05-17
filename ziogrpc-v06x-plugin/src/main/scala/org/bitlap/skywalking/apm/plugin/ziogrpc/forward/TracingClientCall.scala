@@ -53,8 +53,9 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
 
     snapshot = ContextManager.capture
     span.prepareForAsync()
-    ContextManager.stopSpan(span)
-    delegate.start(new TracingClientCallListener(responseListener, method, snapshot, span), headers)
+    delegate
+      .start(new TracingClientCallListener(responseListener, method, snapshot, span), headers)
+      .ensuring(ZIO.attempt(ContextManager.stopSpan()).ignore)
   end start
 
   override def request(numMessages: Int): ZIO[R, Status, Unit] = delegate.request(numMessages)
@@ -99,9 +100,8 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
       a.asException()
     }.ensuring(ZIO.attempt {
       summon[AbstractSpan].asyncFinish()
+      ContextManager.stopSpan()
     }.ignore)
-
-    ContextManager.stopSpan()
 
     result.mapError(e => Status.fromThrowable(e))
 

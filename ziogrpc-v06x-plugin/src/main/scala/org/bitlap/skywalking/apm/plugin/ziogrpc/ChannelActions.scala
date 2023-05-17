@@ -54,10 +54,15 @@ object ChannelActions:
     Tags.RPC_RESPONSE_STATUS_CODE.set(span, status.getCode.name)
     try
       action
-      asyncSpan.asyncFinish
+      span.asyncFinish
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
-    } finally ContextManager.stopSpan(span)
+    } finally
+      try
+        asyncSpan.asyncFinish()
+      catch {
+        case t: Throwable => ContextManager.activeSpan.log(t)
+      }
 
 end ChannelActions

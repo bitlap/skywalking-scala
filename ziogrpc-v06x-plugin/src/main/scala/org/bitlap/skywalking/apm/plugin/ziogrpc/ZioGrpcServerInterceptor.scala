@@ -77,13 +77,15 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     val contextSnapshot = ctx.contextSnapshot
     val asyncSpan       = ctx.asyncSpan
     val listener        = ret.asInstanceOf[Listener[Any]]
-    ContextManager.stopSpan()
-    new TracingServerCallListener(
+
+    val result = new TracingServerCallListener(
       listener,
       call.getMethodDescriptor,
       contextSnapshot,
       asyncSpan
     )
+    ContextManager.stopSpan()
+    result
   end afterMethod
 
   override def handleMethodException(

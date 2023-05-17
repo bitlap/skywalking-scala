@@ -34,8 +34,8 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     val contextSnapshot = context.contextSnapshot
     val method          = context.methodDescriptor
     val span            = ChannelActions.beforeClose(contextSnapshot, method)
-    objInst.setSkyWalkingDynamicField(context.copy(activeSpan = Option(span)))
     span.prepareForAsync()
+    objInst.setSkyWalkingDynamicField(context.copy(activeSpan = Option(span)))
   end beforeMethod
 
   override def afterMethod(
