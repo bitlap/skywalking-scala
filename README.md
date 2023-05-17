@@ -10,7 +10,7 @@ Repository NOT Available!
 - [x] zio-grpc: 0.6.0-test4
   - [x] client
   - [x] server
-- [ ] zio
+- [ ] zio: 2.0.0
   - [x] `FiberRuntime`
     - [x] `run`
   - [x] `blockingExecutor`
