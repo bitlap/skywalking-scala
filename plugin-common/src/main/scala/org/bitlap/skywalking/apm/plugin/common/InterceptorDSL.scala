@@ -19,6 +19,14 @@ object InterceptorDSL:
       Runtime.default.unsafe.run(z).getOrThrowFiberFailure()
     }).getOrElse(null.asInstanceOf[A])
 
+  def continuedSnapshot_(contextSnapshot: ContextSnapshot): Unit =
+    try
+      ContextManager.continued(contextSnapshot)
+    catch {
+      case t: Throwable =>
+        ContextManager.activeSpan.log(t)
+    }
+
   def continuedSnapshot(contextSnapshot: ContextSnapshot)(effect: => Unit): Unit =
     try
       ContextManager.continued(contextSnapshot)

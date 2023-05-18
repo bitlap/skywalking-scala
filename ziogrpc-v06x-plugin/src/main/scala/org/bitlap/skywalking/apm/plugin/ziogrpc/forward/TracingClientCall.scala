@@ -94,7 +94,7 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
   private def continuedSnapshotF[A](contextSnapshot: ContextSnapshot)(
     effect: => ZIO[A, Status, Unit]
   )(using AbstractSpan): ZIO[A, Status, Unit] =
-    ContextManager.continued(contextSnapshot)
+    InterceptorDSL.continuedSnapshot_(contextSnapshot)
     val result = effect.mapError { a =>
       ContextManager.activeSpan.log(a.asException())
       a.asException()

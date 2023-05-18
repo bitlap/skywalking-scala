@@ -4,10 +4,11 @@ import java.lang.reflect.Method
 
 import zio.internal.FiberRuntime
 
-import org.apache.skywalking.apm.agent.core.context.{ ContextManager, ContextSnapshot }
+import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
+import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
 
 /** @author
  *    梦境迷离
@@ -26,22 +27,20 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
     if allArguments == null || allArguments.length < 1 then {
       return
     }
-    val span: AbstractSpan = ContextManager.createLocalSpan(getOperationName)
+    val span: AbstractSpan = ContextManager.createLocalSpan(Utils.blockOperationName)
     val fiberRuntime       = allArguments(0)
+    val storedField        = objInst.getSkyWalkingDynamicField
     fiberRuntime match {
       case fiber: FiberRuntime[?, ?] =>
         ZioTag.setZioTags(span, fiber.id)
-        val storedField = objInst.getSkyWalkingDynamicField
-        if storedField != null then {
-          val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
-          ContextManager.continued(contextSnapshot)
-        }
       case _ =>
+    }
+    if storedField != null then {
+      val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
+      InterceptorDSL.continuedSnapshot_(contextSnapshot)
     }
     span.setComponent(ComponentsDefine.JDK_THREADING)
   }
-
-  private def getOperationName = "ZioBlockingRunnableWrapper/" + Thread.currentThread.getName
 
   override def afterMethod(
     objInst: EnhancedInstance,

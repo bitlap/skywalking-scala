@@ -3,6 +3,8 @@ package org.bitlap.skywalking.apm.plugin.ziohttp
 import java.net.URL
 import java.util.concurrent.atomic.AtomicBoolean
 
+import scala.util.Try
+
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
@@ -30,14 +32,16 @@ object TraceMiddleware:
       .when(req => !req.url.path.toString.startsWith("/actuator"))
 
   private def afterRequest(span: AbstractSpan, response: Response): Unit =
-    if span != null && response != null then {
-      Tags.HTTP_RESPONSE_STATUS_CODE.set(span, response.status.code)
+    Try {
+      if span != null && response != null then {
+        Tags.HTTP_RESPONSE_STATUS_CODE.set(span, response.status.code)
 
-      if response.status.code >= 400 then {
-        span.errorOccurred()
+        if response.status.code >= 400 then {
+          span.errorOccurred()
+        }
       }
-    }
-    ContextManager.stopSpan()
+      ContextManager.stopSpan()
+    }.getOrElse(())
   end afterRequest
 
   private def beforeRequest(request: Request): AbstractSpan =

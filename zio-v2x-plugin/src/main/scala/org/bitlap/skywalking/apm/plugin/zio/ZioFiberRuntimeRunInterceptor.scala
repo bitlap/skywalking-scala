@@ -9,15 +9,13 @@ import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.SpanLayer
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
+import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/5/16
  */
 final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundInterceptor:
-
-  private def generateOperationName(objInst: EnhancedInstance, method: Method, id: Int) =
-    s"ZIO/${objInst.getClass.getSimpleName}/${method.getName}#$id"
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -26,17 +24,17 @@ final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundIntercept
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    if objInst == null then {
+    if objInst == null || !objInst.isInstanceOf[FiberRuntime[?, ?]] then {
       return
     }
 
     val fiberRuntime = objInst.asInstanceOf[FiberRuntime[?, ?]]
-    val span         = ContextManager.createLocalSpan(generateOperationName(objInst, method, fiberRuntime.id.id))
+    val span         = ContextManager.createLocalSpan(Utils.generateOperationName(objInst, method, fiberRuntime.id.id))
     ZioTag.setZioTags(span, fiberRuntime.id)
     val storedField = objInst.getSkyWalkingDynamicField
     if storedField != null then {
       val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
-      ContextManager.continued(contextSnapshot)
+      InterceptorDSL.continuedSnapshot_(contextSnapshot)
     }
 
   override def afterMethod(
