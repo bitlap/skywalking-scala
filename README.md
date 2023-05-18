@@ -29,14 +29,8 @@ Repository NOT Available!
 
 1. Clone code `git clone https://github.com/bitlap/skywalking-scala.git`
 2. Enter the source file directory `cd skywalking-scala`
-3. Compile and package locally `sbt assembly`
-4. Put the jars into skywalking plugins folder:
-```
-skywalking-scala/ziogrpc-v06x-plugin/target/scala-3.2.0/apm-zio-v2x-plugin-0.1.0-SNAPSHOT.jar
-skywalking-scala/ziogrpc-v06x-plugin/target/scala-3.2.0/apm-ziohttp-v2RC10-plugin-0.1.0-SNAPSHOT.jar
-skywalking-scala/ziogrpc-v06x-plugin/target/scala-3.2.0/apm-ziogrpc-v06x-plugin-0.1.0-SNAPSHOT.jar
-skywalking-scala/caliban-v2x-plugin/target/scala-3.2.0/apm-caliban-v2x-plugin-0.1.0-SNAPSHOT.jar
-```
+3. Build plugin `sh packageJars.sh`
+4. Put the `dist/*.jar` into skywalking plugins folder
 
 Please check the official documents for specific information
 [skywalking.apache.org/docs](https://skywalking.apache.org/docs/skywalking-java/v8.15.0/en/setup/service-agent/java-agent/readme/)
