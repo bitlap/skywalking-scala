@@ -7,7 +7,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
  *    梦境迷离
  *  @version 1.0,2023/5/16
  */
-final class ZioFiberRuntimeInitialInterceptor extends InstanceConstructorInterceptor:
+final class ZioFiberRuntimeConstructorInterceptor extends InstanceConstructorInterceptor:
 
   override def onConstruct(objInst: EnhancedInstance, allArguments: Array[Object]): Unit =
     if ContextManager.isActive then objInst.setSkyWalkingDynamicField(ContextManager.capture)

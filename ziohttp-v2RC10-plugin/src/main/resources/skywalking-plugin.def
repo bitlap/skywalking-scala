@@ -1,1 +1,1 @@
-zio-http-z.0.0-RC10-fromFunctionZIO=org.bitlap.skywalking.apm.plugin.ziohttp.define.ZioHttpCollectHttpInstrumentation
+zio-http-z.0.0-RC10-CollectHttp=org.bitlap.skywalking.apm.plugin.ziohttp.define.ZioHttpCollectHttpInstrumentation

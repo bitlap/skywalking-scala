@@ -5,9 +5,6 @@ import java.lang.reflect.Method
 import scala.util.*
 
 import caliban.*
-import caliban.execution.QueryExecution
-import caliban.parsing.Parser
-import caliban.parsing.adt.{ Document, Selection }
 
 import zio.*
 
@@ -33,13 +30,8 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
   ): Unit = {
     val graphQLRequest = allArguments(0).asInstanceOf[GraphQLRequest]
     if graphQLRequest == null || graphQLRequest.query.isEmpty then return
-    val opName = "GraphQL/" + getOperationName(graphQLRequest)
-    val span   = ContextManager.createLocalSpan(opName)
-    span.prepareForAsync()
-    Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
-    SpanLayer.asHttp(span)
-    span.setComponent(ComponentsDefine.GRAPHQL)
-    objInst.setSkyWalkingDynamicField(span)
+    val span = TraceAspect.beforeRequest(graphQLRequest)
+    span.foreach(a => objInst.setSkyWalkingDynamicField(a))
   }
 
   override def afterMethod(
@@ -53,9 +45,7 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     val asyncSpan = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
     result
       .catchAllCause(c =>
-        ZIO.attempt(if ContextManager.isActive then ContextManager.activeSpan.log(c.squash)) *> ZIO.done(
-          Exit.Failure(c)
-        )
+        ZIO.attempt(if ContextManager.isActive then ContextManager.activeSpan.log(c.squash))
       )
       .ensuring(
         ZIO.attempt { asyncSpan.asyncFinish(); ContextManager.stopSpan() }
@@ -70,23 +60,5 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     t: Throwable
   ): Unit =
     if ContextManager.isActive then ContextManager.activeSpan.log(t)
-
-  private def getOperationName(graphQLRequest: GraphQLRequest) =
-    val tryOp: Try[String] = Try {
-      val docOpName = InterceptorDSL
-        .unsafeRun(Parser.parseQuery(graphQLRequest.query.get))
-        .operationDefinitions
-        .map(_.selectionSet.collectFirst {
-          case Selection.Field(alias, name, arguments, directives, selectionSet, index) => alias.getOrElse(name)
-        })
-        .headOption
-        .flatten
-      graphQLRequest.operationName.orElse(docOpName).getOrElse("Unknown")
-    }
-    tryOp match
-      case Failure(e) =>
-        if ContextManager.isActive then ContextManager.activeSpan().log(e)
-        "Unknown"
-      case Success(value) => value
 
 end CalibanInterceptor

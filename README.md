@@ -32,6 +32,8 @@ Repository NOT Available!
 3. Compile and package locally `sbt assembly`
 4. Put the jars into skywalking plugins folder:
 ```
+skywalking-scala/ziogrpc-v06x-plugin/target/scala-3.2.0/apm-zio-v2x-plugin-0.1.0-SNAPSHOT.jar
+skywalking-scala/ziogrpc-v06x-plugin/target/scala-3.2.0/apm-ziohttp-v2RC10-plugin-0.1.0-SNAPSHOT.jar
 skywalking-scala/ziogrpc-v06x-plugin/target/scala-3.2.0/apm-ziogrpc-v06x-plugin-0.1.0-SNAPSHOT.jar
 skywalking-scala/caliban-v2x-plugin/target/scala-3.2.0/apm-caliban-v2x-plugin-0.1.0-SNAPSHOT.jar
 ```

@@ -45,7 +45,7 @@ object ZioFiberRuntimeInstrumentation:
   final val ENHANCE_CLASS: String = "zio.internal.FiberRuntime"
 
   final val FIBER_RUNTIME_CLASS_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.zio.ZioFiberRuntimeInitialInterceptor"
+    "org.bitlap.skywalking.apm.plugin.zio.ZioFiberRuntimeConstructorInterceptor"
 
   final val FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.zio.ZioFiberRuntimeRunInterceptor"
