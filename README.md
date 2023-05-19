@@ -1,4 +1,4 @@
-Skywalking Extension Plugins for Scala 3
+SkyWalking Extension Plugins for Scala 3
 ---
 
 ![CI][Badge-CI]
