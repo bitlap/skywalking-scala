@@ -1,9 +1,7 @@
 #!/bin/bash
 
-if [ ! -d dist ];then mkdir dist
-else rm -rf dist
-fi 
-
+rm -rf dist
+mkdir dist
 
 version=`cat version.sbt | awk -F '"' '{print $2}'`
 ziohttp=ziohttp-v2RC10-plugin
