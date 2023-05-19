@@ -11,6 +11,8 @@ Repository NOT Available!
 
 ## Features
 
+> Other versions may support, but have not been tested.
+
 - [x] caliban: 2.0.1
 - [x] zio-grpc: 0.6.0-test4
 - [x] zio-http(zhttp): 2.0.0-RC10
