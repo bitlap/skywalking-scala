@@ -29,7 +29,6 @@ object TraceMiddleware:
         afterRequest(span, response)
         Patch.empty
       }
-      .when(req => !req.url.path.toString.startsWith("/actuator"))
 
   private def afterRequest(span: AbstractSpan, response: Response): Unit =
     Try {
