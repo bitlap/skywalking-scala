@@ -48,6 +48,7 @@ object TraceAspect:
       val span   = ContextManager.createLocalSpan(opName)
       span.prepareForAsync()
       SpanLayer.asHttp(span)
+      Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
       span.setComponent(ComponentsDefine.GRAPHQL)
       Some(span)
     }
@@ -62,7 +63,8 @@ object TraceAspect:
         })
         .headOption
         .flatten
-      graphQLRequest.operationName.orElse(docOpName).getOrElse("Unknown")
+      val name = graphQLRequest.operationName.map(_.split("__", 2).toList).toList.flatten.headOption
+      name.orElse(docOpName).getOrElse("Unknown")
     }
     tryOp match
       case Failure(e) =>

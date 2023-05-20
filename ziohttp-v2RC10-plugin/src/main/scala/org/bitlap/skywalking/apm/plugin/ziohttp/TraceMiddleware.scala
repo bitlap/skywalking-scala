@@ -45,10 +45,9 @@ object TraceMiddleware:
 
   private def beforeRequest(request: Request): AbstractSpan =
     val uri            = request.url
-    val host           = request.host
     val contextCarrier = new ContextCarrier
     val span: AbstractSpan =
-      ContextManager.createExitSpan(uri.path.toString, contextCarrier, String.valueOf(host.orNull))
+      ContextManager.createEntrySpan(uri.path.toString, contextCarrier)
     Tags.URL.set(span, String.valueOf(request.origin.orNull))
     Tags.HTTP.METHOD.set(span, request.method.toString())
     SpanLayer.asHttp(span)
