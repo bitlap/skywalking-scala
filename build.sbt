@@ -59,7 +59,7 @@ lazy val `skywalking-scala` = (project in file("."))
     `ziogrpc-v06x-plugin`,
     `zio-v2x-plugin`,
     `plugin-common`,
-    `ziohttp-v2RC10-plugin`
+    `ziohttp-v2x-plugin`
   )
   .settings(
     publish / skip := true,
@@ -113,12 +113,12 @@ lazy val `zio-v2x-plugin` = (project in file("zio-v2x-plugin"))
   )
   .dependsOn(`plugin-common`)
 
-lazy val `ziohttp-v2RC10-plugin` = (project in file("ziohttp-v2RC10-plugin"))
+lazy val `ziohttp-v2x-plugin` = (project in file("ziohttp-v2x-plugin"))
   .settings(
     commonSettings,
     commands ++= Commands.value,
-    name                       := "ziohttp-v2RC10-plugin",
-    assembly / assemblyJarName := s"apm-ziohttp-v2RC10-plugin-${(ThisBuild / version).value}.jar",
+    name                       := "ziohttp-v2x-plugin",
+    assembly / assemblyJarName := s"apm-ziohttp-v2x-plugin-${(ThisBuild / version).value}.jar",
     libraryDependencies ++= Seq(
       "io.d11" %% "zhttp" % zioHttpVersion % Provided
     )

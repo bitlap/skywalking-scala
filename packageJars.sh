@@ -4,7 +4,7 @@ rm -rf dist
 mkdir dist
 
 version=`cat version.sbt | awk -F '"' '{print $2}'`
-ziohttp=ziohttp-v2RC10-plugin
+ziohttp=ziohttp-v2x-plugin
 ziogrpc=ziogrpc-v06x-plugin
 caliban=caliban-v2x-plugin
 zio=zio-v2x-plugin
