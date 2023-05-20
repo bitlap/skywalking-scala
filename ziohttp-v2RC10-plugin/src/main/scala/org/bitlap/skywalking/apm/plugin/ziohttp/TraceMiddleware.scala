@@ -47,8 +47,8 @@ object TraceMiddleware:
     val uri            = request.url
     val contextCarrier = new ContextCarrier
     val span: AbstractSpan =
-      ContextManager.createEntrySpan(uri.path.toString, contextCarrier)
-    Tags.URL.set(span, String.valueOf(request.origin.orNull))
+      ContextManager.createEntrySpan(s"${request.method.toString()}:${uri.path.toString}", contextCarrier)
+    Tags.URL.set(span, uri.encode)
     Tags.HTTP.METHOD.set(span, request.method.toString())
     SpanLayer.asHttp(span)
     span
