@@ -6,9 +6,6 @@ SkyWalking Extension Plugins for Scala 3
 
 [Badge-CI]: https://github.com/bitlap/skywalking-scala/actions/workflows/ScalaCI.yml/badge.svg
 
-Repository NOT Available!
-
-
 ## Features
 
 > Other small versions of the libraries supported by this plugin should also be available for use, but have not been tested.
