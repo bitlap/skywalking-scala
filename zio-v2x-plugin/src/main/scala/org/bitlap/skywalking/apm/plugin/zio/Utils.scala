@@ -10,10 +10,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedI
  */
 object Utils:
 
-  def generateOperationName(objInst: EnhancedInstance, method: Method) =
-    s"Zio/${objInst.getClass.getTypeName}/${method.getName}"
-
-  def generateOperationName =
+  def generateFiberOperationName =
     s"ZioFiberWrapper/${Thread.currentThread.getName}"
 
   def blockingOperationName = "ZioBlockingSubmitWrapper/" + Thread.currentThread.getName
