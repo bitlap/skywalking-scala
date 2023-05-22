@@ -16,4 +16,6 @@ object Utils:
   def generateOperationName(objInst: EnhancedInstance, method: Method, id: Int) =
     s"ZIO/${objInst.getClass.getTypeName}/${method.getName}#$id"
 
-  def blockOperationName = "ZioBlockingRunnableWrapper/" + Thread.currentThread.getName
+  def blockingOperationName = "ZioBlockingRunnableWrapper/" + Thread.currentThread.getName
+
+  def operationName = "ZioRunnableWrapper/" + Thread.currentThread.getName

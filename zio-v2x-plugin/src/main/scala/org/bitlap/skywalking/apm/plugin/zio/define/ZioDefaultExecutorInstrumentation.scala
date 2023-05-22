@@ -12,9 +12,9 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
  *    梦境迷离
  *  @version 1.0,2023/5/16
  */
-final class ZioExecutorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
+final class ZioDefaultExecutorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
-  import ZioExecutorInstrumentation.*
+  import ZioDefaultExecutorInstrumentation.*
 
   override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
 
@@ -33,9 +33,9 @@ final class ZioExecutorInstrumentation extends ClassInstanceMethodsEnhancePlugin
 
   end getInstanceMethodsInterceptPoints
 
-end ZioExecutorInstrumentation
+end ZioDefaultExecutorInstrumentation
 
-object ZioExecutorInstrumentation:
+object ZioDefaultExecutorInstrumentation:
 
   final val ENHANCE_CLASS: String = "zio.internal.DefaultExecutors$$anon$1"
 
