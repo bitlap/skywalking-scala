@@ -23,7 +23,6 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit = {
-    if !ContextManager.isActive then { return }
     if allArguments == null || allArguments.length < 1 then {
       return
     }
