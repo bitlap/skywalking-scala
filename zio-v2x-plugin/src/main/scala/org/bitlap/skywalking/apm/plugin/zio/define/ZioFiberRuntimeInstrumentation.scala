@@ -7,7 +7,6 @@ import net.bytebuddy.matcher.ElementMatchers.*
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.ClassInstanceMethodsEnhancePluginDefine
 
 /** @author
  *    梦境迷离
@@ -45,7 +44,7 @@ object ZioFiberRuntimeInstrumentation:
   final val ENHANCE_CLASS: String = "zio.internal.FiberRuntime"
 
   final val FIBER_RUNTIME_CLASS_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.zio.ZioFiberRuntimeConstructorInterceptor"
+    "org.bitlap.skywalking.apm.plugin.zio.ConstructorInterceptor"
 
   final val FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.zio.ZioFiberRuntimeRunInterceptor"
