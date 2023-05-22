@@ -24,7 +24,7 @@ final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundIntercept
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    if objInst == null then {
+    if objInst == null || !ContextManager.isActive then {
       return
     }
 

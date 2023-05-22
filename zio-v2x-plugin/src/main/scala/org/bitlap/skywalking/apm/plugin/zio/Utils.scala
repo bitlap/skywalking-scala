@@ -14,8 +14,8 @@ object Utils:
     s"Zio/${objInst.getClass.getTypeName}/${method.getName}"
 
   def generateOperationName =
-    s"ZioFiber/${Thread.currentThread.getName}"
+    s"ZioFiberWrapper/${Thread.currentThread.getName}"
 
-  def blockingOperationName = "ZioBlockingRunnableWrapper/" + Thread.currentThread.getName
+  def blockingOperationName = "ZioBlockingSubmitWrapper/" + Thread.currentThread.getName
 
-  def operationName = "ZioRunnableWrapper/" + Thread.currentThread.getName
+end Utils
