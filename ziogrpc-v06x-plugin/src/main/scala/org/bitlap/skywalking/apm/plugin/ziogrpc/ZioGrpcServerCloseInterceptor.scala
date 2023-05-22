@@ -29,7 +29,9 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val context = InterceptorCloseThreadContext.poll
+    val context = InterceptorCloseThreadContext.poll(
+      OperationNameFormatUtils.formatOperationName(allArguments(0).asInstanceOf[ServerCall[?, ?]].getMethodDescriptor)
+    )
     if context == null then return
     val contextSnapshot = context.contextSnapshot
     val method          = context.methodDescriptor

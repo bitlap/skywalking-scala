@@ -8,6 +8,7 @@ import io.grpc.MethodDescriptor
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
+import org.bitlap.skywalking.apm.plugin.ziogrpc.InterceptorSendMessageThreadContext.cache
 
 /** TODO remove
  *  @author
@@ -23,20 +24,40 @@ private[ziogrpc] final case class InterceptorThreadContext(
 
 object InterceptorSendMessageThreadContext:
 
-  private final val cache = new LinkedBlockingQueue[InterceptorThreadContext]()
+  private final val cache = new ConcurrentHashMap[String, LinkedBlockingQueue[InterceptorThreadContext]]()
 
-  def offer(value: InterceptorThreadContext): Boolean = Try(cache.offer(value)).getOrElse(false)
+  def offer(string: String, value: InterceptorThreadContext): Boolean = this.synchronized {
+    Try {
+      cache.putIfAbsent(string, new LinkedBlockingQueue[InterceptorThreadContext]())
+      cache.get(string).offer(value)
+    }.getOrElse(false)
+  }
 
-  def poll: InterceptorThreadContext = Try(cache.poll()).getOrElse(null.asInstanceOf[InterceptorThreadContext])
+  def poll(string: String): InterceptorThreadContext = Try {
+    val q   = cache.get(string)
+    val ret = q.poll()
+    if q.isEmpty then cache.remove(string)
+    ret
+  }.getOrElse(null.asInstanceOf[InterceptorThreadContext])
 
 end InterceptorSendMessageThreadContext
 
 object InterceptorCloseThreadContext:
 
-  private final val cache = new LinkedBlockingQueue[InterceptorThreadContext]()
+  private final val cache = new ConcurrentHashMap[String, LinkedBlockingQueue[InterceptorThreadContext]]()
 
-  def offer(value: InterceptorThreadContext): Boolean = Try(cache.offer(value)).getOrElse(false)
+  def offer(string: String, value: InterceptorThreadContext): Boolean = this.synchronized {
+    Try {
+      cache.putIfAbsent(string, new LinkedBlockingQueue[InterceptorThreadContext]())
+      cache.get(string).offer(value)
+    }.getOrElse(false)
+  }
 
-  def poll: InterceptorThreadContext = Try(cache.poll()).getOrElse(null.asInstanceOf[InterceptorThreadContext])
+  def poll(string: String): InterceptorThreadContext = Try {
+    val q   = cache.get(string)
+    val ret = q.poll()
+    if q.isEmpty then cache.remove(string)
+    ret
+  }.getOrElse(null.asInstanceOf[InterceptorThreadContext])
 
 end InterceptorCloseThreadContext
