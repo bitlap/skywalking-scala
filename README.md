@@ -17,6 +17,7 @@ SkyWalking Extension Plugins for Scala 3
 - [x] zio: 2.0.0
   - [x] `FiberRuntime#run`
   - [x] `blockingExecutor#submit`
+  - [x] Also need `apm-jdk-threadpool-plugin-8.15.0.jar` and `apm-jdk-threading-plugin-8.15.0.jar`
 
 ## Environment
 
@@ -33,4 +34,3 @@ SkyWalking Extension Plugins for Scala 3
 
 Please check the official documents for specific information
 [skywalking.apache.org/docs](https://skywalking.apache.org/docs/skywalking-java/v8.15.0/en/setup/service-agent/java-agent/readme/)
-
