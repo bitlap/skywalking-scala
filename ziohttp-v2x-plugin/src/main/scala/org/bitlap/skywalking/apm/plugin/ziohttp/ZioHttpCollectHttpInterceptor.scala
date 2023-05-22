@@ -2,6 +2,7 @@ package org.bitlap.skywalking.apm.plugin.ziohttp
 
 import java.lang.reflect.Method
 
+import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 
 import zhttp.http.*
@@ -31,7 +32,7 @@ final class ZioHttpCollectHttpInterceptor extends InstanceMethodsAroundIntercept
     if !result.isInstanceOf[Http[?, ?, ?, ?]] then return result
     try {
       val http = result.asInstanceOf[Http[?, ?, Request, Response]]
-      http @@ TraceMiddleware.middleware
+        http @@ TraceMiddleware.middleware
     } catch {
       case e: Throwable =>
         e.printStackTrace()

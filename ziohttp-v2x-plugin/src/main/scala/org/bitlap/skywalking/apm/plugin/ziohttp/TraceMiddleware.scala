@@ -51,6 +51,9 @@ object TraceMiddleware:
     Tags.URL.set(span, request.host.map(String.valueOf).getOrElse("") + request.path.encode)
     Tags.HTTP.METHOD.set(span, request.method.toString())
     SpanLayer.asHttp(span)
+    if ContextManager.isActive then {
+      ContextManager.continued(ContextManager.capture())
+    }
     span
   end beforeRequest
 
