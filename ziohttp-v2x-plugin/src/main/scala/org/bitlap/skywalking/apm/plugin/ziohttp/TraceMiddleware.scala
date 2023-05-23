@@ -38,13 +38,22 @@ object TraceMiddleware:
         if response.status.code >= 400 then {
           span.errorOccurred()
         }
+        ContextManager.stopSpan()
       }
-      ContextManager.stopSpan()
     }.getOrElse(())
   end afterRequest
 
+  def prefixList = {
+    val ignoreUrlPrefixes = ZioHttpPluginConfig.Plugin.ZioHttp.IGNORE_HTTP_URL_PREFIXES
+    ignoreUrlPrefixes.split(",")
+  }
+
   private def beforeRequest(request: Request): AbstractSpan =
-    val uri            = request.url
+    val uri               = request.url
+    val ignoreUrlPrefixes = prefixList.toList
+    if ignoreUrlPrefixes.nonEmpty && ignoreUrlPrefixes.exists(p => uri.path.encode.startsWith(p)) then {
+      return null
+    }
     val contextCarrier = new ContextCarrier
     val span: AbstractSpan =
       ContextManager.createEntrySpan(s"${request.method.toString()}:${uri.path.toString}", contextCarrier)
