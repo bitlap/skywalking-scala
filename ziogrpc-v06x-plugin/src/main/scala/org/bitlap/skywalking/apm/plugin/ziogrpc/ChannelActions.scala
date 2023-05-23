@@ -21,16 +21,16 @@ import Constants.*
  */
 object ChannelActions:
 
-  def beforeSendMessage(contextSnapshot: ContextSnapshot, method: MethodDescriptor[?, ?]): AbstractSpan =
+  def beforeSendMessage(contextSnapshot: ContextSnapshot, method: MethodDescriptor[?, ?]): Option[AbstractSpan] =
     if method.getType.serverSendsOneMessage then {
-      return null
+      return None
     }
     val operationPrefix = OperationNameFormatUtils.formatOperationName(method) + SERVER
     val span            = ContextManager.createLocalSpan(operationPrefix + RESPONSE_ON_MESSAGE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot(contextSnapshot)(())
-    span
+    InterceptorDSL.continuedSnapshot_(contextSnapshot)
+    Some(span)
   end beforeSendMessage
 
   def beforeClose(contextSnapshot: ContextSnapshot, method: MethodDescriptor[?, ?]): AbstractSpan =
@@ -38,10 +38,12 @@ object ChannelActions:
     val span            = ContextManager.createLocalSpan(operationPrefix + RESPONSE_ON_CLOSE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot(contextSnapshot)(())
+    span.prepareForAsync()
+    ContextManager.stopSpan(span)
+    InterceptorDSL.continuedSnapshot_(contextSnapshot)
     span
 
-  def afterClose(status: Status, asyncSpan: AbstractSpan, span: AbstractSpan)(action: => Unit): Unit =
+  def afterClose(status: Status, asyncSpan: AbstractSpan, span: AbstractSpan): Unit =
     status match {
       case OK      =>
       case UNKNOWN =>
@@ -53,7 +55,6 @@ object ChannelActions:
     }
     Tags.RPC_RESPONSE_STATUS_CODE.set(span, status.getCode.name)
     try
-      action
       span.asyncFinish
     catch {
       case t: Throwable =>
@@ -62,7 +63,7 @@ object ChannelActions:
       try
         asyncSpan.asyncFinish()
       catch {
-        case t: Throwable => ContextManager.activeSpan.log(t)
+        case ignore: Throwable =>
       }
 
 end ChannelActions

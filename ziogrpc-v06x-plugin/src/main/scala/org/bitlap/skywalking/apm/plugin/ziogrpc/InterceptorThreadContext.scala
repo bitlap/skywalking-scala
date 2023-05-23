@@ -8,7 +8,6 @@ import io.grpc.MethodDescriptor
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
-import org.bitlap.skywalking.apm.plugin.ziogrpc.InterceptorSendMessageThreadContext.cache
 
 /** TODO remove
  *  @author
@@ -22,7 +21,7 @@ private[ziogrpc] final case class InterceptorThreadContext(
   activeSpan: Option[AbstractSpan] = None
 )
 
-object InterceptorSendMessageThreadContext:
+object InterceptorSendMessageQueue:
 
   private final val cache = new ConcurrentHashMap[String, LinkedBlockingQueue[InterceptorThreadContext]]()
 
@@ -40,7 +39,7 @@ object InterceptorSendMessageThreadContext:
     ret
   }.getOrElse(null.asInstanceOf[InterceptorThreadContext])
 
-end InterceptorSendMessageThreadContext
+end InterceptorSendMessageQueue
 
 object InterceptorCloseThreadContext:
 

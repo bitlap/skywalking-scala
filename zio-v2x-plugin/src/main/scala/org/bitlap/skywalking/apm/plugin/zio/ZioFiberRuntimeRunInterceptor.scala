@@ -7,6 +7,7 @@ import zio.internal.FiberRuntime
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.SpanLayer
+import org.apache.skywalking.apm.agent.core.logging.api.{ ILog, LogManager }
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
@@ -16,6 +17,8 @@ import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
  *  @version 1.0,2023/5/16
  */
 final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundInterceptor:
+
+  import ZioFiberRuntimeRunInterceptor.*
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -56,3 +59,9 @@ final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundIntercept
     t: Throwable
   ): Unit =
     if ContextManager.isActive then ContextManager.activeSpan.log(t)
+  end handleMethodException
+
+end ZioFiberRuntimeRunInterceptor
+
+object ZioFiberRuntimeRunInterceptor:
+  private val LOGGER = LogManager.getLogger(classOf[ZioFiberRuntimeRunInterceptor])
