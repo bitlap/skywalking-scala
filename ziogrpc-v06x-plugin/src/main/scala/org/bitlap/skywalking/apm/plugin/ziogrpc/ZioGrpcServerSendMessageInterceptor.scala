@@ -28,7 +28,7 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val context = InterceptorSendMessageQueue.poll(
+    val context = GrpcOperationQueue.poll(
       OperationNameFormatUtils.formatOperationName(allArguments(0).asInstanceOf[ServerCall[?, ?]].getMethodDescriptor)
     )
     if context == null then return

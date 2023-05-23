@@ -55,12 +55,8 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
 
     val contextSnapshot = ContextManager.capture
     span.prepareForAsync()
-    val context = InterceptorThreadContext(contextSnapshot, span, call.getMethodDescriptor)
-    InterceptorSendMessageQueue.offer(
-      OperationNameFormatUtils.formatOperationName(call.getMethodDescriptor),
-      context
-    )
-    InterceptorCloseThreadContext.offer(OperationNameFormatUtils.formatOperationName(call.getMethodDescriptor), context)
+    val context = OperationContext(contextSnapshot, span, call.getMethodDescriptor)
+    GrpcOperationQueue.offer(OperationNameFormatUtils.formatOperationName(call.getMethodDescriptor), context)
     objInst.setSkyWalkingDynamicField(context)
 
   end beforeMethod
@@ -75,7 +71,7 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     val context = objInst.getSkyWalkingDynamicField
     if context == null then return ret
     val call            = allArguments(0).asInstanceOf[ServerCall[Any, Any]]
-    val ctx             = context.asInstanceOf[InterceptorThreadContext]
+    val ctx             = context.asInstanceOf[OperationContext]
     val contextSnapshot = ctx.contextSnapshot
     val asyncSpan       = ctx.asyncSpan
     val listener        = ret.asInstanceOf[Listener[Any]]
