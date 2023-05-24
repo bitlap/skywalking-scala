@@ -29,11 +29,10 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val context = GrpcOperationQueue.poll(
-      OperationNameFormatUtils.formatOperationName(allArguments(0).asInstanceOf[ServerCall[?, ?]].getMethodDescriptor)
-    )
+    val call    = allArguments(0).asInstanceOf[ServerCall[?, ?]]
+    val context = GrpcOperationQueue.remove(call)
     if context == null then return
-    val contextSnapshot = context.contextSnapshot
+    val contextSnapshot = ContextManager.capture
     val method          = context.methodDescriptor
     val span            = ChannelActions.beforeClose(contextSnapshot, method)
     objInst.setSkyWalkingDynamicField(context.copy(activeSpan = Option(span)))

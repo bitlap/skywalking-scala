@@ -4,7 +4,7 @@ import java.util.concurrent.*
 
 import scala.util.Try
 
-import io.grpc.MethodDescriptor
+import io.grpc.*
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
@@ -15,30 +15,30 @@ import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
  *  @version 1.0,2023/5/15
  */
 private[ziogrpc] final case class OperationContext(
-  contextSnapshot: ContextSnapshot,
   asyncSpan: AbstractSpan,
   methodDescriptor: MethodDescriptor[?, ?],
-  activeSpan: Option[AbstractSpan] = None
+  activeSpan: Option[AbstractSpan] = None,
+  contextSnapshot: Option[ContextSnapshot] = None
 )
 
 object GrpcOperationQueue:
 
-  private final val cache = new ConcurrentHashMap[String, LinkedBlockingQueue[OperationContext]]()
+  private final val cacheClose = new ConcurrentHashMap[ServerCall[?, ?], OperationContext]()
 
-  def offer(string: String, value: OperationContext): Boolean = this.synchronized {
+  def put(call: ServerCall[?, ?], ctx: OperationContext): Boolean =
     Try {
-      cache.putIfAbsent(string, new LinkedBlockingQueue[OperationContext]())
-      cache.get(string).offer(value)
+      cacheClose.put(call, ctx)
+      true
     }.getOrElse(false)
-  }
 
-  def poll(string: String): OperationContext = this.synchronized {
+  def get(call: ServerCall[?, ?]): OperationContext =
     Try {
-      val q   = cache.get(string)
-      val ret = q.poll()
-      if q.isEmpty then cache.remove(string)
-      ret
+      cacheClose.get(call)
     }.getOrElse(null.asInstanceOf[OperationContext])
-  }
+
+  def remove(call: ServerCall[?, ?]): OperationContext =
+    Try {
+      cacheClose.remove(call)
+    }.getOrElse(null.asInstanceOf[OperationContext])
 
 end GrpcOperationQueue

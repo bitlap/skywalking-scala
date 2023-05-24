@@ -20,7 +20,7 @@ import org.apache.skywalking.apm.network.language.agent.v3.MeterData
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.forward.TracingServerCallListener
+import org.bitlap.skywalking.apm.plugin.ziogrpc.forward.*
 
 import Constants.*
 
@@ -55,8 +55,8 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
 
     val contextSnapshot = ContextManager.capture
     span.prepareForAsync()
-    val context = OperationContext(contextSnapshot, span, call.getMethodDescriptor)
-    GrpcOperationQueue.offer(OperationNameFormatUtils.formatOperationName(call.getMethodDescriptor), context)
+    val context = OperationContext(span, call.getMethodDescriptor, None, Some(contextSnapshot))
+    GrpcOperationQueue.put(call, context.copy(contextSnapshot = None))
     objInst.setSkyWalkingDynamicField(context)
 
   end beforeMethod
@@ -72,7 +72,7 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     if context == null then return ret
     val call            = allArguments(0).asInstanceOf[ServerCall[Any, Any]]
     val ctx             = context.asInstanceOf[OperationContext]
-    val contextSnapshot = ctx.contextSnapshot
+    val contextSnapshot = ctx.contextSnapshot.orNull
     val asyncSpan       = ctx.asyncSpan
     val listener        = ret.asInstanceOf[Listener[Any]]
 
