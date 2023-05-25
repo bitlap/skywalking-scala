@@ -1,8 +1,5 @@
 package org.bitlap.skywalking.apm.plugin.ziohttp
 
-import java.net.URL
-import java.util.concurrent.atomic.AtomicBoolean
-
 import scala.util.Try
 
 import zio.*
@@ -11,8 +8,7 @@ import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
-import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
+import org.bitlap.skywalking.apm.plugin.common.Utils
 
 import zhttp.http.*
 import zhttp.http.middleware.*
@@ -43,15 +39,9 @@ object TraceMiddleware:
     }.getOrElse(())
   end afterRequest
 
-  def prefixList = {
-    val ignoreUrlPrefixes = ZioHttpPluginConfig.Plugin.ZioHttp.IGNORE_HTTP_URL_PREFIXES
-    ignoreUrlPrefixes.split(",")
-  }
-
   private def beforeRequest(request: Request): AbstractSpan =
-    val uri               = request.url
-    val ignoreUrlPrefixes = prefixList.toList
-    if ignoreUrlPrefixes.nonEmpty && ignoreUrlPrefixes.exists(p => uri.path.encode.startsWith(p)) then {
+    val uri = request.url
+    if Utils.ignorePrefix(ZioHttpPluginConfig.Plugin.ZioHttp.IGNORE_HTTP_URL_PREFIXES, uri.path.encode) then {
       return null
     }
     val contextCarrier = new ContextCarrier

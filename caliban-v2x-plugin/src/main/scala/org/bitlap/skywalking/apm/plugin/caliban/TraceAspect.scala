@@ -44,7 +44,16 @@ object TraceAspect:
   def beforeRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
     if graphQLRequest == null || graphQLRequest.query.isEmpty then None
     else {
-      val opName = "GraphQL/" + getOperationName(graphQLRequest)
+
+      if Utils.ignorePrefix(
+          CalibanPluginConfig.Plugin.Caliban.CALIBAN_IGNORE_URL_PREFIXES,
+          getOperationName(graphQLRequest)
+        )
+      then {
+        return None
+      }
+
+      val opName = CalibanPluginConfig.Plugin.Caliban.CALIBAN_URL_PREFIX + getOperationName(graphQLRequest)
       val span   = ContextManager.createLocalSpan(opName)
       span.prepareForAsync()
       SpanLayer.asHttp(span)
