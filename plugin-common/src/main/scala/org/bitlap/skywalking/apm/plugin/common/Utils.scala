@@ -7,5 +7,5 @@ package org.bitlap.skywalking.apm.plugin.common
 object Utils:
 
   def ignorePrefix(ignoreUrlPrefixes: => String, uri: => String): Boolean =
-    val prefixes = ignoreUrlPrefixes.split(",").toList
+    val prefixes = ignoreUrlPrefixes.split(",").toList.filter(_.nonEmpty)
     prefixes.nonEmpty && prefixes.exists(p => uri.startsWith(p))
