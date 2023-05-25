@@ -41,8 +41,11 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
-    val result    = ret.asInstanceOf[URIO[?, GraphQLResponse[CalibanError]]]
     val asyncSpan = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
+    if asyncSpan == null then return ret
+
+    val result = ret.asInstanceOf[URIO[?, GraphQLResponse[CalibanError]]]
+
     result
       .catchAllCause(c => ZIO.attempt(if ContextManager.isActive then ContextManager.activeSpan.log(c.squash)))
       .ensuring(
