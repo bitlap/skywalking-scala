@@ -10,8 +10,8 @@ import io.grpc.*
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcClientInterceptor
 import org.bitlap.skywalking.apm.plugin.ziogrpc.forward.TracingClientCall
+import org.bitlap.skywalking.apm.plugin.ziogrpc.interceptor.ZioGrpcClientInterceptor
 
 /** @author
  *    梦境迷离
