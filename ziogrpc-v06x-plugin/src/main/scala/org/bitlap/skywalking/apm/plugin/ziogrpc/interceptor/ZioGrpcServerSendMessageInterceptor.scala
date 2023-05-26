@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc
+package org.bitlap.skywalking.apm.plugin.ziogrpc.interceptor
 
 import java.lang.reflect.Method
 
@@ -14,6 +14,7 @@ import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.*
 
 /** @author
  *    梦境迷离
@@ -33,9 +34,24 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     if context == null then return
     val contextSnapshot = ContextManager.capture
     val method          = context.methodDescriptor
-    val span            = ChannelActions.beforeSendMessage(contextSnapshot, method)
+    val span            = beforeSendMessage(contextSnapshot, method)
     span.foreach(a => objInst.setSkyWalkingDynamicField(a))
   end beforeMethod
+
+  private def beforeSendMessage(
+    contextSnapshot: ContextSnapshot,
+    method: MethodDescriptor[?, ?]
+  ): Option[AbstractSpan] =
+    if method.getType.serverSendsOneMessage then {
+      return None
+    }
+    val operationPrefix = OperationNameFormatUtils.formatOperationName(method) + SERVER
+    val span            = ContextManager.createLocalSpan(operationPrefix + RESPONSE_ON_MESSAGE_OPERATION_NAME)
+    span.setComponent(ZIO_GRPC)
+    span.setLayer(SpanLayer.RPC_FRAMEWORK)
+    InterceptorDSL.continuedSnapshot_(contextSnapshot)
+    Some(span)
+  end beforeSendMessage
 
   override def afterMethod(
     objInst: EnhancedInstance,

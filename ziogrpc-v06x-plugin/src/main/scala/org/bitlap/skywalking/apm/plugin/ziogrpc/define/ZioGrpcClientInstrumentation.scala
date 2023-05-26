@@ -37,7 +37,7 @@ end ZioGrpcClientInstrumentation
 object ZioGrpcClientInstrumentation:
 
   private final val INTERCEPTOR_CLASS: String =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcClientInterceptor"
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.interceptor.ZioGrpcClientInterceptor"
   private final val ENHANCE_CLASS: String  = "scalapb.zio_grpc.ZChannel"
   private final val ENHANCE_METHOD: String = "newCall"
 

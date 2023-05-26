@@ -35,10 +35,11 @@ end ZioGrpcServerCallInstrumentation
 
 object ZioGrpcServerCallInstrumentation:
 
-  final val INTERCEPTOR_CLOSE_CLASS = "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcServerCloseInterceptor"
+  final val INTERCEPTOR_CLOSE_CLASS =
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.interceptor.ZioGrpcServerCloseInterceptor"
 
   final val INTERCEPTOR_SEND_MESSAGE_CLASS =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcServerSendMessageInterceptor"
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.interceptor.ZioGrpcServerSendMessageInterceptor"
 
   private final val ENHANCE_CLASS: String = "scalapb.zio_grpc.server.ZServerCall$"
 

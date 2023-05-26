@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc
+package org.bitlap.skywalking.apm.plugin.ziogrpc.interceptor
 
 import java.lang.reflect.Method
 
@@ -10,7 +10,7 @@ import io.grpc.*
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance
+import org.bitlap.skywalking.apm.plugin.ziogrpc.ZioGrpcClientInterceptor
 import org.bitlap.skywalking.apm.plugin.ziogrpc.forward.TracingClientCall
 
 /** @author
