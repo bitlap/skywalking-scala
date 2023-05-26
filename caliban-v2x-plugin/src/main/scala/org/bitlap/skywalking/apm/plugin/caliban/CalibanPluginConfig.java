@@ -11,8 +11,8 @@ public class CalibanPluginConfig {
         @PluginConfig(root = CalibanPluginConfig.class)
         public static class Caliban {
             // split by ,
-            public static String CALIBAN_IGNORE_URL_PREFIXES = "";
-            public static String CALIBAN_URL_PREFIX = "GraphQL/";
+            public static String IGNORE_URL_PREFIXES = "";
+            public static String URL_PREFIX = "GraphQL/";
         }
     }
 }

@@ -46,14 +46,14 @@ object TraceAspect:
     else {
 
       if Utils.ignorePrefix(
-          CalibanPluginConfig.Plugin.Caliban.CALIBAN_IGNORE_URL_PREFIXES,
+          CalibanPluginConfig.Plugin.Caliban.IGNORE_URL_PREFIXES,
           getOperationName(graphQLRequest)
         )
       then {
         return None
       }
 
-      val opName = CalibanPluginConfig.Plugin.Caliban.CALIBAN_URL_PREFIX + getOperationName(graphQLRequest)
+      val opName = CalibanPluginConfig.Plugin.Caliban.URL_PREFIX + getOperationName(graphQLRequest)
       val span   = ContextManager.createLocalSpan(opName)
       span.prepareForAsync()
       SpanLayer.asHttp(span)

@@ -6,18 +6,30 @@ SkyWalking Extension Plugins for Scala 3
 
 [Badge-CI]: https://github.com/bitlap/skywalking-scala/actions/workflows/ScalaCI.yml/badge.svg
 
-## Features
+## Introduction
+
+[SkyWalking Scala](https://github.com/bitlap/skywalking-scala) is a SkyWalking Extension (Agent) Plugins for Scala 3.
+
+
+| plugin              | library  | tested version | breakthrough points                                             |
+|---------------------|----------|----------------|-----------------------------------------------------------------|
+| caliban-v2x-plugin  | caliban  | 2.0.1          | `GraphQLInterpreter#executeRequest`                             |
+| zio-v2x-plugin      | zio      | 2.0.0          | `FiberRuntime#run`,`blockingExecutor#submit`                    |
+| ziogrpc-v06x-plugin | zio-grpc | 0.6.0-test4    | `ZChannel#newCall`,`ZServerCallHandler#startCall`,`ZServerCall` |
+| ziohttp-v2x-plugin  | zio-http | 2.0.0-RC10     | `Http.collectHttp`                                              |
 
 > Other small versions of the library supported by this plugin may also work, but they have not been tested.
 
-- [x] caliban: 2.0.1
-- [x] zio-grpc: 0.6.0-test4
-- [x] zio-http(zhttp): 2.0.0-RC10
-  - [x] `Http.collectHttp`
-- [x] zio: 2.0.0
-  - [x] `FiberRuntime#run`
-  - [x] `blockingExecutor#submit`
-  - [x] Also need `apm-jdk-threadpool-plugin-8.15.0.jar` and `apm-jdk-threading-plugin-8.15.0.jar`
+Also need `apm-jdk-threadpool-plugin-x.y.z.jar` and `apm-jdk-threading-plugin-x.y.z.jar`.
+
+## Available Configurations
+| key                                | description                                                                                |
+|------------------------------------|--------------------------------------------------------------------------------------------|
+| plugin.caliban.url_prefix          | Add a custom prefix to the graphql operation, default is `GraphQL/`.                       |
+| plugin.caliban.ignore_url_prefixes | will ignore operation name that start with this prefix, i.e. no span will be created.      |
+| plugin.ziohttp.ignore_url_prefixes | will ignore request path that should start with this prefix, i.e. no span will be created. |
+
+The prefix should be added when passing command line parameters, such as: `-Dskywalking.plugin.caliban.url_prefix=GQL/`
 
 ## Environment
 

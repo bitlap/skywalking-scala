@@ -11,7 +11,7 @@ public class ZioHttpPluginConfig {
         @PluginConfig(root = ZioHttpPluginConfig.class)
         public static class ZioHttp {
             // split by ,
-            public static String IGNORE_HTTP_URL_PREFIXES = "";
+            public static String IGNORE_URL_PREFIXES = "";
         }
     }
 }
