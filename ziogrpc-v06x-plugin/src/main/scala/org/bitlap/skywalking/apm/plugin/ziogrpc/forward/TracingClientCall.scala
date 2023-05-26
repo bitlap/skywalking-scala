@@ -1,8 +1,10 @@
 package org.bitlap.skywalking.apm.plugin.ziogrpc.forward
 
+import java.lang.reflect.*
+
 import scala.collection.mutable.ListBuffer
 import scalapb.zio_grpc.SafeMetadata
-import scalapb.zio_grpc.client.ZClientCall
+import scalapb.zio_grpc.client.*
 
 import io.grpc.*
 import io.grpc.ClientCall.Listener
@@ -13,6 +15,7 @@ import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
+import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
 import org.bitlap.skywalking.apm.plugin.ziogrpc.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.OperationNameFormatUtils
@@ -30,13 +33,43 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
   private var snapshot: ContextSnapshot = _
   private val serviceName               = OperationNameFormatUtils.formatOperationName(method)
   private val operationPrefix           = serviceName + CLIENT
+  private val DEFAULT_PEER              = "No Peer"
+
+  private def getRemotePeerIp: String = {
+    var call: Field               = null
+    var attMethod: Option[Method] = None
+
+    try {
+      call = delegate.getClass.getDeclaredField("call")
+      call.setAccessible(true)
+      val callImpl = call.get(delegate).asInstanceOf[ClientCall[?, ?]]
+      attMethod = callImpl.getClass.getDeclaredMethods.find(_.getName == "getAttributes")
+      attMethod.foreach(_.setAccessible(true))
+      val attributes = attMethod.map(_.invoke(callImpl).asInstanceOf[Attributes])
+
+      val realRemoteIp = attributes.map(_.get[String](Attributes.Key.create("remote-addr"))).orNull
+      if StringUtil.isNotBlank(realRemoteIp) then {
+        if realRemoteIp.startsWith("/") then realRemoteIp.substring(1) else realRemoteIp
+      } else {
+        peer.getOrElse(DEFAULT_PEER)
+      }
+
+    } catch {
+      case ignore: Throwable =>
+        DEFAULT_PEER
+    } finally {
+      call.setAccessible(false)
+      attMethod.foreach(_.setAccessible(false))
+    }
+  }
 
   override def start(
     responseListener: Listener[RESPONSE],
     headers: SafeMetadata
   ): ZIO[R, Status, Unit] =
     val contextCarrier = new ContextCarrier
-    val span           = ContextManager.createExitSpan(serviceName, peer.getOrElse("No Peer"))
+    val remotePeer     = getRemotePeerIp
+    val span           = ContextManager.createExitSpan(serviceName, remotePeer)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
     ContextManager.inject(contextCarrier)
