@@ -8,7 +8,7 @@ import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.common.Utils
+import org.bitlap.skywalking.apm.plugin.common.{ ScalaTags, Utils }
 
 import zhttp.http.*
 import zhttp.http.middleware.*
@@ -49,6 +49,9 @@ object TraceMiddleware:
       ContextManager.createEntrySpan(s"${request.method.toString()}:${uri.path.toString}", contextCarrier)
     Tags.URL.set(span, request.host.map(String.valueOf).getOrElse("") + request.path.encode)
     Tags.HTTP.METHOD.set(span, request.method.toString())
+    if ZioHttpPluginConfig.Plugin.ZioHttp.COLLECT_HTTP_PARAMS then {
+      Tags.HTTP.PARAMS.set(span, request.url.queryParams.toString())
+    }
     SpanLayer.asHttp(span)
     span
   end beforeRequest

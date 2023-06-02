@@ -12,6 +12,8 @@ public class ZioHttpPluginConfig {
         public static class ZioHttp {
             // split by ,
             public static String IGNORE_URL_PREFIXES = "";
+
+            public static boolean COLLECT_HTTP_PARAMS = false;
         }
     }
 }

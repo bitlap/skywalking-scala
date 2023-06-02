@@ -22,25 +22,6 @@ import org.bitlap.skywalking.apm.plugin.common.*
  */
 object TraceAspect:
 
-  def traceQueryWrapper[R]: OverallWrapper[R] =
-    new OverallWrapper[R] {
-
-      def wrap[R1 <: R](
-        process: GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]]
-      ): GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]] =
-        (request: GraphQLRequest) =>
-          (for {
-            span <- ZIO
-              .succeed(beforeRequest(request))
-            response <- process(request)
-            _ <- ZIO.attempt {
-              span.map(_.asyncFinish())
-            }.mapError { e =>
-              if ContextManager.isActive then ContextManager.activeSpan().errorOccurred().log(e.getCause)
-            }.ignore
-          } yield response).ensuring(ZIO.attempt(ContextManager.stopSpan()).ignore)
-    }
-
   def beforeRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
     if graphQLRequest == null || graphQLRequest.query.isEmpty then None
     else {
@@ -57,6 +38,10 @@ object TraceAspect:
       val span   = ContextManager.createLocalSpan(opName)
       span.prepareForAsync()
       SpanLayer.asHttp(span)
+      if CalibanPluginConfig.Plugin.Caliban.COLLECT_VARIABLES then {
+        ScalaTags.CalibanVariables.tag
+          .set(span, graphQLRequest.variables.getOrElse(Map.empty).map(kv => kv._1 -> kv._2.toInputString).toString())
+      }
       Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
       span.setComponent(ComponentsDefine.GRAPHQL)
       Some(span)

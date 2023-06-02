@@ -34,7 +34,7 @@ final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundIntercept
     val fiberRuntime = objInst.asInstanceOf[FiberRuntime[?, ?]]
     val span         = ContextManager.createLocalSpan(Utils.generateFiberOperationName)
     span.setComponent(ComponentsDefine.JDK_THREADING)
-    ZioTag.setZioTags(span, fiberRuntime.id)
+    ZioTags.setZioTags(span, fiberRuntime.id)
     val storedField = objInst.getSkyWalkingDynamicField
     if storedField != null then {
       val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]

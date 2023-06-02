@@ -31,7 +31,7 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
     val storedField        = objInst.getSkyWalkingDynamicField
     fiberRuntime match {
       case fiber: FiberRuntime[?, ?] =>
-        ZioTag.setZioTags(span, fiber.id)
+        ZioTags.setZioTags(span, fiber.id)
       case _ =>
     }
     if storedField != null then {
