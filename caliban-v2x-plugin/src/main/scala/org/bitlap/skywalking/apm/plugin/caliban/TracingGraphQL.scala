@@ -1,5 +1,6 @@
 package org.bitlap.skywalking.apm.plugin.caliban
 
+import scala.jdk.CollectionConverters.*
 import scala.util.*
 
 import caliban.*
@@ -13,14 +14,16 @@ import zio.*
 import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
+import org.apache.skywalking.apm.agent.core.util.CollectionUtil
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
+import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.*
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/5/18
  */
-object TraceAspect:
+object TracingGraphQL:
 
   def beforeRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
     if graphQLRequest == null || graphQLRequest.query.isEmpty then None
@@ -39,15 +42,23 @@ object TraceAspect:
       span.prepareForAsync()
       SpanLayer.asHttp(span)
       if CalibanPluginConfig.Plugin.Caliban.COLLECT_VARIABLES then {
-        ScalaTags.CalibanVariables.tag
-          .set(span, graphQLRequest.variables.getOrElse(Map.empty).map(kv => kv._1 -> kv._2.toInputString).toString())
+        val tagValue = collectVariables(graphQLRequest)
+        ScalaTags.CalibanVariables.tag.set(span, tagValue)
       }
       Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
       span.setComponent(ComponentsDefine.GRAPHQL)
       Some(span)
     }
 
-  def getOperationName(graphQLRequest: GraphQLRequest) =
+  private def collectVariables(graphQLRequest: GraphQLRequest): String = {
+    val params   = graphQLRequest.variables.getOrElse(Map.empty).map(kv => kv._1 -> Array(kv._2.toInputString))
+    val tagValue = CollectionUtil.toString(params.asJava)
+    if CalibanPluginConfig.Plugin.Caliban.VARIABLES_LENGTH_THRESHOLD > 0 then {
+      StringUtil.cut(tagValue, CalibanPluginConfig.Plugin.Caliban.VARIABLES_LENGTH_THRESHOLD)
+    } else tagValue
+  }
+
+  private def getOperationName(graphQLRequest: GraphQLRequest) =
     val tryOp: Try[String] = Try {
       val docOpName = InterceptorDSL
         .unsafeRun(Parser.parseQuery(graphQLRequest.query.get))

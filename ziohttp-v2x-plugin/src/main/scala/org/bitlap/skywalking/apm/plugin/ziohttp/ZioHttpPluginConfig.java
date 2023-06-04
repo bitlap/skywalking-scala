@@ -14,6 +14,8 @@ public class ZioHttpPluginConfig {
             public static String IGNORE_URL_PREFIXES = "";
 
             public static boolean COLLECT_HTTP_PARAMS = false;
+
+            public static int HTTP_PARAMS_LENGTH_THRESHOLD = 1024;
         }
     }
 }

@@ -32,7 +32,7 @@ final class ZioHttpCollectHttpInterceptor extends InstanceMethodsAroundIntercept
     if !result.isInstanceOf[Http[?, ?, ?, ?]] then return result
     try {
       val http = result.asInstanceOf[Http[?, ?, Request, Response]]
-      http @@ TraceMiddleware.middleware
+      http @@ TracingMiddleware.middleware
     } catch {
       case e: Throwable =>
         e.printStackTrace()

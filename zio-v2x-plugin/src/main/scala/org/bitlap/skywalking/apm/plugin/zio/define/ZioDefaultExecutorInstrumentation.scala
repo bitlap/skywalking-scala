@@ -43,7 +43,7 @@ end ZioDefaultExecutorInstrumentation
 object ZioDefaultExecutorInstrumentation:
 
   final val CONSTRUCTOR_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.zio.ConstructorInterceptor"
+    "org.bitlap.skywalking.apm.plugin.common.ConstructorInterceptor"
 
   final val ENHANCE_CLASS: String = "zio.internal.DefaultExecutors$$anon$1"
 

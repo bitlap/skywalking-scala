@@ -1,5 +1,6 @@
 package org.bitlap.skywalking.apm.plugin.ziohttp
 
+import scala.jdk.CollectionConverters.*
 import scala.util.Try
 
 import zio.*
@@ -8,6 +9,8 @@ import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
+import org.apache.skywalking.apm.agent.core.util.CollectionUtil
+import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.{ ScalaTags, Utils }
 
 import zhttp.http.*
@@ -17,7 +20,7 @@ import zhttp.http.middleware.*
  *    梦境迷离
  *  @version 1.0,2023/5/17
  */
-object TraceMiddleware:
+object TracingMiddleware:
 
   final lazy val middleware: HttpMiddleware[Any, Throwable] =
     Middleware
@@ -50,10 +53,18 @@ object TraceMiddleware:
     Tags.URL.set(span, request.host.map(String.valueOf).getOrElse("") + request.path.encode)
     Tags.HTTP.METHOD.set(span, request.method.toString())
     if ZioHttpPluginConfig.Plugin.ZioHttp.COLLECT_HTTP_PARAMS then {
-      Tags.HTTP.PARAMS.set(span, request.url.queryParams.toString())
+      val tagValue = collectHttpParam(request)
+      Tags.HTTP.PARAMS.set(span, tagValue)
     }
     SpanLayer.asHttp(span)
     span
   end beforeRequest
 
-end TraceMiddleware
+  private def collectHttpParam(request: Request): String = {
+    val tagValue = CollectionUtil.toString(request.url.queryParams.map(kv => kv._1 -> kv._2.toArray).asJava)
+    if ZioHttpPluginConfig.Plugin.ZioHttp.HTTP_PARAMS_LENGTH_THRESHOLD > 0 then
+      StringUtil.cut(tagValue, ZioHttpPluginConfig.Plugin.ZioHttp.HTTP_PARAMS_LENGTH_THRESHOLD)
+    else tagValue
+  }
+
+end TracingMiddleware

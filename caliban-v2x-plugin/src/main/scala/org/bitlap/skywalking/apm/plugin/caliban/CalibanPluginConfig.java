@@ -14,7 +14,9 @@ public class CalibanPluginConfig {
             public static String IGNORE_URL_PREFIXES = "";
             public static String URL_PREFIX = "GraphQL/";
             
-            public static boolean COLLECT_VARIABLES = true;
+            public static boolean COLLECT_VARIABLES = false;
+
+            public static int VARIABLES_LENGTH_THRESHOLD = 1024;
         }
     }
 }

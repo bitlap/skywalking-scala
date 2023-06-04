@@ -23,13 +23,15 @@ SkyWalking Extension Plugins for Scala 3
 Also need `apm-jdk-threadpool-plugin-x.y.z.jar` and `apm-jdk-threading-plugin-x.y.z.jar`.
 
 ## Available Configurations
-| key                                  | description                                                                           |
-|--------------------------------------|---------------------------------------------------------------------------------------|
-| `plugin.caliban.url_prefix`          | Add a custom prefix to the graphql operation, default is `GraphQL/`.                  |
-| `plugin.caliban.ignore_url_prefixes` | Ignore operation name that start with this prefix, i.e. no span will be created.      |
-| `plugin.caliban.collect_variables`   | Collect request variables.                                                            |
-| `plugin.ziohttp.ignore_url_prefixes` | Ignore request path that should start with this prefix, i.e. no span will be created. |
-| `plugin.ziohttp.collect_http_params` | Collect http query params.                                                            |
+| key                                           | description                                                                           |
+|-----------------------------------------------|---------------------------------------------------------------------------------------|
+| `plugin.caliban.url_prefix`                   | Add a custom prefix to the graphql operation, default is `GraphQL/`.                  |
+| `plugin.caliban.ignore_url_prefixes`          | Ignore operation name that start with this prefix, i.e. no span will be created.      |
+| `plugin.caliban.collect_variables`            | Collect request variables.                                                            |
+| `plugin.caliban.variables_length_threshold`   | How many characters to keep and send to the OAP backend.                              |
+| `plugin.ziohttp.ignore_url_prefixes`          | Ignore request path that should start with this prefix, i.e. no span will be created. |
+| `plugin.ziohttp.collect_http_params`          | Collect http query params.                                                            |
+| `plugin.ziohttp.http_params_length_threshold` | How many characters to keep and send to the OAP backend.                              |
 
 The prefix should be added when passing command line parameters, such as: `-Dskywalking.plugin.caliban.url_prefix=GQL/`
 
