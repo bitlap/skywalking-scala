@@ -14,16 +14,16 @@ import org.bitlap.skywalking.apm.plugin.ziogrpc.OperationNameFormatUtils
  *    梦境迷离
  *  @version 1.0,2023/5/14
  */
-final class TracingClientCallListener[RESPONSE](
-  delegate: ClientCall.Listener[RESPONSE],
-  method: MethodDescriptor[?, RESPONSE],
+final class TracingClientCallListener[Resp](
+  delegate: ClientCall.Listener[Resp],
+  method: MethodDescriptor[?, Resp],
   contextSnapshot: ContextSnapshot,
   asyncSpan: AbstractSpan
-) extends ForwardingClientCallListener.SimpleForwardingClientCallListener[RESPONSE](delegate):
+) extends ForwardingClientCallListener.SimpleForwardingClientCallListener[Resp](delegate):
 
   private val operationPrefix = OperationNameFormatUtils.formatOperationName(method) + CLIENT
 
-  override def onMessage(message: RESPONSE): Unit =
+  override def onMessage(message: Resp): Unit =
     if method.getType.serverSendsOneMessage then {
       delegate.onMessage(message)
       return

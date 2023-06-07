@@ -61,11 +61,11 @@ object ZioGrpcClientInterceptor:
 
   private final class ZTraceClientInterceptor[R](peer: Option[String]) extends ZClientInterceptor[R] {
 
-    def interceptCall[REQUEST, RESPONSE](
-      methodDescriptor: MethodDescriptor[REQUEST, RESPONSE],
+    def interceptCall[Req, Resp](
+      methodDescriptor: MethodDescriptor[Req, Resp],
       call: CallOptions,
-      clientCall: ZClientCall[R, REQUEST, RESPONSE]
-    ): ZClientCall[R, REQUEST, RESPONSE] =
-      new TracingClientCall[R, REQUEST, RESPONSE](peer, clientCall, methodDescriptor)
+      clientCall: ZClientCall[R, Req, Resp]
+    ): ZClientCall[R, Req, Resp] =
+      new TracingClientCall[R, Req, Resp](peer, clientCall, methodDescriptor)
 
   }

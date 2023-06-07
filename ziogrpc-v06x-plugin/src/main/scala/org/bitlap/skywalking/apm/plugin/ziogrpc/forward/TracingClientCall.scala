@@ -24,11 +24,11 @@ import org.bitlap.skywalking.apm.plugin.ziogrpc.OperationNameFormatUtils
  *    梦境迷离
  *  @version 1.0,2023/5/14
  */
-final class TracingClientCall[R, REQUEST, RESPONSE](
+final class TracingClientCall[R, Req, Resp](
   peer: Option[String],
-  delegate: ZClientCall[R, REQUEST, RESPONSE],
-  method: MethodDescriptor[REQUEST, RESPONSE]
-) extends ZClientCall[R, REQUEST, RESPONSE]:
+  delegate: ZClientCall[R, Req, Resp],
+  method: MethodDescriptor[Req, Resp]
+) extends ZClientCall[R, Req, Resp]:
 
   private var snapshot: ContextSnapshot = _
   private val serviceName               = OperationNameFormatUtils.formatOperationName(method)
@@ -64,7 +64,7 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
   }
 
   override def start(
-    responseListener: Listener[RESPONSE],
+    responseListener: Listener[Resp],
     headers: SafeMetadata
   ): ZIO[R, Status, Unit] =
     val contextCarrier = new ContextCarrier
@@ -93,7 +93,7 @@ final class TracingClientCall[R, REQUEST, RESPONSE](
 
   override def request(numMessages: Int): ZIO[R, Status, Unit] = delegate.request(numMessages)
 
-  override def sendMessage(message: REQUEST): ZIO[R, Status, Unit] =
+  override def sendMessage(message: Req): ZIO[R, Status, Unit] =
     if method.getType.clientSendsOneMessage then {
       return delegate.sendMessage(message)
     }
