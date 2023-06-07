@@ -18,8 +18,6 @@ import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
  */
 final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundInterceptor:
 
-  import ZioFiberRuntimeRunInterceptor.*
-
   override def beforeMethod(
     objInst: EnhancedInstance,
     method: Method,
@@ -62,6 +60,3 @@ final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundIntercept
   end handleMethodException
 
 end ZioFiberRuntimeRunInterceptor
-
-object ZioFiberRuntimeRunInterceptor:
-  private val LOGGER = LogManager.getLogger(classOf[ZioFiberRuntimeRunInterceptor])

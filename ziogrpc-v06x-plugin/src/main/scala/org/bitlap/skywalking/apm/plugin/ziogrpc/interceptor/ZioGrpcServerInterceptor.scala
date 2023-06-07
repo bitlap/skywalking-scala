@@ -91,6 +91,6 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = {}
+  ): Unit = if ContextManager.isActive then ContextManager.activeSpan.log(t)
 
 end ZioGrpcServerInterceptor

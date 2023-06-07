@@ -74,6 +74,6 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = {}
+  ): Unit = if ContextManager.isActive then ContextManager.activeSpan.log(t)
 
 end ZioGrpcServerSendMessageInterceptor

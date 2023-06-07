@@ -9,6 +9,7 @@ import io.grpc.*
 
 import zio.*
 
+import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.forward.TracingClientCall
 import org.bitlap.skywalking.apm.plugin.ziogrpc.interceptor.ZioGrpcClientInterceptor
@@ -53,7 +54,8 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor, I
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = {}
+  ): Unit =
+    if ContextManager.isActive then ContextManager.activeSpan.log(t)
 
 end ZioGrpcClientInterceptor
 
