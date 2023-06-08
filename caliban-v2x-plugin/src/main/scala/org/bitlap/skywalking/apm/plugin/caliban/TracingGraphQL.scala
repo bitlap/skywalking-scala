@@ -11,7 +11,7 @@ import caliban.wrappers.Wrapper.*
 
 import zio.*
 
-import org.apache.skywalking.apm.agent.core.context.ContextManager
+import org.apache.skywalking.apm.agent.core.context.{ ContextCarrier, ContextManager }
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.util.CollectionUtil
@@ -37,8 +37,9 @@ object TracingGraphQL:
         return None
       }
 
-      val opName = CalibanPluginConfig.Plugin.Caliban.URL_PREFIX + getOperationName(graphQLRequest)
-      val span   = ContextManager.createLocalSpan(opName)
+      val opName         = CalibanPluginConfig.Plugin.Caliban.URL_PREFIX + getOperationName(graphQLRequest)
+      val contextCarrier = new ContextCarrier
+      val span           = ContextManager.createEntrySpan(opName, contextCarrier)
       span.prepareForAsync()
       SpanLayer.asHttp(span)
       if CalibanPluginConfig.Plugin.Caliban.COLLECT_VARIABLES then {
