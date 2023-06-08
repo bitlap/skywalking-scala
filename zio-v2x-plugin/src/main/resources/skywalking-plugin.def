@@ -1,2 +1,3 @@
-zio-2.0.0-fiber=org.bitlap.skywalking.apm.plugin.zio.define.ZioFiberRuntimeInstrumentation
-zio-2.0.0-default-blocking-executor=org.bitlap.skywalking.apm.plugin.zio.define.ZioDefaultExecutorInstrumentation
+zio-2.x-fiber=org.bitlap.skywalking.apm.plugin.zio.define.ZioFiberRuntimeInstrumentation
+zio-2.x-executor=org.bitlap.skywalking.apm.plugin.zio.define.ZioDefaultExecutorInstrumentation
+zio-2.x-scheduler=org.bitlap.skywalking.apm.plugin.zio.define.ZioSchedulerInstrumentation

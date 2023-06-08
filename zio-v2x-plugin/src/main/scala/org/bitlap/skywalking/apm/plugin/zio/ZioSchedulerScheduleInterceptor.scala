@@ -5,6 +5,7 @@ import java.lang.reflect.Method
 import zio.internal.FiberRuntime
 
 import org.apache.skywalking.apm.agent.core.context.*
+import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
@@ -14,7 +15,7 @@ import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
  *    梦境迷离
  *  @version 1.0,2023/5/17
  */
-final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundInterceptor:
+final class ZioSchedulerScheduleInterceptor extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -26,8 +27,9 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
     if allArguments == null || allArguments.length < 1 then {
       return
     }
-    val span: AbstractSpan = ContextManager.createLocalSpan(blockingOperationName)
-    val storedField        = objInst.getSkyWalkingDynamicField
+    val span: AbstractSpan = ContextManager.createLocalSpan(schedulerOperationName(objInst))
+    Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
+    val storedField = objInst.getSkyWalkingDynamicField
     allArguments(0) match {
       case fiber: FiberRuntime[?, ?] =>
         ZioTags.setZioTags(span, fiber.id)
@@ -37,10 +39,9 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
       val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
       InterceptorDSL.continuedSnapshot_(contextSnapshot)
     }
-    span.setComponent(ComponentsDefine.JDK_THREADING)
   }
 
-  private def blockingOperationName = "ZioBlockingSubmitWrapper/" + Thread.currentThread.getName
+  private def schedulerOperationName(objInst: EnhancedInstance) = s"ZioSchedulerWrapper/${objInst.getClass.getName}"
 
   override def afterMethod(
     objInst: EnhancedInstance,
