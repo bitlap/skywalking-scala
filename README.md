@@ -39,7 +39,7 @@ The prefix should be added when passing command line parameters, such as: `-Dsky
 
 - Java 11
 - Scala 3.2.0
-- SkyWalking 8.13.0
+- SkyWalking 8.16.0
 
 ## How to use?
 

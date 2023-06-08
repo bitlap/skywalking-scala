@@ -26,7 +26,7 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
     if allArguments == null || allArguments.length < 1 then {
       return
     }
-    val span: AbstractSpan = ContextManager.createLocalSpan(Utils.blockingOperationName)
+    val span: AbstractSpan = ContextManager.createLocalSpan(blockingOperationName)
     val fiberRuntime       = allArguments(0)
     val storedField        = objInst.getSkyWalkingDynamicField
     fiberRuntime match {
@@ -40,6 +40,8 @@ final class ZioBlockingSubmitInterceptor extends InstanceMethodsAroundIntercepto
     }
     span.setComponent(ComponentsDefine.JDK_THREADING)
   }
+
+  private def blockingOperationName = "ZioBlockingSubmitWrapper/" + Thread.currentThread.getName
 
   override def afterMethod(
     objInst: EnhancedInstance,
