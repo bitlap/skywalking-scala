@@ -7,7 +7,7 @@ import scala.util.*
 import zio.*
 import zio.internal.FiberRuntime
 
-import org.apache.skywalking.apm.agent.core.context.ContextSnapshot
+import org.apache.skywalking.apm.agent.core.context.{ ContextManager, ContextSnapshot }
 import org.apache.skywalking.apm.agent.core.context.tag.*
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance

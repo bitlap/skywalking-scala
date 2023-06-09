@@ -48,12 +48,12 @@ object ZioExecutorInstrumentation:
   final val CLASS_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.common.ConstructorInterceptor"
 
-  final val WORK_INTERCEPTOR: String =
+  final val EXECUTOR_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.zio.ZioExecutorInterceptor"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     (0 until 2)
-      .map(i => s"${WORK_INTERCEPTOR}_$i")
+      .map(i => s"${EXECUTOR_INTERCEPTOR}_$i")
       .zip(
         List(
           named("submit").and(takesArguments(2)),

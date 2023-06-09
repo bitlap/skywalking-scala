@@ -26,7 +26,7 @@ final class ZioExecutorInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit = {
-    implicit val span = ContextManager.createLocalSpan(generateWorkerOperationName(method))
+    implicit val span = ContextManager.createLocalSpan(generateExecutorOperationName(method))
     span.setComponent(ComponentsDefine.JDK_THREADING)
     Utils.getExecutorType(objInst.getClass.getName) match
       case Executor =>
@@ -45,7 +45,7 @@ final class ZioExecutorInterceptor extends InstanceMethodsAroundInterceptor:
   private def generateZSchedulerOperationName(method: Method): String =
     s"ZSchedulerWrapper/${method.getName}/${Thread.currentThread().getName}"
 
-  private def generateWorkerOperationName(method: Method): String =
+  private def generateExecutorOperationName(method: Method): String =
     s"ZioExecutorWrapper/${method.getName}/${Thread.currentThread().getName}"
 
   override def afterMethod(

@@ -24,12 +24,12 @@ final class ZioSchedulerScheduleInterceptor extends InstanceMethodsAroundInterce
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit = {
-    implicit val span = ContextManager.createLocalSpan(schedulerOperationName(objInst))
+    implicit val span = ContextManager.createLocalSpan(schedulerOperationName)
     Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
     Utils.continuedSnapshotFromEnhance(allArguments(0), objInst)
   }
 
-  private def schedulerOperationName(objInst: EnhancedInstance) = s"ZioSchedulerWrapper/${objInst.getClass.getName}"
+  private def schedulerOperationName = s"ZioSchedulerWrapper/${Thread.currentThread().getName}"
 
   override def afterMethod(
     objInst: EnhancedInstance,
