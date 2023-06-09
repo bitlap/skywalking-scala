@@ -28,7 +28,7 @@ object Utils:
       ScalaTags.FiberId.tag.set(span, fiberId.id.toString)
       ScalaTags.FiberStartTime.tag.set(span, formatDate(fiberId.startTimeMillis))
       ScalaTags.FiberLocation.tag.set(span, fiberId.location.toString)
-      ScalaTags.ClazzName.tag.set(span, objInst.getClass.getName)
+      ScalaTags.ClassName.tag.set(span, objInst.getClass.getName)
     } match
       case Failure(ex) => span.errorOccurred.log(ex)
       case Success(_)  =>
