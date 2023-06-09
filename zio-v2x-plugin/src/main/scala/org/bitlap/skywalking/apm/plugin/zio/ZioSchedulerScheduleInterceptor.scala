@@ -24,21 +24,9 @@ final class ZioSchedulerScheduleInterceptor extends InstanceMethodsAroundInterce
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit = {
-    if allArguments == null || allArguments.length < 1 then {
-      return
-    }
-    val span: AbstractSpan = ContextManager.createLocalSpan(schedulerOperationName(objInst))
+    implicit val span = ContextManager.createLocalSpan(schedulerOperationName(objInst))
     Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
-    val storedField = objInst.getSkyWalkingDynamicField
-    allArguments(0) match {
-      case fiber: FiberRuntime[?, ?] =>
-        ZioTags.setZioTags(span, fiber.id)
-      case _ =>
-    }
-    if storedField != null then {
-      val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
-      InterceptorDSL.continuedSnapshot_(contextSnapshot)
-    }
+    Utils.continuedSnapshotFromEnhance(allArguments(0), objInst)
   }
 
   private def schedulerOperationName(objInst: EnhancedInstance) = s"ZioSchedulerWrapper/${objInst.getClass.getName}"

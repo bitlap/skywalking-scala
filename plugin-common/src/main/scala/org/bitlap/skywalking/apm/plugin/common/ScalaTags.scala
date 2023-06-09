@@ -11,3 +11,4 @@ enum ScalaTags[T](val tag: StringTag):
   case FiberStartTime   extends ScalaTags(new StringTag(101, "zio.fiber.startTime"))
   case FiberLocation    extends ScalaTags(new StringTag(102, "zio.fiber.location"))
   case CalibanVariables extends ScalaTags(new StringTag(103, "caliban.variables"))
+  case ClassName        extends ScalaTags(new StringTag(104, "zio.fiber.className"))
