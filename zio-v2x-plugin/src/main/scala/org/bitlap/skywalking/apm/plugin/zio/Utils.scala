@@ -7,7 +7,7 @@ import scala.util.*
 import zio.*
 import zio.internal.FiberRuntime
 
-import org.apache.skywalking.apm.agent.core.context.{ ContextManager, ContextSnapshot }
+import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.*
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance
@@ -34,27 +34,15 @@ object Utils:
       case Success(_)  =>
   end setZioTags
 
-  def continuedSnapshotFromEnhance(arg: Object, objInst: EnhancedInstance)(implicit span: AbstractSpan): Unit = {
+  def setSpanZioTag(arg: Object, objInst: EnhancedInstance)(implicit span: AbstractSpan) =
     arg match {
       case fiber: FiberRuntime[?, ?] =>
         Utils.setZioTags(span, fiber.id, objInst)
       case _ =>
     }
-    val storedField = objInst.getSkyWalkingDynamicField
 
-    if storedField != null then {
-      val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
-      InterceptorDSL.continuedSnapshot_(contextSnapshot)
-    }
-  }
-
-  def continuedSnapshotFromFiber(fiberRuntime: Object, objInst: EnhancedInstance)(implicit span: AbstractSpan): Unit =
-    fiberRuntime match {
-      case fiber: FiberRuntime[?, ?] =>
-        Utils.setZioTags(span, fiber.id, objInst)
-      case _ =>
-    }
-    fiberRuntime match {
+  def continuedSnapshot(enhanced: Object): Unit =
+    enhanced match {
       case instance: EnhancedInstance =>
         val storedField = instance.getSkyWalkingDynamicField
         if storedField != null then {

@@ -10,7 +10,7 @@ import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
-import org.bitlap.skywalking.apm.plugin.zio.ExecutorType.{ DefaultBlockingExecutor, Executor, ZScheduler }
+import org.bitlap.skywalking.apm.plugin.zio.ExecutorType.*
 import org.bitlap.skywalking.apm.plugin.zio.Utils
 
 /** @author
@@ -26,17 +26,16 @@ final class ZioExecutorInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit = {
-    implicit val span = ContextManager.createLocalSpan(generateExecutorOperationName(method))
+    val operationName = Utils.getExecutorType(objInst.getClass.getName) match
+      case Executor                => generateExecutorOperationName(method)
+      case ZScheduler              => generateZSchedulerOperationName(method)
+      case DefaultBlockingExecutor => generateBlockingOperationName(method)
+    end operationName
+
+    implicit val span = ContextManager.createLocalSpan(operationName)
     span.setComponent(ComponentsDefine.JDK_THREADING)
-    Utils.getExecutorType(objInst.getClass.getName) match
-      case Executor =>
-        Utils.continuedSnapshotFromFiber(allArguments(0), objInst)
-      case ZScheduler =>
-        span.setOperationName(generateZSchedulerOperationName(method))
-        Utils.continuedSnapshotFromFiber(allArguments(0), objInst)
-      case DefaultBlockingExecutor =>
-        span.setOperationName(generateBlockingOperationName(method))
-        Utils.continuedSnapshotFromEnhance(allArguments(0), objInst)
+    Utils.setSpanZioTag(allArguments(0), objInst)
+    Utils.continuedSnapshot(allArguments(0))
   }
 
   private def generateBlockingOperationName(method: Method): String =

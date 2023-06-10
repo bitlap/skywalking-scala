@@ -7,7 +7,7 @@ import zio.internal.FiberRuntime
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.SpanLayer
-import org.apache.skywalking.apm.agent.core.logging.api.{ ILog, LogManager }
+import org.apache.skywalking.apm.agent.core.logging.api.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
@@ -16,7 +16,7 @@ import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
  *    梦境迷离
  *  @version 1.0,2023/5/16
  */
-final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundInterceptor:
+final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -25,22 +25,14 @@ final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundIntercept
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    if objInst == null || !ContextManager.isActive then {
-      return
-    }
-
     val fiberRuntime = objInst.asInstanceOf[FiberRuntime[?, ?]]
-    val span         = ContextManager.createLocalSpan(generateFiberOperationName)
+    val span         = ContextManager.createLocalSpan(generateFiberOperationName(method))
     span.setComponent(ComponentsDefine.JDK_THREADING)
     Utils.setZioTags(span, fiberRuntime.id, objInst)
-    val storedField = objInst.getSkyWalkingDynamicField
-    if storedField != null then {
-      val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
-      InterceptorDSL.continuedSnapshot_(contextSnapshot)
-    }
+    Utils.continuedSnapshot(objInst)
 
-  private def generateFiberOperationName =
-    s"ZioFiberWrapper/${Thread.currentThread.getName}"
+  private def generateFiberOperationName(method: Method) =
+    s"ZioFiberWrapper/${method.getName}/${Thread.currentThread.getName}"
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -62,4 +54,4 @@ final class ZioFiberRuntimeRunInterceptor extends InstanceMethodsAroundIntercept
     if ContextManager.isActive then ContextManager.activeSpan.log(t)
   end handleMethodException
 
-end ZioFiberRuntimeRunInterceptor
+end ZioFiberRuntimeInterceptor
