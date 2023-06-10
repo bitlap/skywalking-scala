@@ -10,6 +10,7 @@ import zio.internal.FiberRuntime
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.*
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
+import org.apache.skywalking.apm.agent.core.logging.api.{ ILog, LogManager }
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance
 import org.bitlap.skywalking.apm.plugin.common.*
 
@@ -18,6 +19,8 @@ import org.bitlap.skywalking.apm.plugin.common.*
  *  @version 1.0,2023/5/16
  */
 object Utils:
+
+  private val LOGGER = LogManager.getLogger(classOf[Utils.type])
 
   final lazy val fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
@@ -39,17 +42,25 @@ object Utils:
       case fiber: FiberRuntime[?, ?] =>
         Utils.setZioTags(span, fiber.id, objInst)
       case _ =>
+        LOGGER.debug(s"Invalid FiberRuntime: ${objInst.getClass.getName} ${objInst.toString}")
     }
 
   def continuedSnapshot(enhanced: Object): Unit =
     enhanced match {
-      case instance: EnhancedInstance =>
-        val storedField = instance.getSkyWalkingDynamicField
+      case enhancedInstance: EnhancedInstance =>
+        val storedField = enhancedInstance.getSkyWalkingDynamicField
         if storedField != null then {
           val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
           InterceptorDSL.continuedSnapshot_(contextSnapshot)
+        } else {
+          LOGGER.debug(
+            s"EnhancedInstance/getSkyWalkingDynamicField is null: ${enhanced.toString}"
+          )
         }
       case _ =>
+        LOGGER.debug(
+          s"Invalid EnhancedInstance: ${enhanced.getClass.getName}"
+        )
     }
 
   def getExecutorType(className: String): ExecutorType =

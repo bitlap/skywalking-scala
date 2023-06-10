@@ -22,12 +22,7 @@ final class ZioExecutorInstrumentation extends ClassInstanceMethodsEnhancePlugin
 
   override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
-  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = Array(
-    new ConstructorInterceptPoint:
-      override def getConstructorMatcher: ElementMatcher[MethodDescription] = any()
-
-      override def getConstructorInterceptor: String = CLASS_INTERCEPTOR
-  )
+  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
 
   override def getInstanceMethodsInterceptPoints: Array[InstanceMethodsInterceptPoint] =
     methodInterceptors
@@ -48,9 +43,6 @@ end ZioExecutorInstrumentation
 object ZioExecutorInstrumentation:
 
   final val ENHANCE_CLASS = HierarchyMatch.byHierarchyMatch("zio.Executor")
-
-  final val CLASS_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.ConstructorInterceptor"
 
   final val EXECUTOR_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.zio.ZioExecutorInterceptor"
