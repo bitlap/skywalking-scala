@@ -13,9 +13,9 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.ClassInst
  *    梦境迷离
  *  @version 1.0,2023/5/17
  */
-final class ZioHttpCollectHttpInstrumentationV2 extends ClassInstanceMethodsEnhancePluginDefine:
+final class ZioHttpCollectHttpInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
-  import ZioHttpCollectHttpInstrumentationV2.*
+  import ZioHttpCollectHttpInstrumentation.*
 
   override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
 
@@ -31,7 +31,7 @@ final class ZioHttpCollectHttpInstrumentationV2 extends ClassInstanceMethodsEnha
     }
   )
 
-object ZioHttpCollectHttpInstrumentationV2:
+object ZioHttpCollectHttpInstrumentation:
   // PartialCollectHttp is a AnyVal!!!
   final val INTERCEPTOR_CLASS: String = "org.bitlap.skywalking.apm.plugin.ziohttp.v2.ZioHttpCollectHttpInterceptor"
   final val ENHANCE_CLASS: String     = "zhttp.http.Http$PartialCollectHttp$"
