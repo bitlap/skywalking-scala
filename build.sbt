@@ -7,6 +7,7 @@ lazy val scala3Version    = "3.2.2"
 lazy val scalatestVersion = "3.2.15"
 lazy val junitVersion     = "4.12"
 lazy val mockitoVersion   = "5.0.0"
+lazy val junitInterfaceVersion = "0.12"
 
 lazy val skywalkingVersion = "8.16.0"
 
@@ -52,8 +53,11 @@ lazy val commonSettings =
       "junit"                 % "junit"          % junitVersion      % Test,
       "org.mockito"           % "mockito-core"   % mockitoVersion    % Test,
       "org.apache.skywalking" % "apm-test-tools" % skywalkingVersion % Test,
-      "org.apache.skywalking" % "apm-agent-core" % skywalkingVersion % Provided
-    )
+      "org.apache.skywalking" % "apm-agent-core" % skywalkingVersion % Provided,
+      "com.github.sbt" % "junit-interface" % junitInterfaceVersion % Test
+    ),
+    crossPaths := false,
+    Test / testOptions := Seq(Tests.Argument(TestFrameworks.JUnit, "-a"))
   )
 
 lazy val `skywalking-scala` = (project in file("."))
