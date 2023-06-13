@@ -17,10 +17,10 @@ import zhttp.http.Http.PartialCollectHttp
 class ZioHttpCollectHttpInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch" should "ok" in {
-    val matcher = ZioHttpCollectHttpInstrumentationV2.getMethod
+    val matcher = ZioHttpCollectHttpInstrumentation.getMethod
     val method = new MethodDescription.ForLoadedMethod(
       classOf[PartialCollectHttp[?]].getMethod(
-        ZioHttpCollectHttpInstrumentationV2.ENHANCE_METHOD,
+        ZioHttpCollectHttpInstrumentation.ENHANCE_METHOD,
         classOf[scala.runtime.BoxedUnit],
         classOf[PartialFunction[?, ?]]
       )

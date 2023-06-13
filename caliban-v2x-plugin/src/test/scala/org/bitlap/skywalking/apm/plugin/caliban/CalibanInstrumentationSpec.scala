@@ -3,11 +3,12 @@ package org.bitlap.skywalking.apm.plugin.caliban
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
 
-import caliban.{ GraphQLInterpreter, GraphQLRequest, InputValue }
+import caliban.*
 import caliban.execution.QueryExecution
 
-import zio.Trace
+import zio.*
 
+import org.apache.skywalking.apm.agent.core.plugin.`match`.{ ClassMatch, HierarchyMatch }
 import org.bitlap.skywalking.apm.plugin.caliban.define.CalibanInstrumentation
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -32,5 +33,20 @@ class CalibanInstrumentationSpec extends AnyFlatSpec with Matchers {
     )
 
     matcher.matches(method) shouldEqual true
+  }
+
+  "testClassMatch" should "ok" in {
+    val clazz = new caliban.GraphQLInterpreter[Any, Any] {
+      override def check(query: String)(implicit trace: Trace): IO[CalibanError, Unit] = ???
+      override def executeRequest(
+        request: GraphQLRequest,
+        skipValidation: Boolean,
+        enableIntrospection: Boolean,
+        queryExecution: QueryExecution
+      )(implicit trace: Trace): URIO[Any, GraphQLResponse[Any]] = ???
+
+    }
+    clazz.getClass.getInterfaces.apply(0).getName shouldEqual "caliban.GraphQLInterpreter"
+
   }
 }

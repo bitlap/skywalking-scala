@@ -10,7 +10,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.agent.test.tools.*
 import org.hamcrest.CoreMatchers.is
 import org.junit.*
-import org.junit.Assert.{ assertEquals, assertThat }
+import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.mockito.*
 import org.mockito.junit.*
@@ -93,7 +93,7 @@ class CalibanInterceptorSpec {
     // FIXME
     val operation = ContextManager.activeSpan().getOperationName
 
-    assertEquals("GraphQL/starLakeInsertMetric", operation)
+    assertEquals("Caliban/GraphQL/starLakeInsertMetric", operation)
   }
 
   @Test
@@ -109,7 +109,7 @@ class CalibanInterceptorSpec {
 
     val operation = ContextManager.activeSpan().getOperationName
 
-    assertEquals("GraphQL/Unknown", operation)
+    assertEquals("Caliban/GraphQL/Unknown", operation)
 
   }
 
