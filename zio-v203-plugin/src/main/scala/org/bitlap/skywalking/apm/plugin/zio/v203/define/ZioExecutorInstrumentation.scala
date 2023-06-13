@@ -50,7 +50,7 @@ object ZioExecutorInstrumentation:
   final val ENHANCE_CLASS = HierarchyMatch.byHierarchyMatch("zio.Executor")
 
   final val EXECUTOR_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.zio.v203.ZioExecutorInterceptor"
+    "org.bitlap.skywalking.apm.plugin.common.interceptor.ZioExecutorInterceptor"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     (0 until 2)

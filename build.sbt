@@ -81,7 +81,7 @@ lazy val `caliban-v2x-plugin` = (project in file("caliban-v2x-plugin"))
       "com.github.ghostdogpr" %% "caliban" % calibanVersion % Provided
     )
   )
-  .dependsOn(`plugin-common`)
+  .dependsOn(`plugin-common` % "compile->compile;provided->provided")
 
 lazy val `ziogrpc-v06x-plugin` = (project in file("ziogrpc-v06x-plugin"))
   .settings(
@@ -93,7 +93,7 @@ lazy val `ziogrpc-v06x-plugin` = (project in file("ziogrpc-v06x-plugin"))
       "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcVersion % Provided
     )
   )
-  .dependsOn(`plugin-common`)
+  .dependsOn(`plugin-common` % "compile->compile;provided->provided")
 
 lazy val `plugin-common` = (project in file("plugin-common"))
   .settings(
@@ -115,7 +115,7 @@ lazy val `zio-v200-plugin` = (project in file("zio-v200-plugin"))
       "dev.zio" %% "zio" % zio200Version % Provided
     )
   )
-  .dependsOn(`plugin-common`)
+  .dependsOn(`plugin-common` % "compile->compile;provided->provided")
 
 lazy val `zio-v203-plugin` = (project in file("zio-v203-plugin"))
   .settings(
@@ -127,7 +127,7 @@ lazy val `zio-v203-plugin` = (project in file("zio-v203-plugin"))
       "dev.zio" %% "zio" % zio203Version % Provided
     )
   )
-  .dependsOn(`plugin-common`)
+  .dependsOn(`plugin-common` % "compile->compile;provided->provided")
 
 lazy val `ziohttp-v2x-plugin` = (project in file("ziohttp-v2x-plugin"))
   .settings(
@@ -139,4 +139,4 @@ lazy val `ziohttp-v2x-plugin` = (project in file("ziohttp-v2x-plugin"))
       "io.d11" %% "zhttp" % zioHttp2Version % Provided
     )
   )
-  .dependsOn(`plugin-common`)
+  .dependsOn(`plugin-common` % "compile->compile;provided->provided")

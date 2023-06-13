@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.common
+package org.bitlap.skywalking.apm.plugin.common.interceptor
 
 import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*

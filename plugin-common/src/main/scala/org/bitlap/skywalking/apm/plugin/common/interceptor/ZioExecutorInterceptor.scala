@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.zio.v200
+package org.bitlap.skywalking.apm.plugin.common.zio
 
 import java.lang.reflect.Method
 
