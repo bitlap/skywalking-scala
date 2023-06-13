@@ -9,14 +9,14 @@ import scalapb.zio_grpc.client.*
 import io.grpc.*
 import io.grpc.ClientCall.Listener
 
-import zio.ZIO
+import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
-import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
+import org.bitlap.skywalking.apm.plugin.common.Utils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.OperationNameFormatUtils
 
@@ -24,11 +24,11 @@ import org.bitlap.skywalking.apm.plugin.ziogrpc.OperationNameFormatUtils
  *    梦境迷离
  *  @version 1.0,2023/5/14
  */
-final class TracingClientCall[R, Req, Resp](
+final class TracingClientCall[Req, Resp](
   peer: Option[String],
-  delegate: ZClientCall[R, Req, Resp],
+  delegate: ZClientCall[Req, Resp],
   method: MethodDescriptor[Req, Resp]
-) extends ZClientCall[R, Req, Resp]:
+) extends ZClientCall[Req, Resp]:
 
   private var snapshot: ContextSnapshot = _
   private val serviceName               = OperationNameFormatUtils.formatOperationName(method)
@@ -66,7 +66,7 @@ final class TracingClientCall[R, Req, Resp](
   override def start(
     responseListener: Listener[Resp],
     headers: SafeMetadata
-  ): ZIO[R, Status, Unit] =
+  ): IO[StatusException, Unit] =
     val contextCarrier = new ContextCarrier
     val remotePeer     = getRemotePeerIp
     val span           = ContextManager.createExitSpan(serviceName, remotePeer)
@@ -82,7 +82,7 @@ final class TracingClientCall[R, Req, Resp](
     }
     val putInto = unsafePut.result().map(kv => headers.put(kv._1, kv._2))
 
-    InterceptorDSL.unsafeRun(ZIO.collectAll(putInto))
+    Utils.unsafeRun(ZIO.collectAll(putInto))
 
     snapshot = ContextManager.capture
     span.prepareForAsync()
@@ -91,9 +91,9 @@ final class TracingClientCall[R, Req, Resp](
       .ensuring(ZIO.attempt(ContextManager.stopSpan()).ignore)
   end start
 
-  override def request(numMessages: Int): ZIO[R, Status, Unit] = delegate.request(numMessages)
+  override def request(numMessages: Int): IO[StatusException, Unit] = delegate.request(numMessages)
 
-  override def sendMessage(message: Req): ZIO[R, Status, Unit] =
+  override def sendMessage(message: Req): IO[StatusException, Unit] =
     if method.getType.clientSendsOneMessage then {
       return delegate.sendMessage(message)
     }
@@ -106,7 +106,7 @@ final class TracingClientCall[R, Req, Resp](
     continuedSnapshotF(snapshot)(delegate.sendMessage(message))
   end sendMessage
 
-  override def halfClose(): ZIO[R, Status, Unit] =
+  override def halfClose(): IO[StatusException, Unit] =
     implicit val span: AbstractSpan =
       ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_COMPLETE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
@@ -115,7 +115,7 @@ final class TracingClientCall[R, Req, Resp](
     continuedSnapshotF(snapshot)(delegate.halfClose())
   end halfClose
 
-  override def cancel(message: String): ZIO[R, Status, Unit] =
+  override def cancel(message: String): IO[StatusException, Unit] =
     implicit val span: AbstractSpan = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_CANCEL_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
@@ -124,18 +124,18 @@ final class TracingClientCall[R, Req, Resp](
 
   end cancel
 
-  private def continuedSnapshotF[A](contextSnapshot: ContextSnapshot)(
-    effect: => ZIO[A, Status, Unit]
-  )(using AbstractSpan): ZIO[A, Status, Unit] =
-    InterceptorDSL.continuedSnapshot_(contextSnapshot)
+  private def continuedSnapshotF(contextSnapshot: ContextSnapshot)(
+    effect: => IO[StatusException, Unit]
+  )(using AbstractSpan): IO[StatusException, Unit] =
+    Utils.continuedSnapshot_(contextSnapshot)
     val result = effect.mapError { a =>
-      ContextManager.activeSpan.log(a.asException())
-      a.asException()
+      ContextManager.activeSpan.log(a)
+      a
     }.ensuring(ZIO.attempt {
       summon[AbstractSpan].asyncFinish()
       ContextManager.stopSpan()
     }.ignore)
 
-    result.mapError(e => Status.fromThrowable(e))
+    result.mapError(e => new StatusException(Status.fromThrowable(e)))
 
 end TracingClientCall

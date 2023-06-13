@@ -42,10 +42,10 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor, I
     ret: Object
   ): Object =
     val peer             = objInst.getSkyWalkingDynamicField.asInstanceOf[String]
-    val interceptor      = new ZTraceClientInterceptor[Any](Option(peer))
+    val interceptor      = new ZTraceClientInterceptor(Option(peer))
     val methodDescriptor = allArguments(0).asInstanceOf[MethodDescriptor[Any, Any]]
     val options          = allArguments(1).asInstanceOf[CallOptions]
-    val result           = ret.asInstanceOf[UIO[ZClientCall[Any, Any, Any]]]
+    val result           = ret.asInstanceOf[UIO[ZClientCall[Any, Any]]]
     result.map(r => interceptor.interceptCall(methodDescriptor, options, r))
 
   override def handleMethodException(
@@ -61,13 +61,13 @@ end ZioGrpcClientInterceptor
 
 object ZioGrpcClientInterceptor:
 
-  private final class ZTraceClientInterceptor[R](peer: Option[String]) extends ZClientInterceptor[R] {
+  private final class ZTraceClientInterceptor(peer: Option[String]) extends ZClientInterceptor {
 
     def interceptCall[Req, Resp](
       methodDescriptor: MethodDescriptor[Req, Resp],
       call: CallOptions,
-      clientCall: ZClientCall[R, Req, Resp]
-    ): ZClientCall[R, Req, Resp] =
-      new TracingClientCall[R, Req, Resp](peer, clientCall, methodDescriptor)
+      clientCall: ZClientCall[Req, Resp]
+    ): ZClientCall[Req, Resp] =
+      new TracingClientCall[Req, Resp](peer, clientCall, methodDescriptor)
 
   }

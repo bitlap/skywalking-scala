@@ -12,7 +12,7 @@ public class CalibanPluginConfig {
         public static class Caliban {
             // split by ,
             public static String IGNORE_URL_PREFIXES = "";
-            public static String URL_PREFIX = "GraphQL/";
+            public static String URL_PREFIX = "Caliban/GraphQL/";
             
             public static boolean COLLECT_VARIABLES = false;
 

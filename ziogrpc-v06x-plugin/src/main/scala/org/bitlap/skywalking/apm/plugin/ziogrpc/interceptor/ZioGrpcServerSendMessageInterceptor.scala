@@ -30,13 +30,16 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val call    = allArguments(0).asInstanceOf[ServerCall[?, ?]]
-    val context = GrpcOperationQueue.get(call)
+    val ctx = objInst.getSkyWalkingDynamicField
+    if ctx == null || !ctx.isInstanceOf[OperationContext] then return
+
+    val cx      = ctx.asInstanceOf[OperationContext]
+    val context = GrpcOperationQueue.get(cx.selfCall)
     if context == null then return
     val contextSnapshot = ContextManager.capture
     val method          = context.methodDescriptor
     val span            = beforeSendMessage(contextSnapshot, method)
-    span.foreach(a => objInst.setSkyWalkingDynamicField(a))
+    span.foreach(a => objInst.setSkyWalkingDynamicField(cx.copy(activeSpan = span)))
   end beforeMethod
 
   private def beforeSendMessage(
@@ -50,7 +53,7 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     val span            = ContextManager.createLocalSpan(operationPrefix + RESPONSE_ON_MESSAGE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot_(contextSnapshot)
+    Utils.continuedSnapshot_(contextSnapshot)
     Some(span)
   end beforeSendMessage
 
@@ -61,11 +64,17 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
-    val span = objInst.getSkyWalkingDynamicField
-    if span == null || !span.isInstanceOf[AbstractSpan] then return ret
+    val context = objInst.getSkyWalkingDynamicField
+    if context == null || !context.isInstanceOf[OperationContext] then return ret
+
+    val ctx = context.asInstanceOf[OperationContext]
+
+    if ctx.activeSpan.isEmpty then return ret
+
+    val span = ctx.activeSpan.orNull
     ret
       .asInstanceOf[GIO[Unit]]
-      .ensuring(ZIO.attempt(ContextManager.stopSpan(span.asInstanceOf[AbstractSpan])).ignore)
+      .ensuring(ZIO.attempt(ContextManager.stopSpan(span)).ignore)
   end afterMethod
 
   override def handleMethodException(

@@ -23,7 +23,7 @@ class ZioGrpcServerInstrumentationSpec extends AnyFlatSpec with Matchers {
   "testMethodMatch" should "ok" in {
     val matcher = ZioGrpcServerInstrumentation.getMethod
     val method = new MethodDescription.ForLoadedMethod(
-      classOf[ZServerCallHandler[?, ?, ?]].getMethod(
+      classOf[ZServerCallHandler[?, ?]].getMethod(
         "startCall",
         classOf[ServerCall[?, ?]],
         classOf[Metadata]

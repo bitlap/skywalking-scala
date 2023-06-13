@@ -14,7 +14,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedI
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.InstanceMethodsAroundInterceptor
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.MethodInterceptResult
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
-import org.bitlap.skywalking.apm.plugin.common.InterceptorDSL
+import org.bitlap.skywalking.apm.plugin.common.Utils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.OperationNameFormatUtils
 
@@ -39,21 +39,21 @@ final class TracingServerCallListener[Req](
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_MESSAGE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan)(delegate.onMessage(message))
+    Utils.continuedSnapshot(contextSnapshot, asyncSpan)(delegate.onMessage(message))
   end onMessage
 
   override def onCancel(): Unit =
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_CANCEL_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan)(delegate.onCancel())
+    Utils.continuedSnapshot(contextSnapshot, asyncSpan)(delegate.onCancel())
   end onCancel
 
   override def onHalfClose(): Unit =
     val span = ContextManager.createLocalSpan(operationPrefix + REQUEST_ON_HALF_CLOSE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    InterceptorDSL.continuedSnapshot(contextSnapshot, asyncSpan)(delegate.onHalfClose())
+    Utils.continuedSnapshot(contextSnapshot, asyncSpan)(delegate.onHalfClose())
   end onHalfClose
 
   override def onComplete(): Unit =

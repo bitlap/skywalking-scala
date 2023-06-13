@@ -15,10 +15,11 @@ import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
  *  @version 1.0,2023/5/15
  */
 private[ziogrpc] final case class OperationContext(
-  asyncSpan: AbstractSpan,
-  methodDescriptor: MethodDescriptor[?, ?],
+  selfCall: ServerCall[?, ?] = null,
+  methodDescriptor: MethodDescriptor[?, ?] = null,
+  asyncSpan: AbstractSpan = null,
   activeSpan: Option[AbstractSpan] = None,
-  contextSnapshot: Option[ContextSnapshot] = None
+  contextSnapshot: ContextSnapshot = null
 )
 
 object GrpcOperationQueue:

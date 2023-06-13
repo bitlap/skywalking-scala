@@ -11,7 +11,7 @@ import caliban.wrappers.Wrapper.*
 
 import zio.*
 
-import org.apache.skywalking.apm.agent.core.context.{ ContextCarrier, ContextManager }
+import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.util.CollectionUtil
@@ -44,7 +44,7 @@ object TracingGraphQL:
       SpanLayer.asHttp(span)
       if CalibanPluginConfig.Plugin.Caliban.COLLECT_VARIABLES then {
         val tagValue = collectVariables(graphQLRequest)
-        ScalaTags.CalibanVariables.tag.set(span, tagValue)
+        CustomTag.CalibanVariables.tag.set(span, tagValue)
       }
       Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
       span.setComponent(ComponentsDefine.GRAPHQL)
@@ -61,7 +61,7 @@ object TracingGraphQL:
 
   private def getOperationName(graphQLRequest: GraphQLRequest) =
     val tryOp: Try[String] = Try {
-      val docOpName = InterceptorDSL
+      val docOpName = Utils
         .unsafeRun(Parser.parseQuery(graphQLRequest.query.get))
         .operationDefinitions
         .map(_.selectionSet.collectFirst {
@@ -74,6 +74,6 @@ object TracingGraphQL:
     }
     tryOp match
       case Failure(e) =>
-        if ContextManager.isActive then ContextManager.activeSpan().log(e)
+        Utils.logError(e)
         "Unknown"
       case Success(value) => value

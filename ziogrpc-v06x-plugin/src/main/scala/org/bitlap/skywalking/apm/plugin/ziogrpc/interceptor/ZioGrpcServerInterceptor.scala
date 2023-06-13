@@ -36,6 +36,7 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
+    val ctx            = objInst.getSkyWalkingDynamicField.asInstanceOf[OperationContext]
     val call           = allArguments(0).asInstanceOf[ServerCall[?, ?]]
     val headers        = allArguments(1).asInstanceOf[Metadata]
     val contextCarrier = new ContextCarrier
@@ -54,8 +55,13 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
 
     val contextSnapshot = ContextManager.capture
     span.prepareForAsync()
-    val context = OperationContext(span, call.getMethodDescriptor, None, Some(contextSnapshot))
-    GrpcOperationQueue.put(call, context.copy(contextSnapshot = None))
+    val context = ctx.copy(
+      selfCall = call,
+      asyncSpan = span,
+      contextSnapshot = contextSnapshot,
+      methodDescriptor = call.getMethodDescriptor
+    )
+    GrpcOperationQueue.put(call, context)
     objInst.setSkyWalkingDynamicField(context)
 
   end beforeMethod
@@ -68,18 +74,15 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     ret: Object
   ): Object =
     val context = objInst.getSkyWalkingDynamicField
-    if context == null then return ret
-    val call            = allArguments(0).asInstanceOf[ServerCall[Any, Any]]
-    val ctx             = context.asInstanceOf[OperationContext]
-    val contextSnapshot = ctx.contextSnapshot.orNull
-    val asyncSpan       = ctx.asyncSpan
-    val listener        = ret.asInstanceOf[Listener[Any]]
-
+    if context == null || !context.isInstanceOf[OperationContext] then return ret
+    val call     = allArguments(0).asInstanceOf[ServerCall[Any, Any]]
+    val ctx      = context.asInstanceOf[OperationContext]
+    val listener = ret.asInstanceOf[Listener[Any]]
     val result = new TracingServerCallListener(
       listener,
       call.getMethodDescriptor,
-      contextSnapshot,
-      asyncSpan
+      ctx.contextSnapshot,
+      ctx.asyncSpan
     )
     ContextManager.stopSpan()
     result
@@ -91,6 +94,6 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = if ContextManager.isActive then ContextManager.activeSpan.log(t)
+  ): Unit = Utils.logError(t)
 
 end ZioGrpcServerInterceptor

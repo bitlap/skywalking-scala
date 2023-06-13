@@ -5,10 +5,9 @@ import net.bytebuddy.matcher.ElementMatcher
 import net.bytebuddy.matcher.ElementMatchers.named
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ArgumentTypeNameMatch.takesArgumentWithType
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
-import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.ClassInstanceMethodsEnhancePluginDefine
+import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 
 /** @author
  *    梦境迷离
@@ -18,7 +17,7 @@ final class CalibanInstrumentation extends ClassInstanceMethodsEnhancePluginDefi
 
   import CalibanInstrumentation.*
 
-  override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
+  override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
   override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] =
     new Array[ConstructorInterceptPoint](0)
@@ -37,7 +36,7 @@ end CalibanInstrumentation
 object CalibanInstrumentation:
   private final val INTERCEPTOR_CLASS: String = "org.bitlap.skywalking.apm.plugin.caliban.CalibanInterceptor"
 
-  private final val ENHANCE_CLASS: String  = "caliban.GraphQL$$anon$2"
+  private final val ENHANCE_CLASS          = MultiClassNameMatch.byMultiClassMatch("caliban.GraphQL$$anon$2")
   private final val ENHANCE_METHOD: String = "executeRequest"
 
   def getCalibanExecuteRequestMethod: ElementMatcher[MethodDescription] =

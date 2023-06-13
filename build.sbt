@@ -3,15 +3,18 @@ ThisBuild / resolvers ++= Seq(
   "Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/releases"
 )
 
-lazy val scala3Version     = "3.2.0"
-lazy val scalatestVersion  = "3.2.15"
-lazy val calibanVersion    = "2.0.1"
+lazy val scala3Version    = "3.2.2"
+lazy val scalatestVersion = "3.2.15"
+lazy val junitVersion     = "4.12"
+lazy val mockitoVersion   = "5.0.0"
+
 lazy val skywalkingVersion = "8.16.0"
-lazy val junitVersion      = "4.12"
-lazy val mockitoVersion    = "5.0.0"
-lazy val zioGrpcVersion    = "0.6.0-test4"
-lazy val zioVersion        = "2.0.0"
-lazy val zioHttpVersion    = "2.0.0-RC10"
+
+lazy val calibanVersion  = "2.0.1"
+lazy val zioGrpcVersion  = "0.6.0-RC5"
+lazy val zio200Version   = "2.0.0"
+lazy val zio203Version   = "2.0.3"
+lazy val zioHttp2Version = "2.0.0-RC10"
 
 inThisBuild(
   List(
@@ -57,7 +60,8 @@ lazy val `skywalking-scala` = (project in file("."))
   .aggregate(
     `caliban-v2x-plugin`,
     `ziogrpc-v06x-plugin`,
-    `zio-v2x-plugin`,
+    `zio-v200-plugin`,
+    `zio-v203-plugin`,
     `plugin-common`,
     `ziohttp-v2x-plugin`
   )
@@ -97,18 +101,30 @@ lazy val `plugin-common` = (project in file("plugin-common"))
     commands ++= Commands.value,
     name := "plugin-common",
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % zioVersion % Provided
+      "dev.zio" %% "zio" % zio200Version % Provided
     )
   )
 
-lazy val `zio-v2x-plugin` = (project in file("zio-v2x-plugin"))
+lazy val `zio-v200-plugin` = (project in file("zio-v200-plugin"))
   .settings(
     commonSettings,
     commands ++= Commands.value,
-    name                       := "zio-v2x-plugin",
-    assembly / assemblyJarName := s"apm-zio-v2x-plugin-${(ThisBuild / version).value}.jar",
+    name                       := "zio-v200-plugin",
+    assembly / assemblyJarName := s"apm-zio-v200-plugin-${(ThisBuild / version).value}.jar",
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % zioVersion % Provided
+      "dev.zio" %% "zio" % zio200Version % Provided
+    )
+  )
+  .dependsOn(`plugin-common`)
+
+lazy val `zio-v203-plugin` = (project in file("zio-v203-plugin"))
+  .settings(
+    commonSettings,
+    commands ++= Commands.value,
+    name                       := "zio-v203-plugin",
+    assembly / assemblyJarName := s"apm-zio-v203-plugin-${(ThisBuild / version).value}.jar",
+    libraryDependencies ++= Seq(
+      "dev.zio" %% "zio" % zio203Version % Provided
     )
   )
   .dependsOn(`plugin-common`)
@@ -120,7 +136,7 @@ lazy val `ziohttp-v2x-plugin` = (project in file("ziohttp-v2x-plugin"))
     name                       := "ziohttp-v2x-plugin",
     assembly / assemblyJarName := s"apm-ziohttp-v2x-plugin-${(ThisBuild / version).value}.jar",
     libraryDependencies ++= Seq(
-      "io.d11" %% "zhttp" % zioHttpVersion % Provided
+      "io.d11" %% "zhttp" % zioHttp2Version % Provided
     )
   )
   .dependsOn(`plugin-common`)

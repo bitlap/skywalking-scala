@@ -56,11 +56,11 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
               span.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure")))
             }
             ContextManager.stopSpan()
-          }.ignore
+          }.onError(cleanup => ZIO.attempt(Utils.logError(cleanup)).ignore).ignore
         case Exit.Failure(cause) =>
           ZIO.attempt {
+            Utils.logError(cause)
             ContextManager.stopSpan()
-            if ContextManager.isActive then ContextManager.activeSpan.log(cause.squash)
           }.ignore
     )
 
@@ -71,6 +71,6 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     t: Throwable
   ): Unit =
-    if ContextManager.isActive then ContextManager.activeSpan.log(t)
+    Utils.logError(t)
 
 end CalibanInterceptor

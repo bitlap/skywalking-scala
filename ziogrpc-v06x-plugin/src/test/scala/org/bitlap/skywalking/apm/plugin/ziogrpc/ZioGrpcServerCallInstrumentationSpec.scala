@@ -27,8 +27,7 @@ class ZioGrpcServerCallInstrumentationSpec extends AnyFlatSpec with Matchers {
       )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ZServerCall[?]].getMethod(
-        "sendMessage$extension",
-        classOf[ServerCall[?, ?]],
+        "sendMessage",
         classOf[Object]
       )
     )
@@ -42,8 +41,7 @@ class ZioGrpcServerCallInstrumentationSpec extends AnyFlatSpec with Matchers {
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ZServerCall[?]].getMethod(
-        "close$extension",
-        classOf[ServerCall[?, ?]],
+        "close",
         classOf[Status],
         classOf[Metadata]
       )
