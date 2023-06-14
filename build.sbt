@@ -16,7 +16,7 @@ lazy val zioGrpcVersion     = "0.6.0-rc5"
 lazy val zioGrpcTestVersion = "0.6.0-test1"
 lazy val zio200Version      = "2.0.0"
 lazy val zio203Version      = "2.0.3"
-lazy val zioHttp2Version    = "2.0.0-rc10"
+lazy val zioHttp2Version    = "2.0.0-RC10"
 
 inThisBuild(
   List(
