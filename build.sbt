@@ -69,7 +69,8 @@ lazy val `skywalking-scala` = (project in file("."))
     `zio-v200-plugin`,
     `zio-v203-plugin`,
     `plugin-common`,
-    `ziohttp-v2x-plugin`
+    `ziohttp-v2x-plugin`,
+    `ziogrpc-plugin-common`
   )
   .settings(
     publish / skip := true,
@@ -89,6 +90,17 @@ lazy val `caliban-v2x-plugin` = (project in file("caliban-v2x-plugin"))
   )
   .dependsOn(`plugin-common` % "compile->compile;provided->provided")
 
+lazy val `ziogrpc-plugin-common` = (project in file("ziogrpc-plugin-common"))
+  .settings(
+    commonSettings,
+    commands ++= Commands.value,
+    name := "ziogrpc-plugin-common",
+    libraryDependencies ++= Seq(
+      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcTestVersion % Provided
+    )
+  )
+  .dependsOn(`plugin-common` % "compile->compile;provided->provided")
+
 lazy val `ziogrpc-v06rcx-plugin` = (project in file("ziogrpc-v06rcx-plugin"))
   .settings(
     commonSettings,
@@ -99,7 +111,7 @@ lazy val `ziogrpc-v06rcx-plugin` = (project in file("ziogrpc-v06rcx-plugin"))
       "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcVersion % Provided
     )
   )
-  .dependsOn(`plugin-common` % "compile->compile;provided->provided")
+  .dependsOn(`ziogrpc-plugin-common` % "compile->compile;provided->provided")
 
 lazy val `ziogrpc-v06testx-plugin` = (project in file("ziogrpc-v06testx-plugin"))
   .settings(
@@ -111,7 +123,7 @@ lazy val `ziogrpc-v06testx-plugin` = (project in file("ziogrpc-v06testx-plugin")
       "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcTestVersion % Provided
     )
   )
-  .dependsOn(`plugin-common` % "compile->compile;provided->provided")
+  .dependsOn(`ziogrpc-plugin-common` % "compile->compile;provided->provided")
 
 lazy val `plugin-common` = (project in file("plugin-common"))
   .settings(

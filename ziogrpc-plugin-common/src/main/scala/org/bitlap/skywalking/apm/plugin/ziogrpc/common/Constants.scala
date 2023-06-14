@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx
+package org.bitlap.skywalking.apm.plugin.ziogrpc.common
 
 import io.grpc.Context
 

@@ -8,7 +8,7 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ArgumentTypeNameMatch.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.ZioGrpcWitnessConstant
+import org.bitlap.skywalking.apm.plugin.ziogrpc.common.ZioGrpcWitnessConstant
 
 /** @author
  *    梦境迷离

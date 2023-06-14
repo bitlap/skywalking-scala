@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx
+package org.bitlap.skywalking.apm.plugin.ziogrpc.common
 
 import java.util.concurrent.*
 

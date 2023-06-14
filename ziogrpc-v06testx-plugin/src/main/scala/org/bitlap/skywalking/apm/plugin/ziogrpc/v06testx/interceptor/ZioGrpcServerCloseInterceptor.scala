@@ -16,8 +16,8 @@ import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.Constants.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 
 /** @author
  *    梦境迷离
