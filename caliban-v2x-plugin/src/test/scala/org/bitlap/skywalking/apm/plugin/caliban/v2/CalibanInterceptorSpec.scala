@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.caliban
+package org.bitlap.skywalking.apm.plugin.caliban.v2
 
 import java.lang.reflect.Method
 

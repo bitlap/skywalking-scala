@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.caliban
+package org.bitlap.skywalking.apm.plugin.caliban.v2
 
 import scala.jdk.CollectionConverters.*
 import scala.util.*
@@ -30,14 +30,14 @@ object TracingCaliban:
     else {
 
       if Utils.ignorePrefix(
-          CalibanPluginConfig.Plugin.Caliban.IGNORE_URL_PREFIXES,
+          CalibanPluginConfig.Plugin.CalibanV2.IGNORE_URL_PREFIXES,
           getOperationName(graphQLRequest)
         )
       then {
         return None
       }
 
-      val opName         = CalibanPluginConfig.Plugin.Caliban.URL_PREFIX + getOperationName(graphQLRequest)
+      val opName         = CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + getOperationName(graphQLRequest)
       val contextCarrier = new ContextCarrier
       val span           = ContextManager.createEntrySpan(opName, contextCarrier)
       try
@@ -46,7 +46,7 @@ object TracingCaliban:
         case t: Throwable => Utils.logError(t)
       }
       SpanLayer.asHttp(span)
-      if CalibanPluginConfig.Plugin.Caliban.COLLECT_VARIABLES then {
+      if CalibanPluginConfig.Plugin.CalibanV2.COLLECT_VARIABLES then {
         val tagValue = collectVariables(graphQLRequest)
         CustomTag.CalibanVariables.tag.set(span, tagValue)
       }
@@ -58,8 +58,8 @@ object TracingCaliban:
   private def collectVariables(graphQLRequest: GraphQLRequest): String = {
     val params   = graphQLRequest.variables.getOrElse(Map.empty).map(kv => kv._1 -> Array(kv._2.toInputString))
     val tagValue = CollectionUtil.toString(params.asJava)
-    if CalibanPluginConfig.Plugin.Caliban.VARIABLES_LENGTH_THRESHOLD > 0 then {
-      StringUtil.cut(tagValue, CalibanPluginConfig.Plugin.Caliban.VARIABLES_LENGTH_THRESHOLD)
+    if CalibanPluginConfig.Plugin.CalibanV2.VARIABLES_LENGTH_THRESHOLD > 0 then {
+      StringUtil.cut(tagValue, CalibanPluginConfig.Plugin.CalibanV2.VARIABLES_LENGTH_THRESHOLD)
     } else tagValue
   }
 

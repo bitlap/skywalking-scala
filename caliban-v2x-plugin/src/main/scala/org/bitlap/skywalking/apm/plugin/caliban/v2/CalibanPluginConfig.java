@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.caliban;
+package org.bitlap.skywalking.apm.plugin.caliban.v2;
 
 import org.apache.skywalking.apm.agent.core.boot.PluginConfig;
 
@@ -9,7 +9,7 @@ import org.apache.skywalking.apm.agent.core.boot.PluginConfig;
 public class CalibanPluginConfig {
     public static class Plugin {
         @PluginConfig(root = CalibanPluginConfig.class)
-        public static class Caliban {
+        public static class CalibanV2 {
             // split by ,
             public static String IGNORE_URL_PREFIXES = "";
             public static String URL_PREFIX = "Caliban/GraphQL/";

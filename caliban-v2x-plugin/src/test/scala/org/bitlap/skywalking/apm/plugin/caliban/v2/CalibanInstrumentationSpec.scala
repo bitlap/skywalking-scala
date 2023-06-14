@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.caliban
+package org.bitlap.skywalking.apm.plugin.caliban.v2
 
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
@@ -8,8 +8,8 @@ import caliban.execution.QueryExecution
 
 import zio.*
 
-import org.apache.skywalking.apm.agent.core.plugin.`match`.{ ClassMatch, HierarchyMatch }
-import org.bitlap.skywalking.apm.plugin.caliban.define.CalibanInstrumentation
+import org.apache.skywalking.apm.agent.core.plugin.`match`.*
+import org.bitlap.skywalking.apm.plugin.caliban.v2.define.CalibanInstrumentation
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
