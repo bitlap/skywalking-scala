@@ -11,14 +11,14 @@ SkyWalking Extension Plugins for Scala 3
 [SkyWalking Scala](https://github.com/bitlap/skywalking-scala) is a SkyWalking Extension (Agent) Plugins for Scala 3.
 
 
-| plugin                  | library  | support version           | breakthrough points                                             |
-|-------------------------|----------|---------------------------|-----------------------------------------------------------------|
-| caliban-v2x-plugin      | caliban  | 2.0.1                     | `GraphQLInterpreter#executeRequest`                             |
-| zio-v200-plugin         | zio      | 2.0.0 ~ 2.0.2             | `FiberRuntime#run`,`zio.Executor`,`zio.internal.ZScheduler`     |
-| zio-v203-plugin         | zio      | 2.0.3 ~ 2.0.15            | `FiberRuntime#run`,`zio.Executor`,`zio.internal.ZScheduler`     |
-| ziogrpc-v06rcx-plugin   | zio-grpc | 0.6.0-test6 ~ 0.6.0-RC5   | `ZChannel#newCall`,`ZServerCallHandler#startCall`,`ZServerCall` |
-| ziogrpc-v06testx-plugin | zio-grpc | 0.6.0-test1 ~ 0.6.0-test5 | `ZChannel#newCall`,`ZServerCallHandler#startCall`,`ZServerCall` |
-| ziohttp-v2x-plugin      | zio-http | 2.0.0-RC10                | `Http.collectHttp`                                              |
+| plugin                  | library  | maybe support version     | tested version |
+|-------------------------|----------|---------------------------|----------------|
+| caliban-v2x-plugin      | caliban  | 2.0.0 ~ 2.0.2             | 2.0.1          |
+| zio-v200-plugin         | zio      | 2.0.0 ~ 2.0.2             | 2.0.2          |
+| zio-v203-plugin         | zio      | 2.0.3 ~ 2.0.15            | 2.0.9,2.0.13   |
+| ziogrpc-v06testx-plugin | zio-grpc | 0.6.0-test1 ~ 0.6.0-test5 | 0.6.0-test4    |
+| ziogrpc-v06rcx-plugin   | zio-grpc | 0.6.0-test6 ~ 0.6.0-RC5   | 0.6.0-RC5      |
+| ziohttp-v2x-plugin      | zio-http | 2.0.0-RC2 ~ 2.0.0-RC10    | 2.0.0-RC10     |
 
 > Other small versions of the library supported by this plugin may also work, but they have not been tested.
 
