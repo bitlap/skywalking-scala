@@ -11,27 +11,29 @@ SkyWalking Extension Plugins for Scala 3
 [SkyWalking Scala](https://github.com/bitlap/skywalking-scala) is a SkyWalking Extension (Agent) Plugins for Scala 3.
 
 
-| plugin              | library  | tested version | breakthrough points                                             |
-|---------------------|----------|----------------|-----------------------------------------------------------------|
-| caliban-v2x-plugin  | caliban  | 2.0.1          | `GraphQLInterpreter#executeRequest`                             |
-| zio-v2x-plugin      | zio      | 2.0.0          | `FiberRuntime#run`,`zio.Executor`,`zio.internal.ZScheduler`     |
-| ziogrpc-v06x-plugin | zio-grpc | 0.6.0-test4    | `ZChannel#newCall`,`ZServerCallHandler#startCall`,`ZServerCall` |
-| ziohttp-v2x-plugin  | zio-http | 2.0.0-RC10     | `Http.collectHttp`                                              |
+| plugin                  | library  | maybe support version     | tested version |
+|-------------------------|----------|---------------------------|----------------|
+| caliban-v2x-plugin      | caliban  | 2.0.0 ~ 2.0.2             | 2.0.1          |
+| zio-v200-plugin         | zio      | 2.0.0 ~ 2.0.2             | 2.0.2          |
+| zio-v203-plugin         | zio      | 2.0.3 ~ 2.0.15            | 2.0.9,2.0.13   |
+| ziogrpc-v06testx-plugin | zio-grpc | 0.6.0-test1 ~ 0.6.0-test5 | 0.6.0-test4    |
+| ziogrpc-v06rcx-plugin   | zio-grpc | 0.6.0-test6 ~ 0.6.0-RC5   | 0.6.0-RC5      |
+| ziohttp-v2x-plugin      | zio-http | 2.0.0-RC2 ~ 2.0.0-RC10    | 2.0.0-RC10     |
 
 > Other small versions of the library supported by this plugin may also work, but they have not been tested.
 
 Also need `apm-jdk-threadpool-plugin-x.y.z.jar` and `apm-jdk-threading-plugin-x.y.z.jar`.
 
 ## Available Configurations
-| key                                           | description                                                                           |
-|-----------------------------------------------|---------------------------------------------------------------------------------------|
-| `plugin.caliban.url_prefix`                   | Add a custom prefix to the graphql operation, default is `GraphQL/`.                  |
-| `plugin.caliban.ignore_url_prefixes`          | Ignore operation name that start with this prefix, i.e. no span will be created.      |
-| `plugin.caliban.collect_variables`            | Collect request variables.                                                            |
-| `plugin.caliban.variables_length_threshold`   | How many characters to keep and send to the OAP backend.                              |
-| `plugin.ziohttp.ignore_url_prefixes`          | Ignore request path that should start with this prefix, i.e. no span will be created. |
-| `plugin.ziohttp.collect_http_params`          | Collect http query params.                                                            |
-| `plugin.ziohttp.http_params_length_threshold` | How many characters to keep and send to the OAP backend.                              |
+| key                                             | description                                                                           |
+|-------------------------------------------------|---------------------------------------------------------------------------------------|
+| `plugin.calibanv2.url_prefix`                   | Add a custom prefix to the graphql operation, default is `Caliban/GraphQL/`.          |
+| `plugin.calibanv2.ignore_url_prefixes`          | Ignore operation name that start with this prefix, i.e. no span will be created.      |
+| `plugin.calibanv2.collect_variables`            | Collect request variables.                                                            |
+| `plugin.calibanv2.variables_length_threshold`   | How many characters to keep and send to the OAP backend.                              |
+| `plugin.ziohttpv2.ignore_url_prefixes`          | Ignore request path that should start with this prefix, i.e. no span will be created. |
+| `plugin.ziohttpv2.collect_http_params`          | Collect http query params.                                                            |
+| `plugin.ziohttpv2.http_params_length_threshold` | How many characters to keep and send to the OAP backend.                              |
 
 The prefix should be added when passing command line parameters, such as: `-Dskywalking.plugin.caliban.url_prefix=GQL/`
 

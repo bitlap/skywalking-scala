@@ -1,3 +1,0 @@
-zio-grpc-0.6.x-client=org.bitlap.skywalking.apm.plugin.ziogrpc.define.ZioGrpcClientInstrumentation
-zio-grpc-0.6.x-server=org.bitlap.skywalking.apm.plugin.ziogrpc.define.ZioGrpcServerInstrumentation
-zio-grpc-0.6.x-server-call=org.bitlap.skywalking.apm.plugin.ziogrpc.define.ZioGrpcServerCallInstrumentation
