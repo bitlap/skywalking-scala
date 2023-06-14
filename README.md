@@ -27,10 +27,10 @@ Also need `apm-jdk-threadpool-plugin-x.y.z.jar` and `apm-jdk-threading-plugin-x.
 ## Available Configurations
 | key                                             | description                                                                           |
 |-------------------------------------------------|---------------------------------------------------------------------------------------|
-| `plugin.caliban.url_prefix`                     | Add a custom prefix to the graphql operation, default is `Caliban/GraphQL/`.          |
-| `plugin.caliban.ignore_url_prefixes`            | Ignore operation name that start with this prefix, i.e. no span will be created.      |
-| `plugin.caliban.collect_variables`              | Collect request variables.                                                            |
-| `plugin.caliban.variables_length_threshold`     | How many characters to keep and send to the OAP backend.                              |
+| `plugin.calibanv2.url_prefix`                   | Add a custom prefix to the graphql operation, default is `Caliban/GraphQL/`.          |
+| `plugin.calibanv2.ignore_url_prefixes`          | Ignore operation name that start with this prefix, i.e. no span will be created.      |
+| `plugin.calibanv2.collect_variables`            | Collect request variables.                                                            |
+| `plugin.calibanv2.variables_length_threshold`   | How many characters to keep and send to the OAP backend.                              |
 | `plugin.ziohttpv2.ignore_url_prefixes`          | Ignore request path that should start with this prefix, i.e. no span will be created. |
 | `plugin.ziohttpv2.collect_http_params`          | Collect http query params.                                                            |
 | `plugin.ziohttpv2.http_params_length_threshold` | How many characters to keep and send to the OAP backend.                              |
