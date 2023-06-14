@@ -11,13 +11,13 @@ SkyWalking Extension Plugins for Scala 3
 [SkyWalking Scala](https://github.com/bitlap/skywalking-scala) is a SkyWalking Extension (Agent) Plugins for Scala 3.
 
 
-| plugin              | library  | tested version | breakthrough points                                             |
-|---------------------|----------|----------------|-----------------------------------------------------------------|
-| caliban-v2x-plugin  | caliban  | 2.0.1          | `GraphQLInterpreter#executeRequest`                             |
-| zio-v200-plugin     | zio      | 2.0.0 ~ 2.0.2  | `FiberRuntime#run`,`zio.Executor`,`zio.internal.ZScheduler`     |
-| zio-v203-plugin     | zio      | 2.0.3 ~ -      | `FiberRuntime#run`,`zio.Executor`,`zio.internal.ZScheduler`     |
-| ziogrpc-v06x-plugin | zio-grpc | 0.6.0-RC5      | `ZChannel#newCall`,`ZServerCallHandler#startCall`,`ZServerCall` |
-| ziohttp-v2x-plugin  | zio-http | 2.0.0-RC10     | `Http.collectHttp`                                              |
+| plugin              | library  | support version       | breakthrough points                                             |
+|---------------------|----------|-----------------------|-----------------------------------------------------------------|
+| caliban-v2x-plugin  | caliban  | 2.0.1                 | `GraphQLInterpreter#executeRequest`                             |
+| zio-v200-plugin     | zio      | 2.0.0 ~ 2.0.2         | `FiberRuntime#run`,`zio.Executor`,`zio.internal.ZScheduler`     |
+| zio-v203-plugin     | zio      | 2.0.3 ~ 2.0.15        | `FiberRuntime#run`,`zio.Executor`,`zio.internal.ZScheduler`     |
+| ziogrpc-v06x-plugin | zio-grpc | 0.6.0-RC1 ~ 0.6.0-RC5 | `ZChannel#newCall`,`ZServerCallHandler#startCall`,`ZServerCall` |
+| ziohttp-v2x-plugin  | zio-http | 2.0.0-RC10            | `Http.collectHttp`                                              |
 
 > Other small versions of the library supported by this plugin may also work, but they have not been tested.
 

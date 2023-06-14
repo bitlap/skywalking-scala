@@ -79,4 +79,5 @@ object Utils:
     if ContextManager.isActive then ContextManager.activeSpan.log(cause.squash)
 
   def logError[E <: Throwable](e: E): Unit =
+    LOGGER.error(s"Span Operation Error!", e)
     if ContextManager.isActive then ContextManager.activeSpan.log(e)

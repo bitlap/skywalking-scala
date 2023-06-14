@@ -19,8 +19,7 @@ final class CalibanInstrumentation extends ClassInstanceMethodsEnhancePluginDefi
 
   override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
-  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] =
-    new Array[ConstructorInterceptPoint](0)
+  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
 
   override def getInstanceMethodsInterceptPoints: Array[InstanceMethodsInterceptPoint] =
     Array[InstanceMethodsInterceptPoint](
@@ -36,7 +35,7 @@ end CalibanInstrumentation
 object CalibanInstrumentation:
   private final val INTERCEPTOR_CLASS: String = "org.bitlap.skywalking.apm.plugin.caliban.CalibanInterceptor"
 
-  private final val ENHANCE_CLASS          = MultiClassNameMatch.byMultiClassMatch("caliban.GraphQL$$anon$2")
+  private final val ENHANCE_CLASS          = HierarchyMatch.byHierarchyMatch("caliban.CalibanInterceptor")
   private final val ENHANCE_METHOD: String = "executeRequest"
 
   def getCalibanExecuteRequestMethod: ElementMatcher[MethodDescription] =

@@ -3,19 +3,20 @@ ThisBuild / resolvers ++= Seq(
   "Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/releases"
 )
 
-lazy val scala3Version    = "3.2.2"
-lazy val scalatestVersion = "3.2.15"
-lazy val junitVersion     = "4.12"
-lazy val mockitoVersion   = "5.0.0"
+lazy val scala3Version         = "3.2.2"
+lazy val scalatestVersion      = "3.2.15"
+lazy val junitVersion          = "4.12"
+lazy val mockitoVersion        = "5.0.0"
 lazy val junitInterfaceVersion = "0.12"
 
 lazy val skywalkingVersion = "8.16.0"
 
-lazy val calibanVersion  = "2.0.1"
-lazy val zioGrpcVersion  = "0.6.0-RC5"
-lazy val zio200Version   = "2.0.0"
-lazy val zio203Version   = "2.0.3"
-lazy val zioHttp2Version = "2.0.0-RC10"
+lazy val calibanVersion     = "2.0.1"
+lazy val zioGrpcVersion     = "0.6.0-RC5"
+lazy val zioGrpcTestVersion = "0.6.0-test1"
+lazy val zio200Version      = "2.0.0"
+lazy val zio203Version      = "2.0.3"
+lazy val zioHttp2Version    = "2.0.0-RC10"
 
 inThisBuild(
   List(
@@ -49,21 +50,22 @@ lazy val commonSettings =
       ShadeRule.rename("net.bytebuddy.**" -> s"org.apache.skywalking.apm.dependencies.net.bytebuddy.@1").inAll
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest"        %% "scalatest"      % scalatestVersion  % Test,
-      "junit"                 % "junit"          % junitVersion      % Test,
-      "org.mockito"           % "mockito-core"   % mockitoVersion    % Test,
-      "org.apache.skywalking" % "apm-test-tools" % skywalkingVersion % Test,
-      "org.apache.skywalking" % "apm-agent-core" % skywalkingVersion % Provided,
-      "com.github.sbt" % "junit-interface" % junitInterfaceVersion % Test
+      "org.scalatest"        %% "scalatest"       % scalatestVersion      % Test,
+      "junit"                 % "junit"           % junitVersion          % Test,
+      "org.mockito"           % "mockito-core"    % mockitoVersion        % Test,
+      "org.apache.skywalking" % "apm-test-tools"  % skywalkingVersion     % Test,
+      "org.apache.skywalking" % "apm-agent-core"  % skywalkingVersion     % Provided,
+      "com.github.sbt"        % "junit-interface" % junitInterfaceVersion % Test
     ),
-    crossPaths := false,
+    crossPaths         := false,
     Test / testOptions := Seq(Tests.Argument(TestFrameworks.JUnit, "-a"))
   )
 
 lazy val `skywalking-scala` = (project in file("."))
   .aggregate(
     `caliban-v2x-plugin`,
-    `ziogrpc-v06x-plugin`,
+    `ziogrpc-v06rcx-plugin`,
+    `ziogrpc-v06testx-plugin`,
     `zio-v200-plugin`,
     `zio-v203-plugin`,
     `plugin-common`,
@@ -87,14 +89,26 @@ lazy val `caliban-v2x-plugin` = (project in file("caliban-v2x-plugin"))
   )
   .dependsOn(`plugin-common` % "compile->compile;provided->provided")
 
-lazy val `ziogrpc-v06x-plugin` = (project in file("ziogrpc-v06x-plugin"))
+lazy val `ziogrpc-v06rcx-plugin` = (project in file("ziogrpc-v06rcx-plugin"))
   .settings(
     commonSettings,
     commands ++= Commands.value,
-    name                       := "ziogrpc-v06x-plugin",
-    assembly / assemblyJarName := s"apm-ziogrpc-v06x-plugin-${(ThisBuild / version).value}.jar",
+    name                       := "ziogrpc-v06rcx-plugin",
+    assembly / assemblyJarName := s"apm-ziogrpc-v06rcx-plugin-${(ThisBuild / version).value}.jar",
     libraryDependencies ++= Seq(
       "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcVersion % Provided
+    )
+  )
+  .dependsOn(`plugin-common` % "compile->compile;provided->provided")
+
+lazy val `ziogrpc-v06testx-plugin` = (project in file("ziogrpc-v06testx-plugin"))
+  .settings(
+    commonSettings,
+    commands ++= Commands.value,
+    name                       := "ziogrpc-v06testx-plugin",
+    assembly / assemblyJarName := s"apm-ziogrpc-v06testx-plugin-${(ThisBuild / version).value}.jar",
+    libraryDependencies ++= Seq(
+      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcTestVersion % Provided
     )
   )
   .dependsOn(`plugin-common` % "compile->compile;provided->provided")

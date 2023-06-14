@@ -1,0 +1,3 @@
+zio-grpc-0.6.0-rcx-client=org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.define.ZioGrpcClientInstrumentation
+zio-grpc-0.6.0-rcx-server=org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.define.ZioGrpcServerInstrumentation
+zio-grpc-0.6.0-rcx-server-call=org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.define.ZioGrpcServerCallInstrumentation
