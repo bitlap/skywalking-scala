@@ -40,11 +40,7 @@ object TracingCaliban:
       val opName         = CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + getOperationName(graphQLRequest)
       val contextCarrier = new ContextCarrier
       val span           = ContextManager.createEntrySpan(opName, contextCarrier)
-      try
-        span.prepareForAsync()
-      catch {
-        case t: Throwable => Utils.logError(t)
-      }
+      Utils.prepareAsync(span)
       SpanLayer.asHttp(span)
       if CalibanPluginConfig.Plugin.CalibanV2.COLLECT_VARIABLES then {
         val tagValue = collectVariables(graphQLRequest)

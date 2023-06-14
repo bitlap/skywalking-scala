@@ -133,7 +133,7 @@ final class TracingClientCall[R, Req, Resp](
       ContextManager.activeSpan.log(a.asException())
       a.asException()
     }.ensuring(ZIO.attempt {
-      summon[AbstractSpan].asyncFinish()
+      Utils.stopAsync(summon[AbstractSpan])
       ContextManager.stopSpan()
     }.ignore)
 
