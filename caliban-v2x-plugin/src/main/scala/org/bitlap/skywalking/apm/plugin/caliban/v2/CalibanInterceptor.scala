@@ -50,7 +50,7 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
       cleanup match
         case Exit.Success(value) =>
           ZIO.attempt {
-            span.asyncFinish()
+            Utils.stopAsync(span)
             if value.errors.nonEmpty then {
               val ex: Option[CalibanError] = value.errors.headOption
               span.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure")))

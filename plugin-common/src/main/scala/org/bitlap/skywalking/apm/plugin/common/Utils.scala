@@ -17,6 +17,20 @@ object Utils:
 
   private val LOGGER = LogManager.getLogger(classOf[Utils.type])
 
+  def prepareAsync(span: AbstractSpan) =
+    try
+      span.prepareForAsync()
+    catch {
+      case t: Throwable => logError(t)
+    }
+
+  def stopAsync(span: AbstractSpan) =
+    try
+      span.asyncFinish()
+    catch {
+      case t: Throwable => logError(t)
+    }
+
   def unsafeRun[A](z: ZIO[Any, Any, A]): A =
     Try(Unsafe.unsafe { u ?=>
       Runtime.default.unsafe.run(z).getOrThrowFiberFailure()
@@ -42,11 +56,7 @@ object Utils:
   def continuedSnapshot(contextSnapshot: ContextSnapshot, asyncSpan: AbstractSpan)(effect: => Unit): Unit =
     try
       ContextManager.continued(contextSnapshot)
-      try asyncSpan.asyncFinish
-      catch {
-        case e: Throwable =>
-          Utils.logError(e)
-      }
+      Utils.stopAsync(asyncSpan)
       effect
     catch {
       case t: Throwable =>
