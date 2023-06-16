@@ -26,7 +26,7 @@ object AgentUtils:
     try
       span.asyncFinish()
     catch {
-      case t: Throwable => logError(t)
+      case _: Throwable =>
     }
 
   def continuedSnapshot_(contextSnapshot: ContextSnapshot): Unit =
@@ -83,4 +83,4 @@ object AgentUtils:
     if ContextManager.isActive then ContextManager.activeSpan.log(e)
 
   def generateFiberOperationName =
-    s"IOFiberWrapper/${Thread.currentThread.getName}"  
+    s"IOFiberWrapper/${Thread.currentThread.getName}"
