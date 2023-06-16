@@ -1,18 +1,20 @@
-package org.bitlap.skywalking.apm.plugin.ce.v3
+package org.bitlap.skywalking.apm.plugin.zcommon.interceptor
 
 import java.lang.reflect.Method
 
-import org.apache.skywalking.apm.agent.core.context.ContextManager
+import zio.internal.FiberRuntime
+
+import org.apache.skywalking.apm.agent.core.context.{ ContextManager, ContextSnapshot }
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.AgentUtils
-import org.bitlap.skywalking.apm.plugin.common.ContextCleaningWrapper
+import org.bitlap.skywalking.apm.plugin.zcommon.*
 
 /** @author
  *    梦境迷离
- *  @version 1.0,2023/6/15
+ *  @version 1.0,2023/6/16
  */
-final class IOFiberSchedulerInterceptor extends InstanceMethodsAroundInterceptor:
+final class ZioFiberRuntimeResumeInterceptor extends InstanceMethodsAroundInterceptor {
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -20,11 +22,7 @@ final class IOFiberSchedulerInterceptor extends InstanceMethodsAroundInterceptor
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
-  ): Unit =
-    if ContextManager.isActive then {
-      val runnable = allArguments(1).asInstanceOf[Runnable]
-      allArguments(1) = new ContextCleaningWrapper(runnable, ContextManager.capture())
-    }
+  ): Unit = ()
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -32,8 +30,13 @@ final class IOFiberSchedulerInterceptor extends InstanceMethodsAroundInterceptor
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     ret: Object
-  ): Object =
+  ): Object = {
+    if objInst.getSkyWalkingDynamicField != null && ContextManager.isActive then {
+      val contextSnapshot = objInst.getSkyWalkingDynamicField.asInstanceOf[ContextSnapshot]
+      ContextManager.continued(contextSnapshot)
+    }
     ret
+  }
 
   override def handleMethodException(
     objInst: EnhancedInstance,
@@ -45,4 +48,4 @@ final class IOFiberSchedulerInterceptor extends InstanceMethodsAroundInterceptor
 
   end handleMethodException
 
-end IOFiberSchedulerInterceptor
+}

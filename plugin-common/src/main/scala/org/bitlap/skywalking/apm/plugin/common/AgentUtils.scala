@@ -44,7 +44,7 @@ object AgentUtils:
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
-    } finally ContextManager.stopSpan()
+    } finally if ContextManager.isActive then ContextManager.stopSpan()
 
   def continuedSnapshot(contextSnapshot: ContextSnapshot, asyncSpan: AbstractSpan)(effect: => Unit): Unit =
     try
@@ -54,7 +54,7 @@ object AgentUtils:
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
-    } finally ContextManager.stopSpan()
+    } finally if ContextManager.isActive then ContextManager.stopSpan()
 
   def continuedSnapshot(enhanced: Object): Unit =
     enhanced match {
@@ -81,3 +81,6 @@ object AgentUtils:
   def logError[E <: Throwable](e: E): Unit =
     LOGGER.error(s"Span Operation Error!", e)
     if ContextManager.isActive then ContextManager.activeSpan.log(e)
+
+  def generateFiberOperationName =
+    s"IOFiberWrapper/${Thread.currentThread.getName}"  

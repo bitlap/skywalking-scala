@@ -64,15 +64,13 @@ object CatsEffectIOFiberInstrumentation:
     FIBER_RUN_METHOD_INTERCEPTOR     -> named("run").and(takesArguments(0)),
     FIBER_SUSPEND_METHOD_INTERCEPTOR -> named("suspend").and(takesArguments(0)),
     FIBER_RESUME_METHOD_INTERCEPTOR  -> named("resume").and(takesArguments(0))
-  ) ++ (
-    (0 until 3)
-      .map(i => s"${FIBER_SCHEDULE_METHOD_INTERCEPTOR}_$i")
-      .zip(
-        List(
-          named("rescheduleFiber").and(takesArguments(2)),
-          named("scheduleFiber").and(takesArguments(2)),
-          named("scheduleOnForeignEC").and(takesArguments(2))
-        )
+  ) ++ (0 until 3)
+    .map(i => s"${FIBER_SCHEDULE_METHOD_INTERCEPTOR}_$i")
+    .zip(
+      List(
+        named("rescheduleFiber").and(takesArguments(2)),
+        named("scheduleFiber").and(takesArguments(2)),
+        named("scheduleOnForeignEC").and(takesArguments(2))
       )
-      .toMap
-  )
+    )
+    .toMap

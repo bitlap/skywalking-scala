@@ -35,8 +35,7 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     val call    = allArguments(0).asInstanceOf[ServerCall[?, ?]]
     val context = GrpcOperationQueue.remove(call)
     if context == null then return
-    val method = context.methodDescriptor
-    val span   = beforeClose(ContextManager.capture(), method)
+    val span = beforeClose(context.contextSnapshot, context.methodDescriptor)
     objInst.setSkyWalkingDynamicField(context.copy(activeSpan = Option(span)))
   end beforeMethod
 
@@ -46,7 +45,6 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
     span.prepareForAsync()
-    ContextManager.stopSpan(span)
     AgentUtils.continuedSnapshot_(contextSnapshot)
     span
 
@@ -79,8 +77,7 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
         if status.getCause != null then span.log(status.getCause)
     }
     Tags.RPC_RESPONSE_STATUS_CODE.set(span, status.getCode.name)
-    try
-      span.asyncFinish
+    try span.asyncFinish
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
@@ -90,6 +87,7 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
       catch {
         case ignore: Throwable =>
       }
+      ContextManager.stopSpan()
 
   override def handleMethodException(
     objInst: EnhancedInstance,

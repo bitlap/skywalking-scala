@@ -33,8 +33,7 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     val call    = allArguments(0).asInstanceOf[ServerCall[?, ?]]
     val context = GrpcOperationQueue.get(call)
     if context == null then return
-    val method = context.methodDescriptor
-    val span   = beforeSendMessage(ContextManager.capture(), method)
+    val span = beforeSendMessage(context.contextSnapshot, context.methodDescriptor)
     span.foreach(a => objInst.setSkyWalkingDynamicField(a))
   end beforeMethod
 
@@ -49,6 +48,7 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     val span            = ContextManager.createLocalSpan(operationPrefix + RESPONSE_ON_MESSAGE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
+    span.prepareForAsync()
     AgentUtils.continuedSnapshot_(contextSnapshot)
     Some(span)
   end beforeSendMessage
@@ -64,7 +64,7 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     if span == null || !span.isInstanceOf[AbstractSpan] then return ret
     ret
       .asInstanceOf[GIO[Unit]]
-      .ensuring(ZIO.attempt(ContextManager.stopSpan(span.asInstanceOf[AbstractSpan])).ignore)
+      .ensuring(ZIO.attempt { span.asInstanceOf[AbstractSpan].asyncFinish(); ContextManager.stopSpan() }.ignore)
   end afterMethod
 
   override def handleMethodException(

@@ -1,5 +1,7 @@
 package org.bitlap.skywalking.apm.plugin.zcommon
 
+import java.lang.reflect.Method
+
 import scala.util.Try
 
 import org.apache.skywalking.apm.agent.core.context.*

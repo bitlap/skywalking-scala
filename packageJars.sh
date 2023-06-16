@@ -10,7 +10,7 @@ ziogrpctest=ziogrpc-v06testx-plugin
 caliban=caliban-v2x-plugin
 zio200=zio-v200-plugin
 zio203=zio-v203-plugin
-catseffect3=cats-effect3-v3x-plugin
+catseffect3=cats-effect-v3x-plugin
 
 
 sbt clean assembly

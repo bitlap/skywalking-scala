@@ -1,2 +1,3 @@
 cats-3.x-fiber=org.bitlap.skywalking.apm.plugin.ce.v3.define.CatsEffectIOFiberInstrumentation
 cats-3.x-scheduler=org.bitlap.skywalking.apm.plugin.ce.v3.define.CatsEffectSchedulerInstrumentation
+cats-3.x-work-stealing=org.bitlap.skywalking.apm.plugin.ce.v3.define.CatsEffectWorkStealingInstrumentation

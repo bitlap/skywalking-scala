@@ -61,6 +61,7 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
       contextSnapshot = contextSnapshot,
       methodDescriptor = call.getMethodDescriptor
     )
+    ContextManager.stopSpan(span)
     GrpcOperationQueue.put(call, context)
     objInst.setSkyWalkingDynamicField(context)
 
@@ -84,7 +85,6 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
       ctx.contextSnapshot,
       ctx.asyncSpan
     )
-    ContextManager.stopSpan()
     result
   end afterMethod
 

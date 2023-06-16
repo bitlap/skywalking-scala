@@ -21,8 +21,6 @@ import _root_.zio.internal.FiberRuntime
  */
 object TagUtils:
 
-  private val LOGGER = LogManager.getLogger(classOf[TagUtils.type])
-
   final lazy val fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
   private def formatDate(long: Long) = fmt.format(long)
@@ -33,19 +31,10 @@ object TagUtils:
       CustomTag.FiberStartTime.tag.set(span, formatDate(fiberId.startTimeMillis))
       CustomTag.FiberLocation.tag.set(span, fiberId.location.toString)
       CustomTag.FiberClassName.tag.set(span, objInst.getClass.getName)
+      CustomTag.FiberIOType.tag.set(span, "zio")
     } match
       case Failure(ex) => span.errorOccurred.log(ex)
       case Success(_)  =>
   end setZioTags
 
-  def setSpanZioTag(arg: Object, objInst: EnhancedInstance)(implicit span: AbstractSpan) =
-    arg match {
-      case fiber: FiberRuntime[?, ?] =>
-        TagUtils.setZioTags(span, fiber.id, objInst)
-      case _ =>
-        LOGGER.debug(s"Invalid FiberRuntime: ${objInst.getClass.getName} ${objInst.toString}")
-    }
-
-  def getExecutorType(className: String): zcommon.ExecutorType =
-    ExecutorType.values.find(c => className.startsWith(c.classNamePrefix)).getOrElse(ExecutorType.Executor)
 end TagUtils

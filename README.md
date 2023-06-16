@@ -13,7 +13,7 @@ SkyWalking Extension Plugins for Scala 3
 
 | plugin                  | library     | maybe support version     | tested version |
 |-------------------------|-------------|---------------------------|----------------|
-| cats-effect-v3x-plugin  | cats-effect | 3.3.x ~ 3.5.x             | 3.4.1          |
+| cats-effect-v3x-plugin  | cats-effect | 3.4.0-RC1 ~ 3.5.x         | 3.4.1          |
 | zio-v200-plugin         | zio         | 2.0.0 ~ 2.0.2             | 2.0.2          |
 | zio-v203-plugin         | zio         | 2.0.3 ~ 2.0.15            | 2.0.9,2.0.13   |
 | ziogrpc-v06testx-plugin | zio-grpc    | 0.6.0-test1 ~ 0.6.0-test5 | 0.6.0-test4    |

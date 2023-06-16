@@ -1,2 +1,3 @@
 zio-2.0.3-fiber=org.bitlap.skywalking.apm.plugin.zio.v203.define.ZioFiberRuntimeInstrumentation
 zio-2.0.3-executor=org.bitlap.skywalking.apm.plugin.zio.v203.define.ZioExecutorInstrumentation
+zio-2.0.3-steal-work=org.bitlap.skywalking.apm.plugin.zio.v203.define.ZioWorkStealingInstrumentation

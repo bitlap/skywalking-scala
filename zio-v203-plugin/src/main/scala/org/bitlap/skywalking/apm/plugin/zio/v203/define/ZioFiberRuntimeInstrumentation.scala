@@ -58,6 +58,15 @@ object ZioFiberRuntimeInstrumentation:
   final val FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.zcommon.interceptor.ZioFiberRuntimeInterceptor"
 
+  final val FIBER_RUNTIME_RESUME_METHOD_INTERCEPTOR: String =
+    "org.bitlap.skywalking.apm.plugin.zcommon.interceptor.ZioFiberRuntimeResumeInterceptor"
+
+  final val FIBER_RUNTIME_SUSPEND_METHOD_INTERCEPTOR: String =
+    "org.bitlap.skywalking.apm.plugin.common.interceptor.SaveCurrentContextOnExit"
+
+  final val EXECUTOR_INTERCEPTOR: String =
+    "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
+
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     (0 until 2)
       .map(i => s"${FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR}_$i")
@@ -67,4 +76,8 @@ object ZioFiberRuntimeInstrumentation:
           named("run").and(takesArguments(1))
         )
       )
-      .toMap
+      .toMap ++ Map(
+      FIBER_RUNTIME_RESUME_METHOD_INTERCEPTOR  -> named("resume").and(takesArguments(2)),
+      FIBER_RUNTIME_SUSPEND_METHOD_INTERCEPTOR -> named("await").and(takesArguments(1)),
+      EXECUTOR_INTERCEPTOR                     -> named("drainQueueLaterOnExecutor").and(takesArguments(1))
+    )

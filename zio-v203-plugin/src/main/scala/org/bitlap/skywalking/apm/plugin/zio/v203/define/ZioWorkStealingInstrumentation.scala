@@ -1,11 +1,9 @@
 package org.bitlap.skywalking.apm.plugin.zio.v203.define
 
-import java.util.Collections
-import java.util.List as JList
+import java.util.{ Collections, List as JList }
 
 import net.bytebuddy.description.method.MethodDescription
-import net.bytebuddy.matcher.ElementMatcher
-import net.bytebuddy.matcher.ElementMatchers
+import net.bytebuddy.matcher.*
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
@@ -18,11 +16,11 @@ import org.bitlap.skywalking.apm.plugin.zio.v203.ZioWitnessConstant
  *    梦境迷离
  *  @version 1.0,2023/5/16
  */
-final class ZioExecutorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
+final class ZioWorkStealingInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
-  import ZioExecutorInstrumentation.*
+  import ZioWorkStealingInstrumentation.*
 
-  override def enhanceClass(): ClassMatch = ENHANCE_CLASS
+  override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
 
   override protected def witnessMethods: JList[WitnessMethod] =
     Collections.singletonList(ZioWitnessConstant.WITNESS_203X_METHOD)
@@ -34,31 +32,23 @@ final class ZioExecutorInstrumentation extends ClassInstanceMethodsEnhancePlugin
       .map(kv =>
         new InstanceMethodsInterceptPoint {
           override def getMethodsMatcher: ElementMatcher[MethodDescription] = kv._2
-
-          override def getMethodsInterceptor: String = kv._1.split("_")(0)
-
-          override def isOverrideArgs: Boolean = false
+          override def getMethodsInterceptor: String                        = kv._1
+          override def isOverrideArgs: Boolean                              = false
         }
       )
       .toArray
+
   end getInstanceMethodsInterceptPoints
 
-end ZioExecutorInstrumentation
+end ZioWorkStealingInstrumentation
 
-object ZioExecutorInstrumentation:
+object ZioWorkStealingInstrumentation:
 
-  final val ENHANCE_CLASS = HierarchyMatch.byHierarchyMatch("zio.Executor")
+  final val ENHANCE_CLASS: String = "zio.internal.FiberRuntime"
 
-  final val EXECUTOR_INTERCEPTOR: String =
+  final val FIBER_STEAL_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
 
-  final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
-    (0 until 2)
-      .map(i => s"${EXECUTOR_INTERCEPTOR}_$i")
-      .zip(
-        List(
-          named("submit").and(takesArguments(2)),
-          named("submitAndYield").and(takesArguments(2))
-        )
-      )
-      .toMap
+  final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
+    FIBER_STEAL_METHOD_INTERCEPTOR -> named("stealWork").and(takesArguments(3))
+  )
