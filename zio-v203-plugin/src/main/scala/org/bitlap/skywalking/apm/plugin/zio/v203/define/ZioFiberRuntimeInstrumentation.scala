@@ -56,7 +56,7 @@ object ZioFiberRuntimeInstrumentation:
     "org.bitlap.skywalking.apm.plugin.common.interceptor.ConstructorInterceptor"
 
   final val FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.ZioFiberRuntimeInterceptor"
+    "org.bitlap.skywalking.apm.plugin.zcommon.interceptor.ZioFiberRuntimeInterceptor"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     (0 until 2)

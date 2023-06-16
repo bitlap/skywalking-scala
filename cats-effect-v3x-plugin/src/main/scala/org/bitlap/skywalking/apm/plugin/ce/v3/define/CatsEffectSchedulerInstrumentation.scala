@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.zio.v200.define
+package org.bitlap.skywalking.apm.plugin.ce.v3.define
 
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.*
@@ -14,17 +14,13 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
  *    梦境迷离
  *  @version 1.0,2023/5/16
  */
-final class ZioFiberRuntimeInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
+final class CatsEffectSchedulerInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
-  import ZioFiberRuntimeInstrumentation.*
+  import CatsEffectSchedulerInstrumentation.*
 
-  override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
+  override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
-  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = Array(
-    new ConstructorInterceptPoint:
-      override def getConstructorMatcher: ElementMatcher[MethodDescription] = takesArguments(3)
-      override def getConstructorInterceptor: String                        = FIBER_RUNTIME_CLASS_INTERCEPTOR
-  )
+  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
 
   override def getInstanceMethodsInterceptPoints: Array[InstanceMethodsInterceptPoint] =
     methodInterceptors
@@ -39,18 +35,15 @@ final class ZioFiberRuntimeInstrumentation extends ClassInstanceMethodsEnhancePl
 
   end getInstanceMethodsInterceptPoints
 
-end ZioFiberRuntimeInstrumentation
+end CatsEffectSchedulerInstrumentation
 
-object ZioFiberRuntimeInstrumentation:
+object CatsEffectSchedulerInstrumentation:
 
-  final val ENHANCE_CLASS: String = "zio.internal.FiberRuntime"
+  final val ENHANCE_CLASS = HierarchyMatch.byHierarchyMatch("cats.effect.unsafe.Scheduler")
 
-  final val FIBER_RUNTIME_CLASS_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.ConstructorInterceptor"
-
-  final val FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.zcommon.interceptor.ZioFiberRuntimeInterceptor"
+  final val FIBER_SLEEP_METHOD_INTERCEPTOR: String =
+    "org.bitlap.skywalking.apm.plugin.ce.v3.IOFiberSchedulerInterceptor"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
-    FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR -> named("run").and(takesArguments(0))
+    FIBER_SLEEP_METHOD_INTERCEPTOR -> named("sleep").and(takesArguments(2))
   )

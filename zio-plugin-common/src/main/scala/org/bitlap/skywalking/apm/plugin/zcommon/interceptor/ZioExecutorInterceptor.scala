@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.common.interceptor
+package org.bitlap.skywalking.apm.plugin.zcommon.interceptor
 
 import java.lang.reflect.Method
 
@@ -10,7 +10,8 @@ import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
-import org.bitlap.skywalking.apm.plugin.common.ExecutorType.*
+import org.bitlap.skywalking.apm.plugin.zcommon.*
+import org.bitlap.skywalking.apm.plugin.zcommon.ExecutorType.*
 
 /** @author
  *    梦境迷离
@@ -34,7 +35,7 @@ final class ZioExecutorInterceptor extends InstanceMethodsAroundInterceptor:
     implicit val span = ContextManager.createLocalSpan(operationName)
     span.setComponent(ComponentsDefine.JDK_THREADING)
     TagUtils.setSpanZioTag(allArguments(0), objInst)
-    Utils.continuedSnapshot(allArguments(0))
+    AgentUtils.continuedSnapshot(allArguments(0))
   }
 
   private def generateBlockingOperationName(method: Method): String =
@@ -62,4 +63,4 @@ final class ZioExecutorInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = Utils.logError(t)
+  ): Unit = AgentUtils.logError(t)

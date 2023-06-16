@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.common
+package org.bitlap.skywalking.apm.plugin.zcommon
 
 /** @author
  *    梦境迷离

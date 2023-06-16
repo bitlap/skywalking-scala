@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.common
+package org.bitlap.skywalking.apm.plugin.zcommon
 
 import java.text.SimpleDateFormat
 
@@ -10,6 +10,7 @@ import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.logging.api.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance
 import org.bitlap.skywalking.apm.plugin.common.*
+import org.bitlap.skywalking.apm.plugin.zcommon
 
 import _root_.zio.*
 import _root_.zio.internal.FiberRuntime
@@ -45,6 +46,6 @@ object TagUtils:
         LOGGER.debug(s"Invalid FiberRuntime: ${objInst.getClass.getName} ${objInst.toString}")
     }
 
-  def getExecutorType(className: String): ExecutorType =
+  def getExecutorType(className: String): zcommon.ExecutorType =
     ExecutorType.values.find(c => className.startsWith(c.classNamePrefix)).getOrElse(ExecutorType.Executor)
 end TagUtils

@@ -11,18 +11,20 @@ SkyWalking Extension Plugins for Scala 3
 [SkyWalking Scala](https://github.com/bitlap/skywalking-scala) is a SkyWalking Extension (Agent) Plugins for Scala 3.
 
 
-| plugin                  | library  | maybe support version     | tested version |
-|-------------------------|----------|---------------------------|----------------|
-| caliban-v2x-plugin      | caliban  | 2.0.0 ~ 2.0.2             | 2.0.1          |
-| zio-v200-plugin         | zio      | 2.0.0 ~ 2.0.2             | 2.0.2          |
-| zio-v203-plugin         | zio      | 2.0.3 ~ 2.0.15            | 2.0.9,2.0.13   |
-| ziogrpc-v06testx-plugin | zio-grpc | 0.6.0-test1 ~ 0.6.0-test5 | 0.6.0-test4    |
-| ziogrpc-v06rcx-plugin   | zio-grpc | 0.6.0-test6 ~ 0.6.0-RC5   | 0.6.0-RC5      |
-| ziohttp-v2x-plugin      | zio-http | 2.0.0-RC2 ~ 2.0.0-RC10    | 2.0.0-RC10     |
+| plugin                  | library     | maybe support version     | tested version |
+|-------------------------|-------------|---------------------------|----------------|
+| cats-effect-v3x-plugin  | cats-effect | 3.3.x ~ 3.5.x             | 3.4.1          |
+| zio-v200-plugin         | zio         | 2.0.0 ~ 2.0.2             | 2.0.2          |
+| zio-v203-plugin         | zio         | 2.0.3 ~ 2.0.15            | 2.0.9,2.0.13   |
+| ziogrpc-v06testx-plugin | zio-grpc    | 0.6.0-test1 ~ 0.6.0-test5 | 0.6.0-test4    |
+| ziogrpc-v06rcx-plugin   | zio-grpc    | 0.6.0-test6 ~ 0.6.0-RC5   | 0.6.0-RC5      |
+| ziohttp-v2x-plugin      | zio-http    | 2.0.0-RC2 ~ 2.0.0-RC10    | 2.0.0-RC10     |
+| caliban-v2x-plugin      | caliban     | 2.0.0 ~ 2.0.2             | 2.0.1          |
+
 
 > Other small versions of the library supported by this plugin may also work, but they have not been tested.
 
-Also need `apm-jdk-threadpool-plugin-8.16.0.jar` and `apm-jdk-threading-plugin-8.16.0.jar`.
+Also need `apm-jdk-threadpool-plugin-8.16.0.jar`.
 
 ## Available Configurations
 | key                                             | description                                                                           |

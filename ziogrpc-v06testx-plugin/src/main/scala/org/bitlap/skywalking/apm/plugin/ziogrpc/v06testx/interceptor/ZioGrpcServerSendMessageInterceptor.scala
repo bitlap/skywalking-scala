@@ -49,7 +49,7 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     val span            = ContextManager.createLocalSpan(operationPrefix + RESPONSE_ON_MESSAGE_OPERATION_NAME)
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
-    Utils.continuedSnapshot_(contextSnapshot)
+    AgentUtils.continuedSnapshot_(contextSnapshot)
     Some(span)
   end beforeSendMessage
 
@@ -73,6 +73,6 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = Utils.logError(t)
+  ): Unit = AgentUtils.logError(t)
 
 end ZioGrpcServerSendMessageInterceptor

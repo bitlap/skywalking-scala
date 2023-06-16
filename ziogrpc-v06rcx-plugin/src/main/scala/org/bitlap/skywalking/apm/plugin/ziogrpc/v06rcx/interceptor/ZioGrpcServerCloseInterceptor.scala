@@ -52,7 +52,7 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
     span.prepareForAsync()
     ContextManager.stopSpan(span)
-    Utils.continuedSnapshot_(contextSnapshot)
+    AgentUtils.continuedSnapshot_(contextSnapshot)
     span
 
   override def afterMethod(
@@ -104,6 +104,6 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = Utils.logError(t)
+  ): Unit = AgentUtils.logError(t)
 
 end ZioGrpcServerCloseInterceptor

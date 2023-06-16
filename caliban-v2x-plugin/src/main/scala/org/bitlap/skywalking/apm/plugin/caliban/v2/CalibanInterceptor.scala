@@ -14,6 +14,7 @@ import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
+import org.bitlap.skywalking.apm.plugin.zcommon.*
 
 /** @author
  *    梦境迷离
@@ -50,16 +51,16 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
       cleanup match
         case Exit.Success(value) =>
           ZIO.attempt {
-            Utils.stopAsync(span)
+            AgentUtils.stopAsync(span)
             if value.errors.nonEmpty then {
               val ex: Option[CalibanError] = value.errors.headOption
               span.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure")))
             }
             ContextManager.stopSpan()
-          }.onError(cleanup => ZIO.attempt(Utils.logError(cleanup)).ignore).ignore
+          }.onError(cleanup => ZIO.attempt(ZUtils.logError(cleanup)).ignore).ignore
         case Exit.Failure(cause) =>
           ZIO.attempt {
-            Utils.logError(cause)
+            ZUtils.logError(cause)
             ContextManager.stopSpan()
           }.ignore
     )
@@ -71,6 +72,6 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     t: Throwable
   ): Unit =
-    Utils.logError(t)
+    AgentUtils.logError(t)
 
 end CalibanInterceptor
