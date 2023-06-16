@@ -24,8 +24,6 @@ SkyWalking Extension Plugins for Scala 3
 
 > Other small versions of the library supported by this plugin may also work, but they have not been tested.
 
-Also need `apm-jdk-threadpool-plugin-8.16.0.jar`.
-
 ## Available Configurations
 | key                                             | description                                                                           |
 |-------------------------------------------------|---------------------------------------------------------------------------------------|
