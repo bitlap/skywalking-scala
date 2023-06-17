@@ -35,7 +35,7 @@ SkyWalking Extension Plugins for Scala 3
 | `plugin.ziohttpv2.collect_http_params`          | Collect http query params.                                                            |
 | `plugin.ziohttpv2.http_params_length_threshold` | How many characters to keep and send to the OAP backend.                              |
 
-The prefix should be added when passing command line parameters, such as: `-Dskywalking.plugin.caliban.url_prefix=GQL/`
+The prefix should be added when passing command line parameters, such as: `-Dskywalking.plugin.calibanv2.url_prefix=GQL/`
 
 ## Environment
 
