@@ -44,7 +44,7 @@ object TracingMiddleware:
 
   private def beforeRequest(request: Request): AbstractSpan =
     val uri = request.url
-    if Utils.ignorePrefix(ZioHttpPluginConfig.Plugin.ZioHttpV2.IGNORE_URL_PREFIXES, uri.path.encode) then {
+    if AgentUtils.ignorePrefix(ZioHttpPluginConfig.Plugin.ZioHttpV2.IGNORE_URL_PREFIXES, uri.path.encode) then {
       return null
     }
     val contextCarrier = new ContextCarrier

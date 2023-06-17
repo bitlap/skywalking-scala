@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.common.interceptor
+package org.bitlap.skywalking.apm.plugin.zcommon.interceptor
 
 import java.lang.reflect.Method
 
@@ -13,6 +13,7 @@ import org.apache.skywalking.apm.agent.core.logging.api.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
+import org.bitlap.skywalking.apm.plugin.zcommon.*
 
 /** @author
  *    梦境迷离
@@ -28,13 +29,10 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
     result: MethodInterceptResult
   ): Unit =
     val fiberRuntime = objInst.asInstanceOf[FiberRuntime[?, ?]]
-    val span         = ContextManager.createLocalSpan(generateFiberOperationName(method))
+    val span         = ContextManager.createLocalSpan(AgentUtils.generateFiberOperationName)
     span.setComponent(ComponentsDefine.JDK_THREADING)
     TagUtils.setZioTags(span, fiberRuntime.id, objInst)
-    Utils.continuedSnapshot(objInst)
-
-  private def generateFiberOperationName(method: Method) =
-    s"ZioFiberWrapper/${method.getName}/${Thread.currentThread.getName}"
+    if ContextManager.isActive then AgentUtils.continuedSnapshot(objInst)
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -52,7 +50,7 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = Utils.logError(t)
+  ): Unit = AgentUtils.logError(t)
 
   end handleMethodException
 

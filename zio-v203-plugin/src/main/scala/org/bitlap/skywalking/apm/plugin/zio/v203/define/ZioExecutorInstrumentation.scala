@@ -12,7 +12,7 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.zio.v203.ZioWitnessConstant
+import org.bitlap.skywalking.apm.plugin.zcommon.ZioWitnessConstant
 
 /** @author
  *    梦境迷离
@@ -50,15 +50,10 @@ object ZioExecutorInstrumentation:
   final val ENHANCE_CLASS = HierarchyMatch.byHierarchyMatch("zio.Executor")
 
   final val EXECUTOR_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.ZioExecutorInterceptor"
+    "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
-    (0 until 2)
-      .map(i => s"${EXECUTOR_INTERCEPTOR}_$i")
-      .zip(
-        List(
-          named("submit").and(takesArguments(2)),
-          named("submitAndYield").and(takesArguments(2))
-        )
-      )
-      .toMap
+    Map(
+      EXECUTOR_INTERCEPTOR + "_0" -> named("submit").and(takesArguments(2)),
+      EXECUTOR_INTERCEPTOR + "_1" -> named("submitAndYield").and(takesArguments(2))
+    )

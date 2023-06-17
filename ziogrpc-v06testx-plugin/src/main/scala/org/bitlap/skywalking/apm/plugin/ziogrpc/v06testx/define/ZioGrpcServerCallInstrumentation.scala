@@ -17,7 +17,7 @@ final class ZioGrpcServerCallInstrumentation extends ClassInstanceMethodsEnhance
 
   import ZioGrpcServerCallInstrumentation.*
 
-  override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
+  override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
   override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
 
@@ -36,21 +36,18 @@ end ZioGrpcServerCallInstrumentation
 
 object ZioGrpcServerCallInstrumentation:
 
-  final val INTERCEPTOR_CLOSE_CLASS =
+  final val ENHANCE_CLASS = NameMatch.byName("scalapb.zio_grpc.server.ZServerCall$")
+
+  final val CLOSE_METHOD_INTERCEPTOR =
     "org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.interceptor.ZioGrpcServerCloseInterceptor"
 
-  final val INTERCEPTOR_SEND_MESSAGE_CLASS =
+  final val SEND_MESSAGE_METHOD_INTERCEPTOR =
     "org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.interceptor.ZioGrpcServerSendMessageInterceptor"
 
-  private final val ENHANCE_CLASS: String = "scalapb.zio_grpc.server.ZServerCall$"
-
   // NOTE: ZServerCall is a AnyVal!!!
-  private final val ENHANCE_CLOSE_METHOD: String        = "close$extension"
-  private final val ENHANCE_SEND_MESSAGE_METHOD: String = "sendMessage$extension"
-
   val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
-    INTERCEPTOR_CLOSE_CLASS        -> named(ENHANCE_CLOSE_METHOD),
-    INTERCEPTOR_SEND_MESSAGE_CLASS -> named(ENHANCE_SEND_MESSAGE_METHOD)
+    CLOSE_METHOD_INTERCEPTOR        -> named("close$extension"),
+    SEND_MESSAGE_METHOD_INTERCEPTOR -> named("sendMessage$extension")
   )
 
 end ZioGrpcServerCallInstrumentation

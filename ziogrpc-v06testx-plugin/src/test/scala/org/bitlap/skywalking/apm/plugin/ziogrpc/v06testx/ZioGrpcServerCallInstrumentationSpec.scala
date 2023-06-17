@@ -23,7 +23,7 @@ class ZioGrpcServerCallInstrumentationSpec extends AnyFlatSpec with Matchers {
   "test sendMessage$extension MethodMatch" should "ok" in {
     val matcher =
       ZioGrpcServerCallInstrumentation.methodInterceptors(
-        ZioGrpcServerCallInstrumentation.INTERCEPTOR_SEND_MESSAGE_CLASS
+        ZioGrpcServerCallInstrumentation.SEND_MESSAGE_METHOD_INTERCEPTOR
       )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ZServerCall[?]].getMethod(
@@ -38,7 +38,7 @@ class ZioGrpcServerCallInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "test close$extension MethodMatch" should "ok" in {
     val matcher = ZioGrpcServerCallInstrumentation.methodInterceptors(
-      ZioGrpcServerCallInstrumentation.INTERCEPTOR_CLOSE_CLASS
+      ZioGrpcServerCallInstrumentation.CLOSE_METHOD_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ZServerCall[?]].getMethod(

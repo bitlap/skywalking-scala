@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.common
+package org.bitlap.skywalking.apm.plugin.zcommon
 
 import java.text.SimpleDateFormat
 
@@ -10,6 +10,7 @@ import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.logging.api.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance
 import org.bitlap.skywalking.apm.plugin.common.*
+import org.bitlap.skywalking.apm.plugin.zcommon
 
 import _root_.zio.*
 import _root_.zio.internal.FiberRuntime
@@ -19,8 +20,6 @@ import _root_.zio.internal.FiberRuntime
  *  @version 1.0,2023/5/16
  */
 object TagUtils:
-
-  private val LOGGER = LogManager.getLogger(classOf[TagUtils.type])
 
   final lazy val fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
@@ -32,19 +31,10 @@ object TagUtils:
       CustomTag.FiberStartTime.tag.set(span, formatDate(fiberId.startTimeMillis))
       CustomTag.FiberLocation.tag.set(span, fiberId.location.toString)
       CustomTag.FiberClassName.tag.set(span, objInst.getClass.getName)
+      CustomTag.FiberIOType.tag.set(span, "zio")
     } match
       case Failure(ex) => span.errorOccurred.log(ex)
       case Success(_)  =>
   end setZioTags
 
-  def setSpanZioTag(arg: Object, objInst: EnhancedInstance)(implicit span: AbstractSpan) =
-    arg match {
-      case fiber: FiberRuntime[?, ?] =>
-        TagUtils.setZioTags(span, fiber.id, objInst)
-      case _ =>
-        LOGGER.debug(s"Invalid FiberRuntime: ${objInst.getClass.getName} ${objInst.toString}")
-    }
-
-  def getExecutorType(className: String): ExecutorType =
-    ExecutorType.values.find(c => className.startsWith(c.classNamePrefix)).getOrElse(ExecutorType.Executor)
 end TagUtils

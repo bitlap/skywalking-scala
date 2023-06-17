@@ -11,7 +11,7 @@ import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.common.Utils
+import org.bitlap.skywalking.apm.plugin.common.AgentUtils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.TracingClientCall
@@ -56,7 +56,7 @@ final class ZioGrpcClientInterceptor extends InstanceMethodsAroundInterceptor, I
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = Utils.logError(t)
+  ): Unit = AgentUtils.logError(t)
 
 end ZioGrpcClientInterceptor
 

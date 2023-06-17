@@ -10,6 +10,7 @@ ziogrpctest=ziogrpc-v06testx-plugin
 caliban=caliban-v2x-plugin
 zio200=zio-v200-plugin
 zio203=zio-v203-plugin
+catseffect3=cats-effect-v3x-plugin
 
 
 sbt clean assembly
@@ -23,3 +24,5 @@ cp $caliban/target/apm-$caliban-$version.jar dist/apm-$caliban-$version.jar
 
 cp $zio200/target/apm-$zio200-$version.jar dist/apm-$zio200-$version.jar
 cp $zio203/target/apm-$zio203-$version.jar dist/apm-$zio203-$version.jar
+
+cp $catseffect3/target/apm-$catseffect3-$version.jar dist/apm-$catseffect3-$version.jar

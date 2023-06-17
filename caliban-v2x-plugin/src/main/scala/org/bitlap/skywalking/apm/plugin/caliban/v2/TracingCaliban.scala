@@ -18,6 +18,7 @@ import org.apache.skywalking.apm.agent.core.util.CollectionUtil
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.*
+import org.bitlap.skywalking.apm.plugin.zcommon.*
 
 /** @author
  *    梦境迷离
@@ -29,7 +30,7 @@ object TracingCaliban:
     if graphQLRequest == null || graphQLRequest.query.isEmpty then None
     else {
 
-      if Utils.ignorePrefix(
+      if AgentUtils.ignorePrefix(
           CalibanPluginConfig.Plugin.CalibanV2.IGNORE_URL_PREFIXES,
           getOperationName(graphQLRequest)
         )
@@ -40,7 +41,7 @@ object TracingCaliban:
       val opName         = CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + getOperationName(graphQLRequest)
       val contextCarrier = new ContextCarrier
       val span           = ContextManager.createEntrySpan(opName, contextCarrier)
-      Utils.prepareAsync(span)
+      AgentUtils.prepareAsync(span)
       SpanLayer.asHttp(span)
       if CalibanPluginConfig.Plugin.CalibanV2.COLLECT_VARIABLES then {
         val tagValue = collectVariables(graphQLRequest)
@@ -61,7 +62,7 @@ object TracingCaliban:
 
   private def getOperationName(graphQLRequest: GraphQLRequest) =
     val tryOp: Try[String] = Try {
-      val docOpName = Utils
+      val docOpName = ZUtils
         .unsafeRun(Parser.parseQuery(graphQLRequest.query.get))
         .operationDefinitions
         .map(_.selectionSet.collectFirst {
@@ -74,6 +75,6 @@ object TracingCaliban:
     }
     tryOp match
       case Failure(e) =>
-        Utils.logError(e)
+        AgentUtils.logError(e)
         "Unknown"
       case Success(value) => value

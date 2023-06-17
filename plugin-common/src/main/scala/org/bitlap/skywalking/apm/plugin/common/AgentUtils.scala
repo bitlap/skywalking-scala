@@ -7,15 +7,13 @@ import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance
 
-import _root_.zio.*
-
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/5/13
  */
-object Utils:
+object AgentUtils:
 
-  private val LOGGER = LogManager.getLogger(classOf[Utils.type])
+  private val LOGGER = LogManager.getLogger(classOf[AgentUtils.type])
 
   def prepareAsync(span: AbstractSpan) =
     try
@@ -28,13 +26,8 @@ object Utils:
     try
       span.asyncFinish()
     catch {
-      case t: Throwable => logError(t)
+      case _: Throwable =>
     }
-
-  def unsafeRun[A](z: ZIO[Any, Any, A]): A =
-    Try(Unsafe.unsafe { u ?=>
-      Runtime.default.unsafe.run(z).getOrThrowFiberFailure()
-    }).getOrElse(null.asInstanceOf[A])
 
   def continuedSnapshot_(contextSnapshot: ContextSnapshot): Unit =
     try
@@ -51,17 +44,17 @@ object Utils:
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
-    } finally ContextManager.stopSpan()
+    } finally if ContextManager.isActive then ContextManager.stopSpan()
 
   def continuedSnapshot(contextSnapshot: ContextSnapshot, asyncSpan: AbstractSpan)(effect: => Unit): Unit =
     try
       ContextManager.continued(contextSnapshot)
-      Utils.stopAsync(asyncSpan)
+      AgentUtils.stopAsync(asyncSpan)
       effect
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
-    } finally ContextManager.stopSpan()
+    } finally if ContextManager.isActive then ContextManager.stopSpan()
 
   def continuedSnapshot(enhanced: Object): Unit =
     enhanced match {
@@ -69,7 +62,7 @@ object Utils:
         val storedField = enhancedInstance.getSkyWalkingDynamicField
         if storedField != null then {
           val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
-          Utils.continuedSnapshot_(contextSnapshot)
+          AgentUtils.continuedSnapshot_(contextSnapshot)
         } else {
           LOGGER.debug(
             s"EnhancedInstance/getSkyWalkingDynamicField is null: ${enhanced.toString}"
@@ -85,9 +78,9 @@ object Utils:
     val prefixes = ignoreUrlPrefixes.split(",").toList.filter(_.nonEmpty)
     prefixes.nonEmpty && prefixes.exists(p => uri.startsWith(p))
 
-  def logError[E <: Throwable](cause: Cause[E]): Unit =
-    if ContextManager.isActive then ContextManager.activeSpan.log(cause.squash)
-
   def logError[E <: Throwable](e: E): Unit =
     LOGGER.error(s"Span Operation Error!", e)
     if ContextManager.isActive then ContextManager.activeSpan.log(e)
+
+  def generateFiberOperationName =
+    s"IOFiberWrapper/${Thread.currentThread.getName}"

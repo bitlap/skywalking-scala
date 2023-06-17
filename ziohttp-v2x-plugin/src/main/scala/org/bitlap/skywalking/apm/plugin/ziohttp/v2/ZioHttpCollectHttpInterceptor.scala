@@ -4,7 +4,7 @@ import java.lang.reflect.Method
 
 import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.common.Utils
+import org.bitlap.skywalking.apm.plugin.common.AgentUtils
 
 import zhttp.http.*
 import zhttp.http.Middleware.*
@@ -47,4 +47,4 @@ final class ZioHttpCollectHttpInterceptor extends InstanceMethodsAroundIntercept
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = Utils.logError(t)
+  ): Unit = AgentUtils.logError(t)

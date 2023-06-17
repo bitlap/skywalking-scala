@@ -6,7 +6,7 @@ import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
-import org.bitlap.skywalking.apm.plugin.common.Utils
+import org.bitlap.skywalking.apm.plugin.common.AgentUtils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 
@@ -33,7 +33,7 @@ final class TracingClientCallListener[Resp](
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
 
-    Utils.continuedSnapshot(contextSnapshot)(delegate.onMessage(message))
+    AgentUtils.continuedSnapshot(contextSnapshot)(delegate.onMessage(message))
   end onMessage
 
   override def onClose(status: Status, trailers: Metadata): Unit =
@@ -41,7 +41,7 @@ final class TracingClientCallListener[Resp](
     span.setComponent(ZIO_GRPC)
     span.setLayer(SpanLayer.RPC_FRAMEWORK)
 
-    Utils.continuedSnapshot(contextSnapshot, asyncSpan) {
+    AgentUtils.continuedSnapshot(contextSnapshot, asyncSpan) {
       if !status.isOk then {
         span.log(status.asRuntimeException)
         Tags.RPC_RESPONSE_STATUS_CODE.set(span, status.getCode.name)
