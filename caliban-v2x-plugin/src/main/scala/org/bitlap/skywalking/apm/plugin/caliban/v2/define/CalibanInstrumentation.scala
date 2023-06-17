@@ -36,10 +36,10 @@ end CalibanInstrumentation
 object CalibanInstrumentation:
   private final val INTERCEPTOR_CLASS: String = "org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanInterceptor"
 
-  private final val ENHANCE_CLASS          = NameMatch.byName("caliban.GraphQL$$anon$2")
-  private final val ENHANCE_METHOD: String = "executeRequest"
+  private final val ENHANCE_CLASS                      = NameMatch.byName("caliban.GraphQL$$anon$2")
+  private final val EXECUTE_METHOD_INTERCEPTOR: String = "executeRequest"
 
   def getCalibanExecuteRequestMethod: ElementMatcher[MethodDescription] =
-    named(ENHANCE_METHOD).and(ReturnTypeNameMatch.returnsWithType("zio.ZIO"))
+    named(EXECUTE_METHOD_INTERCEPTOR).and(ReturnTypeNameMatch.returnsWithType("zio.ZIO"))
 
 end CalibanInstrumentation

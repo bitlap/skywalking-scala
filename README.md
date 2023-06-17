@@ -40,7 +40,7 @@ The prefix should be added when passing command line parameters, such as: `-Dsky
 ## Environment
 
 - Java 11
-- Scala 3.2.0
+- Scala 3.2.2
 - SkyWalking 8.16.0
 
 ## How to use?

@@ -12,7 +12,7 @@ import org.bitlap.skywalking.apm.plugin.common.CustomTag
  *    梦境迷离
  *  @version 1.0,2023/6/15
  */
-class IOFiberInterceptor extends InstanceMethodsAroundInterceptor:
+final class IOFiberInterceptor extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
     objInst: EnhancedInstance,

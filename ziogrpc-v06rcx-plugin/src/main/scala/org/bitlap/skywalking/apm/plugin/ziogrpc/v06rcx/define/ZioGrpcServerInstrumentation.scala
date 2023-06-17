@@ -41,10 +41,7 @@ object ZioGrpcServerInstrumentation:
     "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerInterceptor"
   private final val ENHANCE_CLASS: String = "scalapb.zio_grpc.server.ZServerCallHandler"
 
-  private final val ENHANCE_METHOD: String     = "startCall"
-  private final val ARGUMENT_TYPE_NAME: String = "io.grpc.Metadata"
-
   def getMethod: ElementMatcher[MethodDescription] =
-    named(ENHANCE_METHOD).and(takesArgumentWithType(1, ARGUMENT_TYPE_NAME))
+    named("startCall").and(takesArgumentWithType(1, "io.grpc.Metadata"))
 
 end ZioGrpcServerInstrumentation

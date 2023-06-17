@@ -17,7 +17,7 @@ final class ZioHttpCollectHttpInstrumentation extends ClassInstanceMethodsEnhanc
 
   import ZioHttpCollectHttpInstrumentation.*
 
-  override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
+  override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
   override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
 
@@ -32,10 +32,10 @@ final class ZioHttpCollectHttpInstrumentation extends ClassInstanceMethodsEnhanc
   )
 
 object ZioHttpCollectHttpInstrumentation:
+
   // PartialCollectHttp is a AnyVal!!!
+  final val ENHANCE_CLASS             = NameMatch.byName("zhttp.http.Http$PartialCollectHttp$")
   final val INTERCEPTOR_CLASS: String = "org.bitlap.skywalking.apm.plugin.ziohttp.v2.ZioHttpCollectHttpInterceptor"
-  final val ENHANCE_CLASS: String     = "zhttp.http.Http$PartialCollectHttp$"
-  final val ENHANCE_METHOD: String    = "apply$extension"
 
   def getMethod: ElementMatcher[MethodDescription] =
-    named(ENHANCE_METHOD).and(takesArguments(2))
+    named("apply$extension").and(takesArguments(2))

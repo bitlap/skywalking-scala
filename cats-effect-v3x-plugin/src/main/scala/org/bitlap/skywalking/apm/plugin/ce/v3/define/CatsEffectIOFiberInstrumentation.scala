@@ -18,12 +18,12 @@ final class CatsEffectIOFiberInstrumentation extends ClassInstanceMethodsEnhance
 
   import CatsEffectIOFiberInstrumentation.*
 
-  override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
+  override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
   override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = Array(
     new ConstructorInterceptPoint:
       override def getConstructorMatcher: ElementMatcher[MethodDescription] = takesArguments(5)
-      override def getConstructorInterceptor: String                        = FIBER_CLASS_INTERCEPTOR
+      override def getConstructorInterceptor: String                        = CLASS_INTERCEPTOR
   )
 
   override def getInstanceMethodsInterceptPoints: Array[InstanceMethodsInterceptPoint] =
@@ -43,34 +43,28 @@ end CatsEffectIOFiberInstrumentation
 
 object CatsEffectIOFiberInstrumentation:
 
-  final val ENHANCE_CLASS: String = "cats.effect.IOFiber"
+  final val ENHANCE_CLASS = NameMatch.byName("cats.effect.IOFiber")
 
-  final val FIBER_CLASS_INTERCEPTOR: String =
+  final val CLASS_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.common.interceptor.ConstructorInterceptor"
 
-  final val FIBER_RUN_METHOD_INTERCEPTOR: String =
+  final val RUN_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.ce.v3.IOFiberInterceptor"
 
-  final val FIBER_SUSPEND_METHOD_INTERCEPTOR: String =
+  final val SUSPEND_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.common.interceptor.SaveCurrentContextOnExit"
 
-  final val FIBER_RESUME_METHOD_INTERCEPTOR: String =
+  final val RESUME_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.ce.v3.IOFiberResumeInterceptor"
 
-  final val FIBER_SCHEDULE_METHOD_INTERCEPTOR: String =
+  final val SCHEDULE_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
-    FIBER_RUN_METHOD_INTERCEPTOR     -> named("run").and(takesArguments(0)),
-    FIBER_SUSPEND_METHOD_INTERCEPTOR -> named("suspend").and(takesArguments(0)),
-    FIBER_RESUME_METHOD_INTERCEPTOR  -> named("resume").and(takesArguments(0))
-  ) ++ (0 until 3)
-    .map(i => s"${FIBER_SCHEDULE_METHOD_INTERCEPTOR}_$i")
-    .zip(
-      List(
-        named("rescheduleFiber").and(takesArguments(2)),
-        named("scheduleFiber").and(takesArguments(2)),
-        named("scheduleOnForeignEC").and(takesArguments(2))
-      )
-    )
-    .toMap
+    RUN_METHOD_INTERCEPTOR             -> named("run").and(takesArguments(0)),
+    SUSPEND_METHOD_INTERCEPTOR         -> named("suspend").and(takesArguments(0)),
+    RESUME_METHOD_INTERCEPTOR          -> named("resume").and(takesArguments(0)),
+    SCHEDULE_METHOD_INTERCEPTOR + "_0" -> named("rescheduleFiber").and(takesArguments(2)),
+    SCHEDULE_METHOD_INTERCEPTOR + "_1" -> named("scheduleFiber").and(takesArguments(2)),
+    SCHEDULE_METHOD_INTERCEPTOR + "_2" -> named("scheduleOnForeignEC").and(takesArguments(2))
+  )

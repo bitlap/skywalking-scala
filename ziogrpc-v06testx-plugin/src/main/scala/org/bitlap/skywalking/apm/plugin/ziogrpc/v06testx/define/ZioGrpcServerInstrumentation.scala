@@ -18,7 +18,7 @@ final class ZioGrpcServerInstrumentation extends ClassInstanceMethodsEnhancePlug
 
   import ZioGrpcServerInstrumentation.*
 
-  override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
+  override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
   override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
 
@@ -35,9 +35,10 @@ end ZioGrpcServerInstrumentation
 
 object ZioGrpcServerInstrumentation:
 
-  private final val INTERCEPTOR_CLASS =
+  final val ENHANCE_CLASS = NameMatch.byName("scalapb.zio_grpc.server.ZServerCallHandler")
+
+  final val INTERCEPTOR_CLASS =
     "org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.interceptor.ZioGrpcServerInterceptor"
-  private final val ENHANCE_CLASS: String = "scalapb.zio_grpc.server.ZServerCallHandler"
 
   private final val ENHANCE_METHOD: String     = "startCall"
   private final val ARGUMENT_TYPE_NAME: String = "io.grpc.Metadata"

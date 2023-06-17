@@ -41,9 +41,9 @@ object CatsEffectSchedulerInstrumentation:
 
   final val ENHANCE_CLASS = HierarchyMatch.byHierarchyMatch("cats.effect.unsafe.Scheduler")
 
-  final val FIBER_SLEEP_METHOD_INTERCEPTOR: String =
+  final val SLEEP_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.ce.v3.IOFiberSchedulerInterceptor"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
-    FIBER_SLEEP_METHOD_INTERCEPTOR -> named("sleep").and(takesArguments(2))
+    SLEEP_METHOD_INTERCEPTOR -> named("sleep").and(takesArguments(2))
   )

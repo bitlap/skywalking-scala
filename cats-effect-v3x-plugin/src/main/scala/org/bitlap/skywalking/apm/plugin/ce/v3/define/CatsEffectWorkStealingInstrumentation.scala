@@ -17,7 +17,7 @@ final class CatsEffectWorkStealingInstrumentation extends ClassInstanceMethodsEn
 
   import CatsEffectWorkStealingInstrumentation.*
 
-  override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
+  override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
   override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
 
@@ -38,11 +38,11 @@ end CatsEffectWorkStealingInstrumentation
 
 object CatsEffectWorkStealingInstrumentation:
 
-  final val ENHANCE_CLASS: String = "cats.effect.unsafe.WorkStealingThreadPool"
+  final val ENHANCE_CLASS = NameMatch.byName("cats.effect.unsafe.WorkStealingThreadPool")
 
-  final val FIBER_SCHEDULE_METHOD_INTERCEPTOR: String =
+  final val SCHEDULE_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
-    FIBER_SCHEDULE_METHOD_INTERCEPTOR -> named("scheduleExternal").and(takesArguments(0))
+    SCHEDULE_METHOD_INTERCEPTOR -> named("scheduleExternal").and(takesArguments(0))
   )

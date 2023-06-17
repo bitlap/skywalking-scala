@@ -12,7 +12,7 @@ import org.bitlap.skywalking.apm.plugin.common.AgentUtils
  *    梦境迷离
  *  @version 1.0,2023/6/15
  */
-class IOFiberResumeInterceptor extends InstanceMethodsAroundInterceptor {
+final class IOFiberResumeInterceptor extends InstanceMethodsAroundInterceptor {
 
   override def beforeMethod(
     objInst: EnhancedInstance,

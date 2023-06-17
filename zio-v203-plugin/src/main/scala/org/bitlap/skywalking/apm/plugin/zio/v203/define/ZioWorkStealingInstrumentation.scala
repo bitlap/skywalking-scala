@@ -10,7 +10,7 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.zio.v203.ZioWitnessConstant
+import org.bitlap.skywalking.apm.plugin.zcommon.ZioWitnessConstant
 
 /** @author
  *    梦境迷离
@@ -20,7 +20,7 @@ final class ZioWorkStealingInstrumentation extends ClassInstanceMethodsEnhancePl
 
   import ZioWorkStealingInstrumentation.*
 
-  override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
+  override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
   override protected def witnessMethods: JList[WitnessMethod] =
     Collections.singletonList(ZioWitnessConstant.WITNESS_203X_METHOD)
@@ -44,11 +44,11 @@ end ZioWorkStealingInstrumentation
 
 object ZioWorkStealingInstrumentation:
 
-  final val ENHANCE_CLASS: String = "zio.internal.FiberRuntime"
+  final val ENHANCE_CLASS = NameMatch.byName("zio.internal.FiberRuntime")
 
-  final val FIBER_STEAL_METHOD_INTERCEPTOR: String =
+  final val STEAL_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
-    FIBER_STEAL_METHOD_INTERCEPTOR -> named("stealWork").and(takesArguments(3))
+    STEAL_METHOD_INTERCEPTOR -> named("stealWork").and(takesArguments(3))
   )

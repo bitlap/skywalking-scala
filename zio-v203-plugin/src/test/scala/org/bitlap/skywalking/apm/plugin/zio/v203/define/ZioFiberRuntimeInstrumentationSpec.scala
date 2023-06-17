@@ -17,7 +17,7 @@ class ZioFiberRuntimeInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch1" should "ok" in {
     val matcher = ZioFiberRuntimeInstrumentation.methodInterceptors(
-      ZioFiberRuntimeInstrumentation.FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR + "_0"
+      ZioFiberRuntimeInstrumentation.RUN_METHOD_INTERCEPTOR + "_0"
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[FiberRuntime[Any, Any]].getMethod(
@@ -29,7 +29,7 @@ class ZioFiberRuntimeInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch2" should "ok" in {
     val matcher = ZioFiberRuntimeInstrumentation.methodInterceptors(
-      ZioFiberRuntimeInstrumentation.FIBER_RUNTIME_RUN_METHOD_INTERCEPTOR + "_1"
+      ZioFiberRuntimeInstrumentation.RUN_METHOD_INTERCEPTOR + "_1"
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[FiberRuntime[Any, Any]].getMethod(
