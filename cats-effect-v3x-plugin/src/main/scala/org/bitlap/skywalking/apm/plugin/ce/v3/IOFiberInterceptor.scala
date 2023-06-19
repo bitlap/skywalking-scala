@@ -3,6 +3,7 @@ package org.bitlap.skywalking.apm.plugin.ce.v3
 import java.lang.reflect.Method
 
 import org.apache.skywalking.apm.agent.core.context.ContextManager
+import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.AgentUtils
@@ -21,10 +22,9 @@ final class IOFiberInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val span = ContextManager.createLocalSpan(AgentUtils.generateFiberOperationName)
-    span.setComponent(ComponentsDefine.JDK_THREADING)
-    CustomTag.FiberIOType.tag.set(span, "cats-effect")
-    if ContextManager.isActive then AgentUtils.continuedSnapshot(objInst)
+    val currentSpan = ContextManager.createLocalSpan(AgentUtils.generateFiberOperationName("CE"))
+    currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
+    AgentUtils.continuedSnapshot(objInst)
 
   override def afterMethod(
     objInst: EnhancedInstance,

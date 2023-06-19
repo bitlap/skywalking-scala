@@ -57,6 +57,7 @@ object AgentUtils:
     } finally if ContextManager.isActive then ContextManager.stopSpan()
 
   def continuedSnapshot(enhanced: Object): Unit =
+    if !ContextManager.isActive then return ()
     enhanced match {
       case enhancedInstance: EnhancedInstance =>
         val storedField = enhancedInstance.getSkyWalkingDynamicField
@@ -82,5 +83,5 @@ object AgentUtils:
     LOGGER.error(s"Span Operation Error!", e)
     if ContextManager.isActive then ContextManager.activeSpan.log(e)
 
-  def generateFiberOperationName =
-    s"IOFiberWrapper/${Thread.currentThread.getName}"
+  def generateFiberOperationName(tpe: String) =
+    s"$tpe/IOFiberWrapper/${Thread.currentThread.getName}"

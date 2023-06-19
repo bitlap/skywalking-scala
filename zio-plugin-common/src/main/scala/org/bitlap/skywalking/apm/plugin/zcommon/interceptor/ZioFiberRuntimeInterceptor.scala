@@ -29,10 +29,10 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
     result: MethodInterceptResult
   ): Unit =
     val fiberRuntime = objInst.asInstanceOf[FiberRuntime[?, ?]]
-    val span         = ContextManager.createLocalSpan(AgentUtils.generateFiberOperationName)
-    span.setComponent(ComponentsDefine.JDK_THREADING)
-    TagUtils.setZioTags(span, fiberRuntime.id, objInst)
-    if ContextManager.isActive then AgentUtils.continuedSnapshot(objInst)
+    val currentSpan  = ContextManager.createLocalSpan(AgentUtils.generateFiberOperationName("ZIO"))
+    currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
+    TagUtils.setZioTags(currentSpan, fiberRuntime.id, objInst)
+    AgentUtils.continuedSnapshot(objInst)
 
   override def afterMethod(
     objInst: EnhancedInstance,

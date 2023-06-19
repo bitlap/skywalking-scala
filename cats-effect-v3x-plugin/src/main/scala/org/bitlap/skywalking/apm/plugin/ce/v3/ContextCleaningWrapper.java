@@ -27,7 +27,7 @@ public class ContextCleaningWrapper implements Runnable {
     }
 
     private String getOperationName() {
-        return "CatsRunnableWrapper/" + Thread.currentThread().getName();
+        return "CE/RunnableWrapper/" + Thread.currentThread().getName();
     }
 
 }
