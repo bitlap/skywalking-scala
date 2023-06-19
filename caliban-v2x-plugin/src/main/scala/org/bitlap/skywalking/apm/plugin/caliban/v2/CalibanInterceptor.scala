@@ -30,8 +30,7 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     result: MethodInterceptResult
   ): Unit = {
     val graphQLRequest = allArguments(0).asInstanceOf[GraphQLRequest]
-    if graphQLRequest == null || graphQLRequest.query.isEmpty then return
-    val span = TracingCaliban.beforeRequest(graphQLRequest)
+    val span           = TracingCaliban.beforeRequest(graphQLRequest)
     span.foreach(a => objInst.setSkyWalkingDynamicField(a))
   }
 

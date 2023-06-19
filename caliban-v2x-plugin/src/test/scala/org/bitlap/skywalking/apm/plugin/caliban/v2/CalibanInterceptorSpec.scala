@@ -5,6 +5,8 @@ import java.lang.reflect.Method
 import caliban.*
 import caliban.execution.QueryExecution
 
+import zio.URIO
+
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.agent.test.tools.*
@@ -13,6 +15,7 @@ import org.junit.*
 import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.mockito.*
+import org.mockito.Mockito.mock
 import org.mockito.junit.*
 
 /** @author
@@ -21,10 +24,8 @@ import org.mockito.junit.*
  */
 @RunWith(classOf[TracingSegmentRunner])
 class CalibanInterceptorSpec {
-  @SegmentStoragePoint var segmentStorage: SegmentStorage = _
-  @Mock var methodInterceptResult: MethodInterceptResult  = _
-  @Rule def rule: MockitoRule                             = MockitoJUnit.rule
-  @Rule def serviceRule                                   = new AgentServiceRule
+  @Rule def rule: MockitoRule = MockitoJUnit.rule
+  @Rule def serviceRule       = new AgentServiceRule
 
   val calibanInterceptor: CalibanInterceptor = new CalibanInterceptor
 
@@ -42,11 +43,6 @@ class CalibanInterceptorSpec {
     classOf[Boolean],
     classOf[QueryExecution],
     classOf[Any]
-  )
-
-  val method = classOf[GraphQLInterpreter[?, ?]].getMethod(
-    "executeRequest",
-    argTypes*
   )
 
   @Test
@@ -87,10 +83,9 @@ class CalibanInterceptorSpec {
       Boolean.box(false),
       QueryExecution.Sequential
     )
-    calibanInterceptor.beforeMethod(enhancedInstance, method, args, argTypes, methodInterceptResult)
-    calibanInterceptor.afterMethod(enhancedInstance, method, args, argTypes, zio.ZIO.succeed(methodInterceptResult))
+    calibanInterceptor.beforeMethod(enhancedInstance, null, args, argTypes, null)
+    calibanInterceptor.afterMethod(enhancedInstance, null, args, argTypes, zio.ZIO.succeed(null))
 
-    // FIXME
     val operation = ContextManager.activeSpan().getOperationName
 
     assertEquals("Caliban/GraphQL/starLakeInsertMetric", operation)
@@ -104,13 +99,12 @@ class CalibanInterceptorSpec {
       Boolean.box(false),
       QueryExecution.Sequential
     )
-    calibanInterceptor.beforeMethod(enhancedInstance, method, args, argTypes, methodInterceptResult)
-    calibanInterceptor.afterMethod(enhancedInstance, method, args, argTypes, zio.ZIO.succeed(methodInterceptResult))
+    calibanInterceptor.beforeMethod(enhancedInstance, null, args, argTypes, null)
+    calibanInterceptor.afterMethod(enhancedInstance, null, args, argTypes, zio.ZIO.succeed(null))
 
     val operation = ContextManager.activeSpan().getOperationName
 
     assertEquals("Caliban/GraphQL/Unknown", operation)
-
   }
 
 }
