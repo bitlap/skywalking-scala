@@ -71,6 +71,7 @@ object TracingCaliban:
         val tagValue = collectVariables(graphQLRequest)
         CustomTag.CalibanVariables.tag.set(span, tagValue)
       }
+      AgentUtils.prepareAsync(span)
       Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
       span.setComponent(ComponentsDefine.GRAPHQL)
       Some(span)
