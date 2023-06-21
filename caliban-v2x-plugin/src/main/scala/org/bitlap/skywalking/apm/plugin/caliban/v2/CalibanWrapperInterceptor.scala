@@ -1,15 +1,18 @@
-package org.bitlap.skywalking.apm.plugin.zcommon.interceptor
+package org.bitlap.skywalking.apm.plugin.caliban.v2
 
 import java.lang.reflect.Method
 
-import scala.collection.AbstractSeq
+import scala.util.*
 
-import zio.internal.FiberRuntime
+import caliban.*
+import caliban.wrappers.Wrapper.EffectfulWrapper
+
+import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
-import org.apache.skywalking.apm.agent.core.logging.api.*
+import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
@@ -17,9 +20,11 @@ import org.bitlap.skywalking.apm.plugin.zcommon.*
 
 /** @author
  *    梦境迷离
- *  @version 1.0,2023/5/16
+ *  @version 1.0,2023/5/11
  */
-final class ZioUnsafeForkInterceptor extends InstanceMethodsAroundInterceptor:
+final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
+
+  private val LOGGER = LogManager.getLogger(classOf[CalibanWrapperInterceptor])
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -27,8 +32,7 @@ final class ZioUnsafeForkInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
-  ): Unit =
-    AgentUtils.continuedSnapshot(allArguments(2))
+  ): Unit = ()
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -37,7 +41,15 @@ final class ZioUnsafeForkInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
-    ret
+    if !ret.isInstanceOf[EffectfulWrapper[?]] then return ret
+    try {
+      val wrapper = ret.asInstanceOf[EffectfulWrapper[?]]
+      wrapper.copy(wrapper = wrapper.wrapper.map(_ |+| TracingCaliban.traceAspect))
+    } catch {
+      case e: Throwable =>
+        LOGGER.error("Caliban Tracer initialization failed", e)
+        ret
+    }
 
   override def handleMethodException(
     objInst: EnhancedInstance,
@@ -45,8 +57,7 @@ final class ZioUnsafeForkInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = AgentUtils.logError(t)
+  ): Unit =
+    AgentUtils.logError(t)
 
-  end handleMethodException
-
-end ZioUnsafeForkInterceptor
+end CalibanWrapperInterceptor

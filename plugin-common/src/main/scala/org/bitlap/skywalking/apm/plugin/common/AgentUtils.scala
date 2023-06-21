@@ -19,7 +19,7 @@ object AgentUtils:
     try
       span.prepareForAsync()
     catch {
-      case t: Throwable => logError(t)
+      case _: Throwable =>
     }
 
   def stopAsync(span: AbstractSpan) =

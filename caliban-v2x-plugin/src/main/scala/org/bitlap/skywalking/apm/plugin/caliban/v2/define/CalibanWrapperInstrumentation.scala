@@ -2,22 +2,21 @@ package org.bitlap.skywalking.apm.plugin.caliban.v2.define
 
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
-import net.bytebuddy.matcher.ElementMatchers.named
+import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.apache.skywalking.apm.agent.core.plugin.`match`.logical.LogicalMatchOperation
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanInterceptor
+import org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanWrapperInterceptor
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-final class CalibanInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
+final class CalibanWrapperInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
-  import CalibanInstrumentation.*
+  import CalibanWrapperInstrumentation.*
 
   override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
@@ -32,15 +31,13 @@ final class CalibanInstrumentation extends ClassInstanceMethodsEnhancePluginDefi
 
         override def isOverrideArgs: Boolean = false
     )
-end CalibanInstrumentation
+end CalibanWrapperInstrumentation
 
-object CalibanInstrumentation:
-  private final val INTERCEPTOR_CLASS: String = classOf[CalibanInterceptor].getTypeName
+object CalibanWrapperInstrumentation:
 
-  private final val ENHANCE_CLASS                      = NameMatch.byName("caliban.GraphQL$$anon$2")
-  private final val EXECUTE_METHOD_INTERCEPTOR: String = "executeRequest"
+  final val INTERCEPTOR_CLASS: String = classOf[CalibanWrapperInterceptor].getTypeName
+  final val ENHANCE_CLASS             = NameMatch.byName("caliban.federation.tracing.ApolloFederatedTracing$")
 
-  def getMethod: ElementMatcher[MethodDescription] =
-    named(EXECUTE_METHOD_INTERCEPTOR).and(ReturnTypeNameMatch.returnsWithType("zio.ZIO"))
+  def getMethod: ElementMatcher[MethodDescription] = named("wrapper")
 
-end CalibanInstrumentation
+end CalibanWrapperInstrumentation

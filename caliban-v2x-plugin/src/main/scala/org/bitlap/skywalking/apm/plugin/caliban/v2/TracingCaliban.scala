@@ -11,12 +11,14 @@ import caliban.wrappers.Wrapper.*
 
 import zio.*
 
+import org.apache.skywalking.apm.agent.core.context
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.util.CollectionUtil
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
+import org.bitlap.skywalking.apm.plugin.caliban.v2.TracingCaliban.getOperationName
 import org.bitlap.skywalking.apm.plugin.common.*
 import org.bitlap.skywalking.apm.plugin.zcommon.*
 
@@ -26,7 +28,66 @@ import org.bitlap.skywalking.apm.plugin.zcommon.*
  */
 object TracingCaliban:
 
+  def traceAspect[R]: OverallWrapper[R] =
+    new OverallWrapper[R]:
+
+      def wrap[R1 <: R](
+        process: GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]]
+      ): GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]] =
+        (request: GraphQLRequest) => {
+          val span = beforeWrapperRequest(request)
+          afterRequest(span, process.apply(request))
+        }
+
+  def afterRequest[R](
+    span: Option[AbstractSpan],
+    ret: ZIO[R, Nothing, GraphQLResponse[CalibanError]]
+  ) =
+    ret.onExit {
+      case Exit.Success(value) =>
+        span.foreach(a => AgentUtils.stopAsync(a))
+        if span.isDefined && value.errors.nonEmpty then {
+          val ex: Option[CalibanError] = value.errors.headOption
+          span.orNull.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure")))
+        }
+        ContextManager.stopSpan()
+        ZIO.unit
+
+      case Exit.Failure(cause) =>
+        span.foreach(a => AgentUtils.stopAsync(a))
+        ZUtils.logError(cause)
+        ContextManager.stopSpan()
+        ZIO.unit
+    }
+
   def beforeRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
+    checkRequest(graphQLRequest) {
+      val opName =
+        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + TracingCaliban.getOperationName(graphQLRequest)
+      val contextCarrier = new ContextCarrier
+      val span           = ContextManager.createEntrySpan(opName, contextCarrier)
+      SpanLayer.asHttp(span)
+      if CalibanPluginConfig.Plugin.CalibanV2.COLLECT_VARIABLES then {
+        val tagValue = collectVariables(graphQLRequest)
+        CustomTag.CalibanVariables.tag.set(span, tagValue)
+      }
+      Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
+      span.setComponent(ComponentsDefine.GRAPHQL)
+      Some(span)
+    }
+
+  def beforeWrapperRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
+    checkRequest(graphQLRequest) {
+      val opName =
+        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + TracingCaliban.getOperationName(graphQLRequest) + "/wrapper"
+      val span = ContextManager.createLocalSpan(opName)
+      AgentUtils.prepareAsync(span)
+      SpanLayer.asHttp(span)
+      span.setComponent(ComponentsDefine.GRAPHQL)
+      Some(span)
+    }
+
+  private def checkRequest(graphQLRequest: GraphQLRequest)(effect: => Option[AbstractSpan]): Option[AbstractSpan] =
     if graphQLRequest == null || graphQLRequest.query.isEmpty then None
     else {
 
@@ -38,18 +99,7 @@ object TracingCaliban:
         return None
       }
 
-      val opName         = CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + getOperationName(graphQLRequest)
-      val contextCarrier = new ContextCarrier
-      val span           = ContextManager.createEntrySpan(opName, contextCarrier)
-      AgentUtils.prepareAsync(span)
-      SpanLayer.asHttp(span)
-      if CalibanPluginConfig.Plugin.CalibanV2.COLLECT_VARIABLES then {
-        val tagValue = collectVariables(graphQLRequest)
-        CustomTag.CalibanVariables.tag.set(span, tagValue)
-      }
-      Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
-      span.setComponent(ComponentsDefine.GRAPHQL)
-      Some(span)
+      effect
     }
 
   private def collectVariables(graphQLRequest: GraphQLRequest): String = {

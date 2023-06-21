@@ -43,26 +43,8 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
   ): Object =
     val span = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
     if span == null then return ret
-
     val result = ret.asInstanceOf[URIO[?, GraphQLResponse[CalibanError]]]
-
-    result.onExit(cleanup =>
-      cleanup match
-        case Exit.Success(value) =>
-          ZIO.attempt {
-            AgentUtils.stopAsync(span)
-            if value.errors.nonEmpty then {
-              val ex: Option[CalibanError] = value.errors.headOption
-              span.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure")))
-            }
-            ContextManager.stopSpan()
-          }.onError(cleanup => ZIO.attempt(ZUtils.logError(cleanup)).ignore).ignore
-        case Exit.Failure(cause) =>
-          ZIO.attempt {
-            ZUtils.logError(cause)
-            ContextManager.stopSpan()
-          }.ignore
-    )
+    TracingCaliban.afterRequest(Some(span), result)
 
   override def handleMethodException(
     objInst: EnhancedInstance,

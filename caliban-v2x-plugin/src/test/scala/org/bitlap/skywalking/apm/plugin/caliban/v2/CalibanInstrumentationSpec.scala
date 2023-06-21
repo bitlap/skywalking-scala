@@ -5,11 +5,12 @@ import net.bytebuddy.matcher.ElementMatcher
 
 import caliban.*
 import caliban.execution.QueryExecution
+import caliban.federation.tracing.ApolloFederatedTracing
 
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.bitlap.skywalking.apm.plugin.caliban.v2.define.CalibanInstrumentation
+import org.bitlap.skywalking.apm.plugin.caliban.v2.define.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -19,8 +20,19 @@ import org.scalatest.matchers.should.Matchers
  */
 class CalibanInstrumentationSpec extends AnyFlatSpec with Matchers {
 
-  "testMethodMatch" should "ok" in {
-    val matcher = CalibanInstrumentation.getCalibanExecuteRequestMethod
+  "test wrapper" should "ok" in {
+    val matcher = CalibanWrapperInstrumentation.getMethod
+    val method = new MethodDescription.ForLoadedMethod(
+      classOf[ApolloFederatedTracing.type].getMethod(
+        "wrapper"
+      )
+    )
+
+    matcher.matches(method) shouldEqual true
+  }
+
+  "test exec" should "ok" in {
+    val matcher = CalibanInstrumentation.getMethod
     val method = new MethodDescription.ForLoadedMethod(
       classOf[GraphQLInterpreter[?, ?]].getMethod(
         "executeRequest",
@@ -35,7 +47,7 @@ class CalibanInstrumentationSpec extends AnyFlatSpec with Matchers {
     matcher.matches(method) shouldEqual true
   }
 
-  "testClassMatch" should "ok" in {
+  "test class match" should "ok" in {
     val clazz = new caliban.GraphQLInterpreter[Any, Any] {
       override def check(query: String)(implicit trace: Trace): IO[CalibanError, Unit] = ???
       override def executeRequest(

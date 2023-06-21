@@ -41,7 +41,7 @@ object CatsEffectWorkStealingInstrumentation:
 
   final val ENHANCE_CLASS = NameMatch.byName("cats.effect.unsafe.WorkStealingThreadPool")
 
-  final val SCHEDULE_METHOD_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
+  final val SCHEDULE_METHOD_INTERCEPTOR: String = classOf[SetContextOnNewFiberArg].getTypeName
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
     SCHEDULE_METHOD_INTERCEPTOR -> named("scheduleExternal").and(takesArguments(0))

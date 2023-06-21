@@ -12,7 +12,7 @@ import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.common.interceptor.{ ConstructorInterceptor, SetContextOnNewFiber }
+import org.bitlap.skywalking.apm.plugin.common.interceptor.*
 import org.bitlap.skywalking.apm.plugin.zcommon.ZioWitnessConstant
 import org.bitlap.skywalking.apm.plugin.zcommon.interceptor.ZioFiberRuntimeInterceptor
 
