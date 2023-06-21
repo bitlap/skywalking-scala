@@ -12,6 +12,7 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
+import org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber
 import org.bitlap.skywalking.apm.plugin.zcommon.ZioWitnessConstant
 
 /** @author
@@ -49,8 +50,7 @@ object ZioExecutorInstrumentation:
 
   final val ENHANCE_CLASS = HierarchyMatch.byHierarchyMatch("zio.Executor")
 
-  final val EXECUTOR_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
+  final val EXECUTOR_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(

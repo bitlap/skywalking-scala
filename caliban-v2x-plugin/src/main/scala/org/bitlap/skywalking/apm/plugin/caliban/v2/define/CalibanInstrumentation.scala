@@ -9,6 +9,7 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.logical.LogicalMatchO
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
+import org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanInterceptor
 
 /** @author
  *    梦境迷离
@@ -34,7 +35,7 @@ final class CalibanInstrumentation extends ClassInstanceMethodsEnhancePluginDefi
 end CalibanInstrumentation
 
 object CalibanInstrumentation:
-  private final val INTERCEPTOR_CLASS: String = "org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanInterceptor"
+  private final val INTERCEPTOR_CLASS: String = classOf[CalibanInterceptor].getTypeName
 
   private final val ENHANCE_CLASS                      = NameMatch.byName("caliban.GraphQL$$anon$2")
   private final val EXECUTE_METHOD_INTERCEPTOR: String = "executeRequest"

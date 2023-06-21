@@ -2,19 +2,24 @@ package org.bitlap.skywalking.apm.plugin.zcommon.interceptor
 
 import java.lang.reflect.Method
 
+import scala.collection.AbstractSeq
+
 import zio.internal.FiberRuntime
 
-import org.apache.skywalking.apm.agent.core.context.{ ContextManager, ContextSnapshot }
+import org.apache.skywalking.apm.agent.core.context.*
+import org.apache.skywalking.apm.agent.core.context.tag.Tags
+import org.apache.skywalking.apm.agent.core.context.trace.*
+import org.apache.skywalking.apm.agent.core.logging.api.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
-import org.bitlap.skywalking.apm.plugin.common.AgentUtils
+import org.bitlap.skywalking.apm.plugin.common.*
 import org.bitlap.skywalking.apm.plugin.zcommon.*
 
 /** @author
  *    梦境迷离
- *  @version 1.0,2023/6/16
+ *  @version 1.0,2023/5/16
  */
-final class ZioFiberRuntimeResumeInterceptor extends InstanceMethodsAroundInterceptor {
+final class ZioUnsafeForkInterceptor extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -22,7 +27,8 @@ final class ZioFiberRuntimeResumeInterceptor extends InstanceMethodsAroundInterc
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
-  ): Unit = ()
+  ): Unit =
+    AgentUtils.continuedSnapshot(allArguments(2))
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -30,10 +36,8 @@ final class ZioFiberRuntimeResumeInterceptor extends InstanceMethodsAroundInterc
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     ret: Object
-  ): Object = {
-    AgentUtils.continuedSnapshot(objInst)
+  ): Object =
     ret
-  }
 
   override def handleMethodException(
     objInst: EnhancedInstance,
@@ -45,4 +49,4 @@ final class ZioFiberRuntimeResumeInterceptor extends InstanceMethodsAroundInterc
 
   end handleMethodException
 
-}
+end ZioUnsafeForkInterceptor

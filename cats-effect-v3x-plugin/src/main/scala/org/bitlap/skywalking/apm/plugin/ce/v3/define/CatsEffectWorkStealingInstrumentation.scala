@@ -8,6 +8,7 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
+import org.bitlap.skywalking.apm.plugin.common.interceptor.*
 
 /** @author
  *    梦境迷离
@@ -40,8 +41,7 @@ object CatsEffectWorkStealingInstrumentation:
 
   final val ENHANCE_CLASS = NameMatch.byName("cats.effect.unsafe.WorkStealingThreadPool")
 
-  final val SCHEDULE_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
+  final val SCHEDULE_METHOD_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
     SCHEDULE_METHOD_INTERCEPTOR -> named("scheduleExternal").and(takesArguments(0))

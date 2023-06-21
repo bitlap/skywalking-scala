@@ -9,6 +9,7 @@ import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ArgumentTypeNameMatch.takesArgumentWithType
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.interceptor.*
 
 /** @author
  *    梦境迷离
@@ -37,8 +38,7 @@ object ZioGrpcServerInstrumentation:
 
   final val ENHANCE_CLASS = NameMatch.byName("scalapb.zio_grpc.server.ZServerCallHandler")
 
-  final val INTERCEPTOR_CLASS =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.interceptor.ZioGrpcServerInterceptor"
+  final val INTERCEPTOR_CLASS = classOf[ZioGrpcServerInterceptor].getTypeName
 
   private final val ENHANCE_METHOD: String     = "startCall"
   private final val ARGUMENT_TYPE_NAME: String = "io.grpc.Metadata"

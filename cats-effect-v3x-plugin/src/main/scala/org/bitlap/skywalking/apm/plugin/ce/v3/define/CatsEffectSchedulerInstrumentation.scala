@@ -9,6 +9,7 @@ import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
+import org.bitlap.skywalking.apm.plugin.ce.v3.*
 
 /** @author
  *    梦境迷离
@@ -41,8 +42,7 @@ object CatsEffectSchedulerInstrumentation:
 
   final val ENHANCE_CLASS = HierarchyMatch.byHierarchyMatch("cats.effect.unsafe.Scheduler")
 
-  final val SLEEP_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.ce.v3.IOFiberSchedulerInterceptor"
+  final val SLEEP_METHOD_INTERCEPTOR: String = classOf[IOFiberSchedulerInterceptor].getTypeName
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
     SLEEP_METHOD_INTERCEPTOR -> named("sleep").and(takesArguments(2))
