@@ -9,6 +9,8 @@ import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
+import org.bitlap.skywalking.apm.plugin.ce.v3.*
+import org.bitlap.skywalking.apm.plugin.common.interceptor.*
 
 /** @author
  *    梦境迷离
@@ -45,20 +47,15 @@ object CatsEffectIOFiberInstrumentation:
 
   final val ENHANCE_CLASS = NameMatch.byName("cats.effect.IOFiber")
 
-  final val CLASS_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.ConstructorInterceptor"
+  final val CLASS_INTERCEPTOR: String = classOf[ConstructorInterceptor].getTypeName
 
-  final val RUN_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.ce.v3.IOFiberInterceptor"
+  final val RUN_METHOD_INTERCEPTOR: String = classOf[IOFiberInterceptor].getTypeName
 
-  final val SUSPEND_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.SaveCurrentContextOnExit"
+  final val SUSPEND_METHOD_INTERCEPTOR: String = classOf[SaveCurrentContextOnExit].getTypeName
 
-  final val RESUME_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.ce.v3.IOFiberResumeInterceptor"
+  final val RESUME_METHOD_INTERCEPTOR: String = classOf[IOFiberResumeInterceptor].getTypeName
 
-  final val SCHEDULE_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
+  final val SCHEDULE_METHOD_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
     RUN_METHOD_INTERCEPTOR             -> named("run").and(takesArguments(0)),

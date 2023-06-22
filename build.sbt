@@ -13,8 +13,8 @@ lazy val skywalkingVersion = "8.16.0"
 
 lazy val calibanVersion     = "2.0.1"
 lazy val zioGrpcVersion     = "0.6.0-rc5"
-lazy val zioGrpcTestVersion = "0.6.0-test1"
-lazy val zio200Version      = "2.0.0"
+lazy val zioGrpcTestVersion = "0.6.0-test4"
+lazy val zio200Version      = "2.0.2"
 lazy val zio203Version      = "2.0.3"
 lazy val zioHttp2Version    = "2.0.0-RC10"
 lazy val catsEffectVersion  = "3.4.1"
@@ -88,7 +88,8 @@ lazy val `caliban-v2x-plugin` = (project in file("caliban-v2x-plugin"))
     name                       := "caliban-v2x-plugin",
     assembly / assemblyJarName := s"apm-caliban-v2x-plugin-${(ThisBuild / version).value}.jar",
     libraryDependencies ++= Seq(
-      "com.github.ghostdogpr" %% "caliban" % calibanVersion % Provided
+      "com.github.ghostdogpr" %% "caliban"            % calibanVersion % Provided,
+      "com.github.ghostdogpr" %% "caliban-federation" % calibanVersion % Provided
     )
   )
   .dependsOn(`zio-plugin-common` % "compile->compile;provided->provided")

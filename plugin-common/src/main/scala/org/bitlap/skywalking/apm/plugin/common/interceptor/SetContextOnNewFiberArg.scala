@@ -1,20 +1,17 @@
-package org.bitlap.skywalking.apm.plugin.zcommon.interceptor
+package org.bitlap.skywalking.apm.plugin.common.interceptor
 
 import java.lang.reflect.Method
 
-import zio.internal.FiberRuntime
-
-import org.apache.skywalking.apm.agent.core.context.{ ContextManager, ContextSnapshot }
+import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.AgentUtils
-import org.bitlap.skywalking.apm.plugin.zcommon.*
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/6/16
  */
-final class ZioFiberRuntimeResumeInterceptor extends InstanceMethodsAroundInterceptor {
+final class SetContextOnNewFiberArg extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -22,7 +19,10 @@ final class ZioFiberRuntimeResumeInterceptor extends InstanceMethodsAroundInterc
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
-  ): Unit = ()
+  ): Unit =
+    if ContextManager.isActive && allArguments(0).isInstanceOf[EnhancedInstance] then {
+      allArguments(0).asInstanceOf[EnhancedInstance].setSkyWalkingDynamicField(ContextManager.capture())
+    }
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -30,13 +30,8 @@ final class ZioFiberRuntimeResumeInterceptor extends InstanceMethodsAroundInterc
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     ret: Object
-  ): Object = {
-    if objInst.getSkyWalkingDynamicField != null && ContextManager.isActive then {
-      val contextSnapshot = objInst.getSkyWalkingDynamicField.asInstanceOf[ContextSnapshot]
-      ContextManager.continued(contextSnapshot)
-    }
+  ): Object =
     ret
-  }
 
   override def handleMethodException(
     objInst: EnhancedInstance,
@@ -48,4 +43,4 @@ final class ZioFiberRuntimeResumeInterceptor extends InstanceMethodsAroundInterc
 
   end handleMethodException
 
-}
+end SetContextOnNewFiberArg

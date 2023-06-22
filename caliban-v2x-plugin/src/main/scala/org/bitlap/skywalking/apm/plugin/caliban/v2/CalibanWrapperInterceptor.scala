@@ -5,12 +5,14 @@ import java.lang.reflect.Method
 import scala.util.*
 
 import caliban.*
+import caliban.wrappers.Wrapper.EffectfulWrapper
 
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
+import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
@@ -20,7 +22,9 @@ import org.bitlap.skywalking.apm.plugin.zcommon.*
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
+final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
+
+  private val LOGGER = LogManager.getLogger(classOf[CalibanWrapperInterceptor])
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -28,11 +32,7 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
-  ): Unit = {
-    val graphQLRequest = allArguments(0).asInstanceOf[GraphQLRequest]
-    val span           = TracingCaliban.beforeRequest(graphQLRequest)
-    span.foreach(a => objInst.setSkyWalkingDynamicField(a))
-  }
+  ): Unit = ()
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -41,10 +41,15 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
-    val span = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
-    if span == null then return ret
-    val result = ret.asInstanceOf[URIO[?, GraphQLResponse[CalibanError]]]
-    TracingCaliban.afterRequest(Some(span), result)
+    if !ret.isInstanceOf[EffectfulWrapper[?]] then return ret
+    try {
+      val wrapper = ret.asInstanceOf[EffectfulWrapper[?]]
+      wrapper.copy(wrapper = wrapper.wrapper.map(_ |+| TracingCaliban.traceAspect))
+    } catch {
+      case e: Throwable =>
+        LOGGER.error("Caliban Tracer initialization failed", e)
+        ret
+    }
 
   override def handleMethodException(
     objInst: EnhancedInstance,
@@ -55,4 +60,4 @@ final class CalibanInterceptor extends InstanceMethodsAroundInterceptor:
   ): Unit =
     AgentUtils.logError(t)
 
-end CalibanInterceptor
+end CalibanWrapperInterceptor

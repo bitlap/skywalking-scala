@@ -9,6 +9,8 @@ import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
+import org.bitlap.skywalking.apm.plugin.common.interceptor.*
+import org.bitlap.skywalking.apm.plugin.zcommon.interceptor.*
 
 /** @author
  *    梦境迷离
@@ -45,25 +47,14 @@ object ZioFiberRuntimeInstrumentation:
 
   final val ENHANCE_CLASS = NameMatch.byName("zio.internal.FiberRuntime")
 
-  final val CLASS_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.ConstructorInterceptor"
+  final val CLASS_INTERCEPTOR: String = classOf[ConstructorInterceptor].getTypeName
 
-  final val RUN_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.zcommon.interceptor.ZioFiberRuntimeInterceptor"
+  final val RUN_METHOD_INTERCEPTOR: String = classOf[ZioFiberRuntimeInterceptor].getTypeName
 
-  final val RESUME_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.zcommon.interceptor.ZioFiberRuntimeResumeInterceptor"
-
-  final val SUSPEND_METHOD_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.SaveCurrentContextOnExit"
-
-  final val EXECUTOR_INTERCEPTOR: String =
-    "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
+  final val EXECUTOR_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(
-      RUN_METHOD_INTERCEPTOR     -> named("run").and(takesArguments(0)),
-      RESUME_METHOD_INTERCEPTOR  -> named("startFork").and(takesArguments(2)),
-      SUSPEND_METHOD_INTERCEPTOR -> named("await").and(takesArguments(1)),
-      EXECUTOR_INTERCEPTOR       -> named("drainQueueLaterOnExecutor").and(takesArguments(1))
+      RUN_METHOD_INTERCEPTOR -> named("run").and(takesArguments(0)),
+      EXECUTOR_INTERCEPTOR   -> named("drainQueueLaterOnExecutor").and(takesArguments(1))
     )

@@ -9,6 +9,7 @@ import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ArgumentTypeNameMatch.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.interceptor.*
 
 /** @author
  *    梦境迷离
@@ -39,8 +40,7 @@ object ZioGrpcClientInstrumentation:
 
   final val ENHANCE_CLASS = NameMatch.byName("scalapb.zio_grpc.ZChannel")
 
-  final val INTERCEPTOR_CLASS: String =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.interceptor.ZioGrpcClientInterceptor"
+  final val INTERCEPTOR_CLASS: String = classOf[ZioGrpcClientInterceptor].getTypeName
 
   def getMethod: ElementMatcher[MethodDescription] =
     named("newCall")

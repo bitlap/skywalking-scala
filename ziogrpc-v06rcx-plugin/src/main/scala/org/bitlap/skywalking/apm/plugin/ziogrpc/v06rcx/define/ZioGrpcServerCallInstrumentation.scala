@@ -8,6 +8,7 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.ZioGrpcWitnessConstant
+import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.*
 
 /** @author
  *    梦境迷离
@@ -43,14 +44,11 @@ end ZioGrpcServerCallInstrumentation
 
 object ZioGrpcServerCallInstrumentation:
 
-  final val CLASS_INTERCEPTOR =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerCallConstructorInterceptor"
+  final val CLASS_INTERCEPTOR = classOf[ZioGrpcServerCallConstructorInterceptor].getTypeName
 
-  final val CLOSE_METHOD_INTERCEPTOR =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerCloseInterceptor"
+  final val CLOSE_METHOD_INTERCEPTOR = classOf[ZioGrpcServerCloseInterceptor].getTypeName
 
-  final val SEND_MESSAGE_METHOD_INTERCEPTOR =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerSendMessageInterceptor"
+  final val SEND_MESSAGE_METHOD_INTERCEPTOR = classOf[ZioGrpcServerSendMessageInterceptor].getTypeName
 
   private final val ENHANCE_CLASS: String = "scalapb.zio_grpc.server.ZServerCall"
 
