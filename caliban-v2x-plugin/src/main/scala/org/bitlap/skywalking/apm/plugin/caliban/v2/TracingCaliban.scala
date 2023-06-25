@@ -53,12 +53,14 @@ object TracingCaliban:
             val ex: Option[CalibanError] = value.errors.headOption
             span.foreach(_.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure"))))
           }
+          ContextManager.stopSpan()
         }
 
       case Exit.Failure(cause) =>
         ZIO.succeed {
           span.foreach(a => AgentUtils.stopAsync(a))
           ZUtils.logError(cause)
+          ContextManager.stopSpan()
         }
     }
 
@@ -90,6 +92,8 @@ object TracingCaliban:
         val ex: Option[CalibanError] = result.errors.headOption
         span.foreach(_.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure"))))
       }
+
+      ContextManager.stopSpan()
     }
 
   private def beforeWrapperRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
