@@ -28,6 +28,8 @@ import org.bitlap.skywalking.apm.plugin.zcommon.*
  */
 object TracingCaliban:
 
+  private val DEFAULT_OP = "Unknown"
+
   val traceOverall: OverallWrapper[Any] =
     new OverallWrapper[Any]:
 
@@ -47,21 +49,21 @@ object TracingCaliban:
   ): ZIO[R, Nothing, GraphQLResponse[CalibanError]] =
     ret.onExit {
       case Exit.Success(value) =>
-        ZIO.succeed {
+        ZIO.attempt {
           span.foreach(a => AgentUtils.stopAsync(a))
           if value.errors.nonEmpty then {
             val ex: Option[CalibanError] = value.errors.headOption
             span.foreach(_.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure"))))
           }
           ContextManager.stopSpan()
-        }
+        }.ignore
 
       case Exit.Failure(cause) =>
-        ZIO.succeed {
+        ZIO.attempt {
           span.foreach(a => AgentUtils.stopAsync(a))
           ZUtils.logError(cause)
           ContextManager.stopSpan()
-        }
+        }.ignore
     }
 
   def beforeRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
@@ -85,7 +87,7 @@ object TracingCaliban:
     span: Option[AbstractSpan],
     result: GraphQLResponse[CalibanError]
   ): ZIO[Any, Nothing, Unit] =
-    ZIO.succeed {
+    ZIO.attempt {
       span.foreach(a => AgentUtils.stopAsync(a))
 
       if result.errors.nonEmpty then {
@@ -94,7 +96,7 @@ object TracingCaliban:
       }
 
       ContextManager.stopSpan()
-    }
+    }.ignore
 
   private def beforeWrapperRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
     checkRequest(graphQLRequest) {
@@ -141,10 +143,10 @@ object TracingCaliban:
         .headOption
         .flatten
       val name = graphQLRequest.operationName.map(_.split("__", 2).toList).toList.flatten.headOption
-      name.orElse(docOpName).getOrElse("Unknown")
+      name.orElse(docOpName).getOrElse(DEFAULT_OP)
     }
     tryOp match
       case Failure(e) =>
         AgentUtils.logError(e)
-        "Unknown"
+        DEFAULT_OP
       case Success(value) => value
