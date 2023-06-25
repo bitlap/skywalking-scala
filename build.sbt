@@ -88,8 +88,7 @@ lazy val `caliban-v2x-plugin` = (project in file("caliban-v2x-plugin"))
     name                       := "caliban-v2x-plugin",
     assembly / assemblyJarName := s"apm-caliban-v2x-plugin-${(ThisBuild / version).value}.jar",
     libraryDependencies ++= Seq(
-      "com.github.ghostdogpr" %% "caliban"            % calibanVersion % Provided,
-      "com.github.ghostdogpr" %% "caliban-federation" % calibanVersion % Provided
+      "com.github.ghostdogpr" %% "caliban" % calibanVersion % Provided
     )
   )
   .dependsOn(`zio-plugin-common` % "compile->compile;provided->provided")

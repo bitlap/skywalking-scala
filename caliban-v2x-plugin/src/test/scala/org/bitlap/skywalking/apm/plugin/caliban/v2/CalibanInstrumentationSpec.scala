@@ -5,7 +5,7 @@ import net.bytebuddy.matcher.ElementMatcher
 
 import caliban.*
 import caliban.execution.QueryExecution
-import caliban.federation.tracing.ApolloFederatedTracing
+import caliban.wrappers.ApolloTracing
 
 import zio.*
 
@@ -23,8 +23,8 @@ class CalibanInstrumentationSpec extends AnyFlatSpec with Matchers {
   "test wrapper" should "ok" in {
     val matcher = CalibanWrapperInstrumentation.getMethod
     val method = new MethodDescription.ForLoadedMethod(
-      classOf[ApolloFederatedTracing.type].getMethod(
-        "wrapper"
+      classOf[ApolloTracing.type].getMethod(
+        "apolloTracing"
       )
     )
 

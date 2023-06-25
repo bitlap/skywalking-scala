@@ -5,7 +5,7 @@ import java.lang.reflect.Method
 import scala.util.*
 
 import caliban.*
-import caliban.wrappers.Wrapper.EffectfulWrapper
+import caliban.wrappers.Wrapper.*
 
 import zio.*
 
@@ -43,8 +43,8 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
   ): Object =
     if !ret.isInstanceOf[EffectfulWrapper[?]] then return ret
     try {
-      val wrapper = ret.asInstanceOf[EffectfulWrapper[?]]
-      wrapper.copy(wrapper = wrapper.wrapper.map(_ |+| TracingCaliban.traceAspect))
+      val wrapper = ret.asInstanceOf[EffectfulWrapper[Any]]
+      EffectfulWrapper(wrapper.wrapper.map(w => TracingCaliban.traceOverall.|+|(w)))
     } catch {
       case e: Throwable =>
         LOGGER.error("Caliban Tracer initialization failed", e)

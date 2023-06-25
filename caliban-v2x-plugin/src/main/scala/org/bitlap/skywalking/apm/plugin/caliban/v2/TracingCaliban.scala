@@ -28,36 +28,38 @@ import org.bitlap.skywalking.apm.plugin.zcommon.*
  */
 object TracingCaliban:
 
-  def traceAspect[R]: OverallWrapper[R] =
-    new OverallWrapper[R]:
+  val traceOverall: OverallWrapper[Any] =
+    new OverallWrapper[Any]:
 
-      def wrap[R1 <: R](
+      def wrap[R1](
         process: GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]]
       ): GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]] =
-        (request: GraphQLRequest) => {
-          val span = beforeWrapperRequest(request)
-          afterRequest(span, process.apply(request))
-        }
+        (request: GraphQLRequest) =>
+          for {
+            span   <- ZIO.succeed(beforeWrapperRequest(request))
+            result <- process(request)
+            _      <- afterWrapperRequest(span, result)
+          } yield result
 
   def afterRequest[R](
     span: Option[AbstractSpan],
     ret: ZIO[R, Nothing, GraphQLResponse[CalibanError]]
-  ) =
+  ): ZIO[R, Nothing, GraphQLResponse[CalibanError]] =
     ret.onExit {
       case Exit.Success(value) =>
-        span.foreach(a => AgentUtils.stopAsync(a))
-        if span.isDefined && value.errors.nonEmpty then {
-          val ex: Option[CalibanError] = value.errors.headOption
-          span.orNull.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure")))
+        ZIO.succeed {
+          span.foreach(a => AgentUtils.stopAsync(a))
+          if value.errors.nonEmpty then {
+            val ex: Option[CalibanError] = value.errors.headOption
+            span.foreach(_.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure"))))
+          }
         }
-        ContextManager.stopSpan()
-        ZIO.unit
 
       case Exit.Failure(cause) =>
-        span.foreach(a => AgentUtils.stopAsync(a))
-        ZUtils.logError(cause)
-        ContextManager.stopSpan()
-        ZIO.unit
+        ZIO.succeed {
+          span.foreach(a => AgentUtils.stopAsync(a))
+          ZUtils.logError(cause)
+        }
     }
 
   def beforeRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
@@ -77,7 +79,20 @@ object TracingCaliban:
       Some(span)
     }
 
-  def beforeWrapperRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
+  private def afterWrapperRequest(
+    span: Option[AbstractSpan],
+    result: GraphQLResponse[CalibanError]
+  ): ZIO[Any, Nothing, Unit] =
+    ZIO.succeed {
+      span.foreach(a => AgentUtils.stopAsync(a))
+
+      if result.errors.nonEmpty then {
+        val ex: Option[CalibanError] = result.errors.headOption
+        span.foreach(_.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure"))))
+      }
+    }
+
+  private def beforeWrapperRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
     checkRequest(graphQLRequest) {
       val opName =
         CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + TracingCaliban.getOperationName(graphQLRequest) + "/wrapper"
