@@ -61,9 +61,7 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     val span = ctx.activeSpan.orNull
     if span == null || !span.isInstanceOf[AbstractSpan] then return ret
     val status = allArguments(1).asInstanceOf[Status]
-    ret
-      .asInstanceOf[GIO[Unit]]
-      .ensuring(ZIO.attempt(afterClose(status, ctx.asyncSpan, span)).ignore)
+    ret.asInstanceOf[GIO[Unit]].ensuring(ZIO.attempt(afterClose(status, ctx.asyncSpan, span)).ignore)
   end afterMethod
 
   private def afterClose(status: Status, asyncSpan: AbstractSpan, span: AbstractSpan): Unit =

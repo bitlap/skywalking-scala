@@ -139,12 +139,11 @@ lazy val `ziogrpc-v06testx-plugin` = (project in file("ziogrpc-v06testx-plugin")
   )
   .dependsOn(`ziogrpc-plugin-common` % "compile->compile;provided->provided")
 
-lazy val `plugin-common` = (project in file("plugin-common"))
-  .settings(
-    commonSettings,
-    commands ++= Commands.value,
-    name := "plugin-common"
-  )
+lazy val `plugin-common` = (project in file("plugin-common")).settings(
+  commonSettings,
+  commands ++= Commands.value,
+  name := "plugin-common"
+)
 
 lazy val `zio-v200-plugin` = (project in file("zio-v200-plugin"))
   .settings(

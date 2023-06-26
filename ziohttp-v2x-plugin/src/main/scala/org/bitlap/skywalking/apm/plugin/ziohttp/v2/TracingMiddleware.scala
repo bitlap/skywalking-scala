@@ -23,11 +23,10 @@ import zhttp.http.middleware.*
 object TracingMiddleware:
 
   final lazy val middleware: HttpMiddleware[Any, Throwable] =
-    Middleware
-      .interceptPatch(req => beforeRequest(req)) { case (response, span) =>
-        afterRequest(span, response)
-        Patch.empty
-      }
+    Middleware.interceptPatch(req => beforeRequest(req)) { case (response, span) =>
+      afterRequest(span, response)
+      Patch.empty
+    }
 
   private def afterRequest(span: AbstractSpan, response: Response): Unit =
     Try {
