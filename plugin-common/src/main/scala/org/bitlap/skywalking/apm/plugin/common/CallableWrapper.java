@@ -5,29 +5,31 @@ import org.apache.skywalking.apm.agent.core.context.ContextSnapshot;
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan;
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine;
 
-public class ContextCleaningWrapper implements Runnable {
-    private final Runnable runnable;
+import java.util.concurrent.Callable;
+
+public class CallableWrapper<A> implements Callable<A> {
+    private final Callable<A> callable;
     private final ContextSnapshot context;
 
-    public ContextCleaningWrapper(Runnable runnable, ContextSnapshot context) {
-        this.runnable = runnable;
+    public CallableWrapper(Callable<A> callable, ContextSnapshot context) {
+        this.callable = callable;
         this.context = context;
     }
 
     @Override
-    public void run() {
+    public A call() throws Exception {
         AbstractSpan span = ContextManager.createLocalSpan(getOperationName());
         span.setComponent(ComponentsDefine.JDK_THREADING);
         ContextManager.continued(context);
         try {
-            runnable.run();
+            return callable.call();
         } finally {
             ContextManager.stopSpan();
         }
     }
 
     private String getOperationName() {
-        return "RunnableWrapper/" + Thread.currentThread().getName();
+        return "CallableWrapper/" + Thread.currentThread().getName();
     }
 
 }

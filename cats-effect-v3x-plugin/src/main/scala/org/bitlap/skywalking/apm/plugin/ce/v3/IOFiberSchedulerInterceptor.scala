@@ -5,8 +5,7 @@ import java.lang.reflect.Method
 import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
-import org.bitlap.skywalking.apm.plugin.common.AgentUtils
-import org.bitlap.skywalking.apm.plugin.common.ContextCleaningWrapper
+import org.bitlap.skywalking.apm.plugin.common.*
 
 /** @author
  *    梦境迷离
@@ -23,7 +22,7 @@ final class IOFiberSchedulerInterceptor extends InstanceMethodsAroundInterceptor
   ): Unit =
     if ContextManager.isActive then {
       val runnable = allArguments(1).asInstanceOf[Runnable]
-      allArguments(1) = new ContextCleaningWrapper(runnable, ContextManager.capture())
+      allArguments(1) = new RunnableWrapper(runnable, ContextManager.capture())
     }
 
   override def afterMethod(
