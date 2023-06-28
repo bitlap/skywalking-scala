@@ -44,7 +44,7 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
     if !ret.isInstanceOf[EffectfulWrapper[?]] then return ret
     try {
       val wrapper = ret.asInstanceOf[EffectfulWrapper[Any]]
-      EffectfulWrapper(wrapper.wrapper.map(w => TracingCaliban.traceOverall.|+|(w)))
+      EffectfulWrapper(wrapper.wrapper.map(_.|+|(TracingCaliban.traceOverall)))
     } catch {
       case e: Throwable =>
         LOGGER.error("Caliban Tracer initialization failed", e)
