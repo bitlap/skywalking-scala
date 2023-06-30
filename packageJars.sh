@@ -15,14 +15,14 @@ catseffect3=cats-effect-v3x-plugin
 
 sbt clean assembly
 
-cp $ziohttpv2/target/apm-$ziohttpv2-$version.jar dist/apm-$ziohttpv2-$version.jar
+cp plugins/$ziohttpv2/target/apm-$ziohttpv2-$version.jar dist/apm-$ziohttpv2-$version.jar
 
-cp $ziogrpcrc/target/apm-$ziogrpcrc-$version.jar dist/apm-$ziogrpcrc-$version.jar
-cp $ziogrpctest/target/apm-$ziogrpctest-$version.jar dist/apm-$ziogrpctest-$version.jar
+cp plugins/$ziogrpcrc/target/apm-$ziogrpcrc-$version.jar dist/apm-$ziogrpcrc-$version.jar
+cp plugins/$ziogrpctest/target/apm-$ziogrpctest-$version.jar dist/apm-$ziogrpctest-$version.jar
 
-cp $caliban/target/apm-$caliban-$version.jar dist/apm-$caliban-$version.jar
+cp plugins/$caliban/target/apm-$caliban-$version.jar dist/apm-$caliban-$version.jar
 
-cp $zio200/target/apm-$zio200-$version.jar dist/apm-$zio200-$version.jar
-cp $zio203/target/apm-$zio203-$version.jar dist/apm-$zio203-$version.jar
+cp plugins/$zio200/target/apm-$zio200-$version.jar dist/apm-$zio200-$version.jar
+cp plugins/$zio203/target/apm-$zio203-$version.jar dist/apm-$zio203-$version.jar
 
-cp $catseffect3/target/apm-$catseffect3-$version.jar dist/apm-$catseffect3-$version.jar
+cp plugins/$catseffect3/target/apm-$catseffect3-$version.jar dist/apm-$catseffect3-$version.jar
