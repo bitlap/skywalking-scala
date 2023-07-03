@@ -16,7 +16,7 @@ services:
         soft: -1
         hard: -1
   skywalking-oap-server:
-    image: apache/skywalking-oap-server:8.9.1
+    image: apache/skywalking-oap-server:9.5.0
     container_name: skywalking-oap-server
     depends_on:
       - elasticsearch
@@ -31,7 +31,7 @@ services:
       SW_STORAGE_ES_CLUSTER_NODES: elasticsearch:9200
       TZ: Asia/Shanghai
   skywalking-ui:
-    image: apache/skywalking-ui:8.9.1
+    image: apache/skywalking-ui:9.5.0
     container_name: skywalking-ui
     depends_on:
       - skywalking-oap-server
