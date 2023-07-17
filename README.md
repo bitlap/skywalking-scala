@@ -60,7 +60,7 @@ The prefix should be added when passing command line parameters, such as: `-Dsky
       - ziohttp-v2x-plugin
       - caliban-v2x-plugin
       - cats-effect-v3x-plugin
-4. Put the `dist/*.jar` into skywalking plugins folder
+4. Copy the `dist-v1/*.jar` or `dist-v2/*.jar` to skywalking plugins folder
 
 Please check the official documents for specific information
 [skywalking.apache.org/docs](https://skywalking.apache.org/docs/skywalking-java/v8.15.0/en/setup/service-agent/java-agent/readme/)
