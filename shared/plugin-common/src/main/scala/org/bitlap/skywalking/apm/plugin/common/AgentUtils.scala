@@ -14,10 +14,9 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedI
 object AgentUtils:
 
   private val LOGGER = LogManager.getLogger(classOf[AgentUtils.type])
-  
-  def stopIfActive(): Unit = {
-    if(ContextManager.isActive) ContextManager.stopSpan() 
-  }
+
+  def stopIfActive(): Unit =
+    if ContextManager.isActive then ContextManager.stopSpan()
 
   def prepareAsync(span: AbstractSpan) =
     try
