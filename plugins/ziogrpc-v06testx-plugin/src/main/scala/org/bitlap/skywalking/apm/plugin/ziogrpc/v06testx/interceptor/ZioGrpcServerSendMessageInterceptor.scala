@@ -31,7 +31,7 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     result: MethodInterceptResult
   ): Unit =
     val call    = allArguments(0).asInstanceOf[ServerCall[?, ?]]
-    val context = GrpcOperationQueue.get(call)
+    val context = OperationContext.get(call)
     if context == null then return
     val span = beforeSendMessage(context.contextSnapshot, context.methodDescriptor)
     span.foreach(a => objInst.setSkyWalkingDynamicField(a))

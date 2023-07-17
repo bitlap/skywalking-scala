@@ -18,11 +18,11 @@ private[ziogrpc] final case class OperationContext(
   selfCall: ServerCall[?, ?] = null,
   methodDescriptor: MethodDescriptor[?, ?] = null,
   asyncSpan: AbstractSpan = null,
-  activeSpan: Option[AbstractSpan] = None,
+  activeSpan: AbstractSpan = null,
   contextSnapshot: ContextSnapshot = null
 )
 
-object GrpcOperationQueue:
+object OperationContext:
 
   private final val cacheClose = new ConcurrentHashMap[ServerCall[?, ?], OperationContext]()
 
@@ -42,4 +42,4 @@ object GrpcOperationQueue:
       cacheClose.remove(call)
     }.getOrElse(null.asInstanceOf[OperationContext])
 
-end GrpcOperationQueue
+end OperationContext

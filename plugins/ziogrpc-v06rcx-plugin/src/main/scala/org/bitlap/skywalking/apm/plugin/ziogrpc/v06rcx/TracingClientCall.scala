@@ -17,7 +17,7 @@ import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.AgentUtils
-import org.bitlap.skywalking.apm.plugin.zcommon.ZUtils
+import org.bitlap.skywalking.apm.plugin.zcommon.ZioUtils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.listener.*
@@ -83,13 +83,14 @@ final class TracingClientCall[Req, Resp](
       val headerKey = Metadata.Key.of(contextItem.getHeadKey, Metadata.ASCII_STRING_MARSHALLER)
       unsafePut.append(headerKey -> contextItem.getHeadValue)
     }
-    val putInto = unsafePut.result().map(kv => headers.put(kv._1, kv._2))
+    val putInto    = unsafePut.result().map(kv => headers.put(kv._1, kv._2))
+    val setHeaders = ZIO.collectAll(putInto).ignore
 
-    ZUtils.unsafeRun(ZIO.collectAll(putInto))
+    // ZioUtils.unsafeRun(ZIO.collectAll(putInto))
 
     snapshot = ContextManager.capture
     span.prepareForAsync()
-    delegate
+    setHeaders *> delegate
       .start(new TracingClientCallListener(responseListener, method, snapshot, span), headers)
       .ensuring(ZIO.attempt(ContextManager.stopSpan()).ignore)
   end start

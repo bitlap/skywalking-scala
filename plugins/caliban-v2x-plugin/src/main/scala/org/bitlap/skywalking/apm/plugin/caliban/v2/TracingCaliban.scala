@@ -61,7 +61,7 @@ object TracingCaliban:
       case Exit.Failure(cause) =>
         ZIO.attempt {
           span.foreach(a => AgentUtils.stopAsync(a))
-          ZUtils.logError(cause)
+          ZioUtils.logError(cause)
           ContextManager.stopSpan()
         }.ignore
     }
@@ -134,7 +134,7 @@ object TracingCaliban:
 
   private def getOperationName(graphQLRequest: GraphQLRequest) =
     val tryOp: Try[String] = Try {
-      val docOpName = ZUtils
+      val docOpName = ZioUtils
         .unsafeRun(Parser.parseQuery(graphQLRequest.query.get))
         .operationDefinitions
         .map(_.selectionSet.collectFirst {

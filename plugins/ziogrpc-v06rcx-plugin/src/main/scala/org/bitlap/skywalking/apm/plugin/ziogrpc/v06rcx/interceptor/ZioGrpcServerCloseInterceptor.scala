@@ -37,11 +37,11 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     if ctx == null || !ctx.isInstanceOf[OperationContext] then return
 
     val cx      = ctx.asInstanceOf[OperationContext]
-    val context = GrpcOperationQueue.remove(cx.selfCall)
+    val context = OperationContext.remove(cx.selfCall)
     if context == null then return
 
     val span = beforeClose(context.contextSnapshot, context.methodDescriptor)
-    objInst.setSkyWalkingDynamicField(context.copy(activeSpan = Option(span)))
+    objInst.setSkyWalkingDynamicField(context.copy(activeSpan = span))
   end beforeMethod
 
   private def beforeClose(contextSnapshot: ContextSnapshot, method: MethodDescriptor[?, ?]): AbstractSpan =
@@ -64,7 +64,7 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     if context == null then return ret
 
     val ctx  = context.asInstanceOf[OperationContext]
-    val span = ctx.activeSpan.orNull
+    val span = ctx.activeSpan
     if span == null || !span.isInstanceOf[AbstractSpan] then return ret
 
     val status = allArguments(0).asInstanceOf[Status]

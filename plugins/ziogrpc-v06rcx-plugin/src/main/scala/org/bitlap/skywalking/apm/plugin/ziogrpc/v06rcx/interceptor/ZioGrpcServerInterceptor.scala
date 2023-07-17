@@ -61,7 +61,7 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
       methodDescriptor = call.getMethodDescriptor
     )
     ContextManager.stopSpan(span)
-    GrpcOperationQueue.put(call, context)
+    OperationContext.put(call, context)
     objInst.setSkyWalkingDynamicField(context)
 
   end beforeMethod

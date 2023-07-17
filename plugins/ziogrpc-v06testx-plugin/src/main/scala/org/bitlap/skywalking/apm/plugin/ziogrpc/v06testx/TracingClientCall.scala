@@ -83,13 +83,14 @@ final class TracingClientCall[R, Req, Resp](
       val headerKey = Metadata.Key.of(contextItem.getHeadKey, Metadata.ASCII_STRING_MARSHALLER)
       unsafePut.append(headerKey -> contextItem.getHeadValue)
     }
-    val putInto = unsafePut.result().map(kv => headers.put(kv._1, kv._2))
+    val putInto    = unsafePut.result().map(kv => headers.put(kv._1, kv._2))
+    val setHeaders = ZIO.collectAll(putInto).ignore
 
-    ZUtils.unsafeRun(ZIO.collectAll(putInto))
+    // ZioUtils.unsafeRun(ZIO.collectAll(putInto))
 
     snapshot = ContextManager.capture
     span.prepareForAsync()
-    delegate
+    setHeaders *> delegate
       .start(new TracingClientCallListener(responseListener, method, snapshot, span), headers)
       .ensuring(ZIO.attempt(ContextManager.stopSpan()).ignore)
   end start

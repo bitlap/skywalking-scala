@@ -12,7 +12,7 @@ import _root_.zio.*
  *    梦境迷离
  *  @version 1.0,2023/5/13
  */
-object ZUtils:
+object ZioUtils:
 
   def unsafeRun[A](z: ZIO[Any, Any, A]): A =
     Try(Unsafe.unsafe { u ?=>
