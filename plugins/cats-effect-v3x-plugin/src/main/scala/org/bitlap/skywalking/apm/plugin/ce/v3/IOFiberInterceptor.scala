@@ -33,7 +33,7 @@ final class IOFiberInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
-    if ContextManager.isActive then ContextManager.stopSpan()
+    AgentUtils.stopIfActive()
     ret
 
   override def handleMethodException(

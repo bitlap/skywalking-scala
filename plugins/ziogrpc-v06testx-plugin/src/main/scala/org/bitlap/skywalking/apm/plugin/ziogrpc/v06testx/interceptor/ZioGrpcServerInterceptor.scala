@@ -54,7 +54,6 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
     val contextSnapshot = ContextManager.capture
     span.prepareForAsync()
     val context = OperationContext(call, call.getMethodDescriptor, span, null, contextSnapshot)
-    ContextManager.stopSpan(span)
     OperationContext.put(call, context)
     objInst.setSkyWalkingDynamicField(context)
 
@@ -81,6 +80,7 @@ final class ZioGrpcServerInterceptor extends InstanceMethodsAroundInterceptor:
       contextSnapshot,
       asyncSpan
     )
+    AgentUtils.stopIfActive()
     result
   end afterMethod
 

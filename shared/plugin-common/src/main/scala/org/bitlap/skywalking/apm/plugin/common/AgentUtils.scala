@@ -14,6 +14,10 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedI
 object AgentUtils:
 
   private val LOGGER = LogManager.getLogger(classOf[AgentUtils.type])
+  
+  def stopIfActive(): Unit = {
+    if(ContextManager.isActive) ContextManager.stopSpan() 
+  }
 
   def prepareAsync(span: AbstractSpan) =
     try
@@ -44,7 +48,7 @@ object AgentUtils:
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
-    } finally if ContextManager.isActive then ContextManager.stopSpan()
+    } finally AgentUtils.stopIfActive()
 
   def continuedSnapshot(contextSnapshot: ContextSnapshot, asyncSpan: AbstractSpan)(effect: => Unit): Unit =
     try
@@ -54,7 +58,7 @@ object AgentUtils:
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
-    } finally if ContextManager.isActive then ContextManager.stopSpan()
+    } finally AgentUtils.stopIfActive()
 
   def continuedSnapshot(enhanced: Object): Unit =
     if ContextManager.isActive then
