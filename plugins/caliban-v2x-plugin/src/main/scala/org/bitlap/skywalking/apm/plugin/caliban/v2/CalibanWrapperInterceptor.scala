@@ -5,6 +5,8 @@ import java.lang.reflect.Method
 import scala.util.*
 
 import caliban.*
+import caliban.execution.ExecutionRequest
+import caliban.parsing.adt.Document
 import caliban.wrappers.Wrapper.*
 
 import zio.*
@@ -15,6 +17,7 @@ import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
+import org.bitlap.skywalking.apm.plugin.caliban.v2.TracingCaliban
 import org.bitlap.skywalking.apm.plugin.common.*
 import org.bitlap.skywalking.apm.plugin.zcommon.*
 
@@ -24,15 +27,23 @@ import org.bitlap.skywalking.apm.plugin.zcommon.*
  */
 final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
 
-  private val LOGGER = LogManager.getLogger(classOf[CalibanWrapperInterceptor])
-
   override def beforeMethod(
     objInst: EnhancedInstance,
     method: Method,
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
-  ): Unit = ()
+  ): Unit =
+    val span = allArguments(2) match {
+      case request: GraphQLRequest =>
+        TracingCaliban.beforeGraphQLRequest(request)
+      case executionRequest: ExecutionRequest =>
+        TracingCaliban.beforeExecute(executionRequest)
+      case doc: Document => TracingCaliban.beforeValidate(doc)
+      case query: String => TracingCaliban.beforeParseQuery(query)
+    }
+
+    span.foreach(a => objInst.setSkyWalkingDynamicField(a))
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -41,14 +52,18 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
-    if !ret.isInstanceOf[EffectfulWrapper[?]] then return ret
-    try {
-      val wrapper = ret.asInstanceOf[EffectfulWrapper[Any]]
-      EffectfulWrapper(wrapper.wrapper.map(_.|+|(TracingCaliban.traceOverall)))
-    } catch {
-      case e: Throwable =>
-        LOGGER.error("Caliban Tracer initialization failed", e)
-        ret
+    if objInst.getSkyWalkingDynamicField == null then return ret
+    val span = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
+    allArguments(2) match {
+      case _: GraphQLRequest =>
+        val result = ret.asInstanceOf[ZIO[?, Nothing, GraphQLResponse[CalibanError]]]
+        TracingCaliban.afterRequest(Option(span), result)
+      case _ =>
+        val result = ret.asInstanceOf[ZIO[?, ?, ?]]
+        result.ensuring(ZIO.attempt {
+          AgentUtils.stopAsync(span)
+          ContextManager.stopSpan()
+        }.ignore)
     }
 
   override def handleMethodException(

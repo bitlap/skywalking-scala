@@ -36,8 +36,8 @@ end CalibanWrapperInstrumentation
 object CalibanWrapperInstrumentation:
 
   final val INTERCEPTOR_CLASS: String = classOf[CalibanWrapperInterceptor].getTypeName
-  final val ENHANCE_CLASS             = NameMatch.byName("caliban.wrappers.ApolloTracing$")
+  final val ENHANCE_CLASS             = NameMatch.byName("caliban.wrappers.Wrapper$")
 
-  def getMethod: ElementMatcher[MethodDescription] = named("apolloTracing")
+  def getMethod: ElementMatcher[MethodDescription] = named("wrap")
 
 end CalibanWrapperInstrumentation
