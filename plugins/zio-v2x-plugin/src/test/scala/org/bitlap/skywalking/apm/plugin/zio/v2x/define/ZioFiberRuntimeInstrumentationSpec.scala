@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.zio.v203.define
+package org.bitlap.skywalking.apm.plugin.zio.v2x.define
 
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.ElementMatcher
