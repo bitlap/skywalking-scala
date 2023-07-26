@@ -139,6 +139,16 @@ object TracingCaliban:
     span.setComponent(ComponentsDefine.GRAPHQL)
     Some(span)
 
+  def beforeExecutor(executionRequest: ExecutionRequest): Option[AbstractSpan] =
+    val opName =
+      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "executor"
+    val span = ContextManager.createLocalSpan(opName)
+    Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
+    AgentUtils.prepareAsync(span)
+    SpanLayer.asHttp(span)
+    span.setComponent(ComponentsDefine.GRAPHQL)
+    Some(span)
+
   private def checkRequest(graphQLRequest: GraphQLRequest)(effect: => Option[AbstractSpan]): Option[AbstractSpan] =
     if graphQLRequest == null || graphQLRequest.query.isEmpty then None
     else {
