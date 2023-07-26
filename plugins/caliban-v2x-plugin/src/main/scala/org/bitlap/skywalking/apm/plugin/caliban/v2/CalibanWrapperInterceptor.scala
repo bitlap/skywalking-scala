@@ -41,6 +41,7 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
         TracingCaliban.beforeExecute(executionRequest)
       case doc: Document => TracingCaliban.beforeValidate(doc)
       case query: String => TracingCaliban.beforeParseQuery(query)
+      case _             => None
     }
 
     span.foreach(a => objInst.setSkyWalkingDynamicField(a))
