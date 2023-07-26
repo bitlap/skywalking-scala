@@ -1,4 +1,7 @@
-package org.bitlap.skywalking.apm.plugin.zio.v200.define
+package org.bitlap.skywalking.apm.plugin.zio.v203.define
+
+import java.util
+import java.util.{ Collections, List as JList }
 
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.*
@@ -10,7 +13,8 @@ import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.common.interceptor.*
-import org.bitlap.skywalking.apm.plugin.zcommon.interceptor.*
+import org.bitlap.skywalking.apm.plugin.zcommon.ZioWitnessConstant
+import org.bitlap.skywalking.apm.plugin.zcommon.interceptor.ZioFiberRuntimeInterceptor
 
 /** @author
  *    梦境迷离
@@ -21,6 +25,9 @@ final class ZioFiberRuntimeInstrumentation extends ClassInstanceMethodsEnhancePl
   import ZioFiberRuntimeInstrumentation.*
 
   override def enhanceClass(): ClassMatch = ENHANCE_CLASS
+
+  override protected def witnessMethods: JList[WitnessMethod] =
+    Collections.singletonList(ZioWitnessConstant.WITNESS_203X_METHOD)
 
   override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = Array(
     new ConstructorInterceptPoint:
@@ -33,7 +40,7 @@ final class ZioFiberRuntimeInstrumentation extends ClassInstanceMethodsEnhancePl
       .map(kv =>
         new InstanceMethodsInterceptPoint {
           override def getMethodsMatcher: ElementMatcher[MethodDescription] = kv._2
-          override def getMethodsInterceptor: String                        = kv._1
+          override def getMethodsInterceptor: String                        = kv._1.split("_")(0)
           override def isOverrideArgs: Boolean                              = false
         }
       )
@@ -51,10 +58,8 @@ object ZioFiberRuntimeInstrumentation:
 
   final val RUN_METHOD_INTERCEPTOR: String = classOf[ZioFiberRuntimeInterceptor].getTypeName
 
-  final val EXECUTOR_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
-
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(
-      RUN_METHOD_INTERCEPTOR -> named("run").and(takesArguments(0)),
-      EXECUTOR_INTERCEPTOR   -> named("drainQueueLaterOnExecutor").and(takesArguments(1))
+      RUN_METHOD_INTERCEPTOR + "_0" -> named("run").and(takesArguments(0)),
+      RUN_METHOD_INTERCEPTOR + "_1" -> named("run").and(takesArguments(1))
     )

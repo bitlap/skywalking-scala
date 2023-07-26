@@ -14,8 +14,7 @@ lazy val skywalkingVersion = "8.16.0"
 lazy val calibanVersion     = "2.0.1"
 lazy val zioGrpcVersion     = "0.6.0-rc5"
 lazy val zioGrpcTestVersion = "0.6.0-test4"
-lazy val zio200Version      = "2.0.2"
-lazy val zio203Version      = "2.0.3"
+lazy val zioVersion         = "2.0.3"
 lazy val zioHttp2Version    = "2.0.0-RC10"
 lazy val catsEffectVersion  = "3.4.1"
 
@@ -67,8 +66,7 @@ lazy val `skywalking-scala` = (project in file("."))
     `caliban-v2x-plugin`,
     `ziogrpc-v06rcx-plugin`,
     `ziogrpc-v06testx-plugin`,
-    `zio-v200-plugin`,
-    `zio-v203-plugin`,
+    `zio-v2x-plugin`,
     `plugin-common`,
     `ziohttp-v2x-plugin`,
     `ziogrpc-plugin-common`,
@@ -116,7 +114,7 @@ lazy val `zio-plugin-common` = (project in file("shared/zio-plugin-common"))
     assemblyPackageScala / assembleArtifact      := false,
     assemblyPackageDependency / assembleArtifact := false,
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % zio200Version % Provided
+      "dev.zio" %% "zio" % zioVersion % Provided
     )
   )
   .dependsOn(`plugin-common` % "compile->compile;provided->provided")
@@ -157,20 +155,6 @@ lazy val `plugin-common` = (project in file("shared/plugin-common")).settings(
   name                                         := "plugin-common"
 )
 
-lazy val `zio-v200-plugin` = (project in file("plugins/zio-v200-plugin"))
-  .settings(
-    commonSettings,
-    commands ++= Commands.value,
-    name                                         := "zio-v200-plugin",
-    assembly / assemblyJarName                   := s"apm-zio-v200-plugin-${(ThisBuild / version).value}.jar",
-    assemblyPackageScala / assembleArtifact      := false,
-    assemblyPackageDependency / assembleArtifact := false,
-    libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % zio200Version % Provided
-    )
-  )
-  .dependsOn(`zio-plugin-common` % "compile->compile;provided->provided")
-
 lazy val `cats-effect-v3x-plugin` = (project in file("plugins/cats-effect-v3x-plugin"))
   .settings(
     commonSettings,
@@ -185,16 +169,16 @@ lazy val `cats-effect-v3x-plugin` = (project in file("plugins/cats-effect-v3x-pl
   )
   .dependsOn(`plugin-common` % "compile->compile;provided->provided")
 
-lazy val `zio-v203-plugin` = (project in file("plugins/zio-v203-plugin"))
+lazy val `zio-v2x-plugin` = (project in file("plugins/zio-v2x-plugin"))
   .settings(
     commonSettings,
     commands ++= Commands.value,
-    name                                         := "zio-v203-plugin",
-    assembly / assemblyJarName                   := s"apm-zio-v203-plugin-${(ThisBuild / version).value}.jar",
+    name                                         := "zio-v2x-plugin",
+    assembly / assemblyJarName                   := s"apm-zio-v2x-plugin-${(ThisBuild / version).value}.jar",
     assemblyPackageScala / assembleArtifact      := false,
     assemblyPackageDependency / assembleArtifact := false,
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % zio203Version % Provided
+      "dev.zio" %% "zio" % zioVersion % Provided
     )
   )
   .dependsOn(`zio-plugin-common` % "compile->compile;provided->provided")
