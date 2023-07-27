@@ -60,23 +60,18 @@ object AgentUtils:
     } finally AgentUtils.stopIfActive()
 
   def continuedSnapshot(enhanced: Object): Unit =
-    if ContextManager.isActive then
-      enhanced match {
-        case enhancedInstance: EnhancedInstance =>
-          val storedField = enhancedInstance.getSkyWalkingDynamicField
-          if storedField != null then {
-            val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
-            AgentUtils.continuedSnapshot_(contextSnapshot)
-          } else {
-            LOGGER.debug(
-              s"EnhancedInstance/getSkyWalkingDynamicField is null: ${enhanced.toString}"
-            )
-          }
-        case _ =>
-          LOGGER.debug(
-            s"Invalid EnhancedInstance: ${enhanced.getClass.getName}"
-          )
-      }
+    enhanced match {
+      case enhancedInstance: EnhancedInstance =>
+        val storedField = enhancedInstance.getSkyWalkingDynamicField
+        if storedField != null then {
+          val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
+          AgentUtils.continuedSnapshot_(contextSnapshot)
+        } else {
+          LOGGER.debug(s"EnhancedInstance/getSkyWalkingDynamicField is null: ${enhanced.toString}")
+        }
+      case _ =>
+        LOGGER.debug(s"Invalid EnhancedInstance: ${enhanced.getClass.getName}")
+    }
 
   def ignorePrefix(ignoreUrlPrefixes: => String, uri: => String): Boolean =
     val prefixes = ignoreUrlPrefixes.split(",").toList.filter(_.nonEmpty)
