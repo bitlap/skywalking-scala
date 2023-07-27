@@ -118,7 +118,6 @@ object TracingCaliban:
     }
 
   def beforeParseQuery(query: String): Option[AbstractSpan] =
-    if !CalibanPluginConfig.Plugin.CalibanV2.TRACE_WRAPPERS then return None
     val opName =
       CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-parse"
     val span = ContextManager.createLocalSpan(opName)
@@ -130,7 +129,6 @@ object TracingCaliban:
     Some(span)
 
   def beforeValidate(doc: Document): Option[AbstractSpan] =
-    if !CalibanPluginConfig.Plugin.CalibanV2.TRACE_WRAPPERS then return None
     val opName =
       CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-validate"
     val span = ContextManager.createLocalSpan(opName)
