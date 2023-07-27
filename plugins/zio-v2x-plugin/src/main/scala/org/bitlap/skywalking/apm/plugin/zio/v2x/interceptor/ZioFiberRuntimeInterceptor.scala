@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.zcommon.interceptor
+package org.bitlap.skywalking.apm.plugin.zio.v2x.interceptor
 
 import java.lang.reflect.Method
 

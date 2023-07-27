@@ -14,7 +14,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.common.interceptor.*
 import org.bitlap.skywalking.apm.plugin.zcommon.ZioWitnessConstant
-import org.bitlap.skywalking.apm.plugin.zcommon.interceptor.ZioFiberRuntimeInterceptor
+import org.bitlap.skywalking.apm.plugin.zio.v2x.interceptor.ZioFiberRuntimeInterceptor
 
 /** @author
  *    梦境迷离

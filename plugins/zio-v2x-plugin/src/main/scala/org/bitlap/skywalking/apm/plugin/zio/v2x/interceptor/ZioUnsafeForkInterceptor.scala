@@ -1,4 +1,4 @@
-package org.bitlap.skywalking.apm.plugin.zcommon.interceptor
+package org.bitlap.skywalking.apm.plugin.zio.v2x.interceptor
 
 import java.lang.reflect.Method
 
@@ -14,12 +14,15 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
 import org.bitlap.skywalking.apm.plugin.zcommon.*
+import org.bitlap.skywalking.apm.plugin.zio.v2x.ZioPluginConfig
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/5/16
  */
 final class ZioUnsafeForkInterceptor extends InstanceMethodsAroundInterceptor:
+
+  private val ForkSwitch = "forkSwitch"
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -28,11 +31,15 @@ final class ZioUnsafeForkInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val fiberRuntime = allArguments(2).asInstanceOf[FiberRuntime[?, ?]]
-    val currentSpan  = ContextManager.createLocalSpan(AgentUtils.generateFiberForkOperationName("ZIO"))
-    currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
-    TagUtils.setZioTags(currentSpan, fiberRuntime.id, objInst)
-    AgentUtils.continuedSnapshot(fiberRuntime)
+    val switch = ZioPluginConfig.Plugin.ZioV2.TRACE_FIBER_FORK
+    ContextManager.getRuntimeContext.put(ForkSwitch, switch)
+    if switch then {
+      val fiberRuntime = allArguments(2).asInstanceOf[FiberRuntime[?, ?]]
+      val currentSpan  = ContextManager.createLocalSpan(AgentUtils.generateFiberForkOperationName("ZIO"))
+      currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
+      TagUtils.setZioTags(currentSpan, fiberRuntime.id, objInst)
+      AgentUtils.continuedSnapshot(fiberRuntime)
+    }
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -41,7 +48,10 @@ final class ZioUnsafeForkInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
-    AgentUtils.stopIfActive()
+    val switch = ContextManager.getRuntimeContext.get(ForkSwitch, classOf[Boolean])
+    if switch then {
+      AgentUtils.stopIfActive()
+    }
     ret
 
   override def handleMethodException(

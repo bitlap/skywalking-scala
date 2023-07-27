@@ -37,8 +37,6 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
     val span = allArguments(2) match {
       case request: GraphQLRequest =>
         TracingCaliban.beforeGraphQLRequest(request)
-      case executionRequest: ExecutionRequest =>
-        TracingCaliban.beforeExecute(executionRequest)
       case doc: Document => TracingCaliban.beforeValidate(doc)
       case query: String => TracingCaliban.beforeParseQuery(query)
       case _             => None

@@ -36,7 +36,7 @@ final class CalibanExecutorInterceptor extends InstanceMethodsAroundInterceptor:
   ): Unit =
     val span = allArguments(0) match {
       case executionRequest: ExecutionRequest =>
-        TracingCaliban.beforeExecutor(executionRequest)
+        TracingCaliban.beforeExecutorExecuteRequest(executionRequest)
       case _ => None
     }
 

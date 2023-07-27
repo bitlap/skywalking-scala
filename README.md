@@ -26,6 +26,7 @@ SkyWalking Extension Plugins for Scala 3
 ## Available Configurations
 | key                                             | description                                                                           |
 |-------------------------------------------------|---------------------------------------------------------------------------------------|
+| `plugin.ziov2.trace_fiber_fork`                 | Create spans for `ZIO.fork`, default is `false`.                                      |
 | `plugin.calibanv2.url_prefix`                   | Add a custom prefix to the graphql operation, default is `Caliban/GraphQL/`.          |
 | `plugin.calibanv2.ignore_url_prefixes`          | Ignore operation name that start with this prefix, i.e. no span will be created.      |
 | `plugin.calibanv2.collect_variables`            | Collect request variables.                                                            |
