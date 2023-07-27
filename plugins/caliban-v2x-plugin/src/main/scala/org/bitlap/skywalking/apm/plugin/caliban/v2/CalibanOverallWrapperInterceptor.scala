@@ -25,7 +25,9 @@ import org.bitlap.skywalking.apm.plugin.zcommon.*
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
+final class CalibanOverallWrapperInterceptor extends InstanceMethodsAroundInterceptor:
+
+  private val LOGGER = LogManager.getLogger(classOf[CalibanWrapperInterceptor])
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -33,16 +35,7 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
-  ): Unit =
-    val span = allArguments(2) match {
-      case request: GraphQLRequest =>
-        TracingCaliban.beforeGraphQLRequest(request)
-      case doc: Document => TracingCaliban.beforeValidate(doc)
-      case query: String => TracingCaliban.beforeParseQuery(query)
-      case _             => None
-    }
-
-    span.foreach(a => objInst.setSkyWalkingDynamicField(a))
+  ): Unit = ()
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -51,18 +44,14 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
-    if objInst.getSkyWalkingDynamicField == null then return ret
-    val span = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
-    allArguments(2) match {
-      case _: GraphQLRequest =>
-        val result = ret.asInstanceOf[ZIO[?, Nothing, GraphQLResponse[CalibanError]]]
-        TracingCaliban.afterRequest(Option(span), result)
-      case _ =>
-        val result = ret.asInstanceOf[ZIO[?, ?, ?]]
-        result.ensuring(ZIO.attempt {
-          AgentUtils.stopAsync(span)
-          ContextManager.stopSpan()
-        }.ignore)
+    if !ret.isInstanceOf[EffectfulWrapper[?]] then return ret
+    try {
+      val wrapper = ret.asInstanceOf[EffectfulWrapper[Any]]
+      EffectfulWrapper(wrapper.wrapper.map(_ |+| TracingCaliban.traceOverall))
+    } catch {
+      case e: Throwable =>
+        LOGGER.error("Caliban Tracer initialization failed", e)
+        ret
     }
 
   override def handleMethodException(
@@ -74,4 +63,4 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
   ): Unit =
     AgentUtils.logError(t)
 
-end CalibanWrapperInterceptor
+end CalibanOverallWrapperInterceptor

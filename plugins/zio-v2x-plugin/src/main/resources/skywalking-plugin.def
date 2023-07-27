@@ -1,0 +1,2 @@
+zio-2.0.3-fiber=org.bitlap.skywalking.apm.plugin.zio.v2x.define.ZioFiberRuntimeInstrumentation
+zio-2.0.3-fork=org.bitlap.skywalking.apm.plugin.zio.v2x.define.ZioUnsafeForkInstrumentation

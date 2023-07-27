@@ -8,15 +8,15 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanWrapperInterceptor
+import org.bitlap.skywalking.apm.plugin.caliban.v2.*
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-final class CalibanWrapperInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
+final class CalibanOverallWrapperInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
-  import CalibanWrapperInstrumentation.*
+  import CalibanOverallWrapperInstrumentation.*
 
   override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
@@ -31,13 +31,13 @@ final class CalibanWrapperInstrumentation extends ClassInstanceMethodsEnhancePlu
 
         override def isOverrideArgs: Boolean = false
     )
-end CalibanWrapperInstrumentation
+end CalibanOverallWrapperInstrumentation
 
-object CalibanWrapperInstrumentation:
+object CalibanOverallWrapperInstrumentation:
 
-  final val INTERCEPTOR_CLASS: String = classOf[CalibanWrapperInterceptor].getTypeName
-  final val ENHANCE_CLASS             = NameMatch.byName("caliban.wrappers.Wrapper$")
+  final val INTERCEPTOR_CLASS: String = classOf[CalibanOverallWrapperInterceptor].getTypeName
+  final val ENHANCE_CLASS             = NameMatch.byName("caliban.wrappers.ApolloTracing$")
 
-  def getMethod: ElementMatcher[MethodDescription] = named("wrap")
+  def getMethod: ElementMatcher[MethodDescription] = named("apolloTracing")
 
-end CalibanWrapperInstrumentation
+end CalibanOverallWrapperInstrumentation

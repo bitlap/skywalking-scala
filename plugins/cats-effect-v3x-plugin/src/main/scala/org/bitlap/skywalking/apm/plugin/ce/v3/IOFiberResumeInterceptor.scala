@@ -3,6 +3,7 @@ package org.bitlap.skywalking.apm.plugin.ce.v3
 import java.lang.reflect.Method
 
 import org.apache.skywalking.apm.agent.core.context.{ ContextManager, ContextSnapshot }
+import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.InstanceMethodsInterceptPoint
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
@@ -31,7 +32,10 @@ final class IOFiberResumeInterceptor extends InstanceMethodsAroundInterceptor {
   ): Object =
     if objInst.getSkyWalkingDynamicField != null && ContextManager.isActive && true.equals(ret) then {
       val contextSnapshot = objInst.getSkyWalkingDynamicField.asInstanceOf[ContextSnapshot]
-      ContextManager.continued(contextSnapshot)
+      val span            = ContextManager.createLocalSpan(AgentUtils.generateFiberOperationName("CE"))
+      span.setComponent(ComponentsDefine.JDK_THREADING)
+      AgentUtils.continuedSnapshot_(contextSnapshot)
+      AgentUtils.stopIfActive()
     }
     ret
 

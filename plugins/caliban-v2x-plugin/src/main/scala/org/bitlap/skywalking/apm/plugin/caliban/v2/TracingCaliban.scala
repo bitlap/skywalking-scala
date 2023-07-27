@@ -4,7 +4,7 @@ import scala.jdk.CollectionConverters.*
 import scala.util.*
 
 import caliban.*
-import caliban.execution.QueryExecution
+import caliban.execution.{ ExecutionRequest, QueryExecution }
 import caliban.parsing.Parser
 import caliban.parsing.adt.{ Document, Selection }
 import caliban.wrappers.Wrapper.*
@@ -18,7 +18,6 @@ import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.util.CollectionUtil
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
-import org.bitlap.skywalking.apm.plugin.caliban.v2.TracingCaliban.getOperationName
 import org.bitlap.skywalking.apm.plugin.common.*
 import org.bitlap.skywalking.apm.plugin.zcommon.*
 
@@ -37,11 +36,8 @@ object TracingCaliban:
         process: GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]]
       ): GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]] =
         (request: GraphQLRequest) =>
-          for {
-            span   <- ZIO.succeed(beforeWrapperRequest(request))
-            result <- process(request)
-            _      <- afterWrapperRequest(span, result)
-          } yield result
+          val span = beforeOverallGraphQLRequest(request)
+          process(request).tap(result => afterGraphQLRequest(span, result).ignore)
 
   def afterRequest[R](
     span: Option[AbstractSpan],
@@ -70,8 +66,7 @@ object TracingCaliban:
     checkRequest(graphQLRequest) {
       val opName =
         CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + TracingCaliban.getOperationName(graphQLRequest)
-      val contextCarrier = new ContextCarrier
-      val span           = ContextManager.createEntrySpan(opName, contextCarrier)
+      val span = ContextManager.createLocalSpan(opName)
       SpanLayer.asHttp(span)
       if CalibanPluginConfig.Plugin.CalibanV2.COLLECT_VARIABLES then {
         val tagValue = collectVariables(graphQLRequest)
@@ -83,7 +78,7 @@ object TracingCaliban:
       Some(span)
     }
 
-  private def afterWrapperRequest(
+  private def afterGraphQLRequest(
     span: Option[AbstractSpan],
     result: GraphQLResponse[CalibanError]
   ): ZIO[Any, Nothing, Unit] =
@@ -98,16 +93,60 @@ object TracingCaliban:
       ContextManager.stopSpan()
     }.ignore
 
-  private def beforeWrapperRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
+  def beforeOverallGraphQLRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
     checkRequest(graphQLRequest) {
       val opName =
-        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + TracingCaliban.getOperationName(graphQLRequest) + "/wrapper"
+        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-overall"
       val span = ContextManager.createLocalSpan(opName)
+      Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
       AgentUtils.prepareAsync(span)
       SpanLayer.asHttp(span)
       span.setComponent(ComponentsDefine.GRAPHQL)
       Some(span)
     }
+
+  def beforeGraphQLRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
+    checkRequest(graphQLRequest) {
+      val opName =
+        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-request"
+      val span = ContextManager.createLocalSpan(opName)
+      Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
+      AgentUtils.prepareAsync(span)
+      SpanLayer.asHttp(span)
+      span.setComponent(ComponentsDefine.GRAPHQL)
+      Some(span)
+    }
+
+  def beforeParseQuery(query: String): Option[AbstractSpan] =
+    val opName =
+      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-parse"
+    val span = ContextManager.createLocalSpan(opName)
+    Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
+    AgentUtils.prepareAsync(span)
+
+    SpanLayer.asHttp(span)
+    span.setComponent(ComponentsDefine.GRAPHQL)
+    Some(span)
+
+  def beforeValidate(doc: Document): Option[AbstractSpan] =
+    val opName =
+      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-validate"
+    val span = ContextManager.createLocalSpan(opName)
+    Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
+    AgentUtils.prepareAsync(span)
+    SpanLayer.asHttp(span)
+    span.setComponent(ComponentsDefine.GRAPHQL)
+    Some(span)
+
+  def beforeExecutorExecuteRequest(executionRequest: ExecutionRequest): Option[AbstractSpan] =
+    val opName =
+      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-executeRequest"
+    val span = ContextManager.createLocalSpan(opName)
+    Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
+    AgentUtils.prepareAsync(span)
+    SpanLayer.asHttp(span)
+    span.setComponent(ComponentsDefine.GRAPHQL)
+    Some(span)
 
   private def checkRequest(graphQLRequest: GraphQLRequest)(effect: => Option[AbstractSpan]): Option[AbstractSpan] =
     if graphQLRequest == null || graphQLRequest.query.isEmpty then None

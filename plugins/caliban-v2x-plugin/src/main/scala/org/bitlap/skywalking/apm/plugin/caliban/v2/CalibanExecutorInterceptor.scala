@@ -25,7 +25,7 @@ import org.bitlap.skywalking.apm.plugin.zcommon.*
  *    梦境迷离
  *  @version 1.0,2023/5/11
  */
-final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
+final class CalibanExecutorInterceptor extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -34,12 +34,10 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val span = allArguments(2) match {
-      case request: GraphQLRequest =>
-        TracingCaliban.beforeGraphQLRequest(request)
-      case doc: Document => TracingCaliban.beforeValidate(doc)
-      case query: String => TracingCaliban.beforeParseQuery(query)
-      case _             => None
+    val span = allArguments(0) match {
+      case executionRequest: ExecutionRequest =>
+        TracingCaliban.beforeExecutorExecuteRequest(executionRequest)
+      case _ => None
     }
 
     span.foreach(a => objInst.setSkyWalkingDynamicField(a))
@@ -52,18 +50,12 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
     ret: Object
   ): Object =
     if objInst.getSkyWalkingDynamicField == null then return ret
-    val span = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
-    allArguments(2) match {
-      case _: GraphQLRequest =>
-        val result = ret.asInstanceOf[ZIO[?, Nothing, GraphQLResponse[CalibanError]]]
-        TracingCaliban.afterRequest(Option(span), result)
-      case _ =>
-        val result = ret.asInstanceOf[ZIO[?, ?, ?]]
-        result.ensuring(ZIO.attempt {
-          AgentUtils.stopAsync(span)
-          ContextManager.stopSpan()
-        }.ignore)
-    }
+    val span   = objInst.getSkyWalkingDynamicField.asInstanceOf[AbstractSpan]
+    val result = ret.asInstanceOf[ZIO[?, ?, ?]]
+    result.ensuring(ZIO.attempt {
+      AgentUtils.stopAsync(span)
+      ContextManager.stopSpan()
+    }.ignore)
 
   override def handleMethodException(
     objInst: EnhancedInstance,
@@ -74,4 +66,4 @@ final class CalibanWrapperInterceptor extends InstanceMethodsAroundInterceptor:
   ): Unit =
     AgentUtils.logError(t)
 
-end CalibanWrapperInterceptor
+end CalibanExecutorInterceptor
