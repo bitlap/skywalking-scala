@@ -81,4 +81,6 @@ object AgentUtils:
     LOGGER.error(s"Span Operation Error!", e)
     if ContextManager.isActive then ContextManager.activeSpan.log(e)
 
-  def generateFiberOperationName(tpe: String) = s"$tpe/IOFiberWrapper/${Thread.currentThread.getName}"
+  def generateFiberOperationName(tpe: String) = s"$tpe/IOFiber/${Thread.currentThread.getName}"
+
+  def generateFiberForkOperationName(tpe: String) = s"$tpe/ForkFiber/${Thread.currentThread.getName}"
