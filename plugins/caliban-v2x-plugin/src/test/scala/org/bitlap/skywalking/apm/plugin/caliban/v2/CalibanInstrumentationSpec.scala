@@ -20,6 +20,17 @@ import org.scalatest.matchers.should.Matchers
  */
 class CalibanInstrumentationSpec extends AnyFlatSpec with Matchers {
 
+  "test apolloTracing" should "ok" in {
+    val matcher = CalibanOverallWrapperInstrumentation.getMethod
+    val method = new MethodDescription.ForLoadedMethod(
+      classOf[ApolloTracing.type].getMethod(
+        "apolloTracing"
+      )
+    )
+
+    matcher.matches(method) shouldEqual true
+  }
+
   "test executor" should "ok" in {
     val matcher = CalibanExecutorInstrumentation.getMethod
     val method = new MethodDescription.ForLoadedMethod(

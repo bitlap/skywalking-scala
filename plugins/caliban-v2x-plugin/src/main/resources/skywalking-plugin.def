@@ -1,3 +1,4 @@
 caliban-2.x=org.bitlap.skywalking.apm.plugin.caliban.v2.define.CalibanInstrumentation
 caliban-2.x-wrapper=org.bitlap.skywalking.apm.plugin.caliban.v2.define.CalibanWrapperInstrumentation
 caliban-2.x-executor=org.bitlap.skywalking.apm.plugin.caliban.v2.define.CalibanExecutorInstrumentation
+caliban-2.x-overall=org.bitlap.skywalking.apm.plugin.caliban.v2.define.CalibanOverallWrapperInstrumentation

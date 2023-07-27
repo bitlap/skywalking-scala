@@ -36,11 +36,8 @@ object TracingCaliban:
         process: GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]]
       ): GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]] =
         (request: GraphQLRequest) =>
-          for {
-            span   <- ZIO.succeed(beforeGraphQLRequest(request))
-            result <- process(request)
-            _      <- afterGraphQLRequest(span, result)
-          } yield result
+          val span = beforeOverallGraphQLRequest(request)
+          process(request).tap(result => afterGraphQLRequest(span, result).ignore)
 
   def afterRequest[R](
     span: Option[AbstractSpan],
@@ -96,10 +93,22 @@ object TracingCaliban:
       ContextManager.stopSpan()
     }.ignore
 
+  def beforeOverallGraphQLRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
+    checkRequest(graphQLRequest) {
+      val opName =
+        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrappers-overall"
+      val span = ContextManager.createLocalSpan(opName)
+      Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
+      AgentUtils.prepareAsync(span)
+      SpanLayer.asHttp(span)
+      span.setComponent(ComponentsDefine.GRAPHQL)
+      Some(span)
+    }
+
   def beforeGraphQLRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
     checkRequest(graphQLRequest) {
       val opName =
-        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "request"
+        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrappers-request"
       val span = ContextManager.createLocalSpan(opName)
       Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
       AgentUtils.prepareAsync(span)
@@ -110,7 +119,7 @@ object TracingCaliban:
 
   def beforeParseQuery(query: String): Option[AbstractSpan] =
     val opName =
-      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "parse"
+      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrappers-parse"
     val span = ContextManager.createLocalSpan(opName)
     Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
     AgentUtils.prepareAsync(span)
@@ -121,7 +130,7 @@ object TracingCaliban:
 
   def beforeValidate(doc: Document): Option[AbstractSpan] =
     val opName =
-      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "validate"
+      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrappers-validate"
     val span = ContextManager.createLocalSpan(opName)
     Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
     AgentUtils.prepareAsync(span)
@@ -131,7 +140,7 @@ object TracingCaliban:
 
   def beforeExecute(executionRequest: ExecutionRequest): Option[AbstractSpan] =
     val opName =
-      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "execute"
+      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrappers-execute"
     val span = ContextManager.createLocalSpan(opName)
     Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
     AgentUtils.prepareAsync(span)
@@ -141,7 +150,7 @@ object TracingCaliban:
 
   def beforeExecutor(executionRequest: ExecutionRequest): Option[AbstractSpan] =
     val opName =
-      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "executor"
+      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "Executor-executeRequest"
     val span = ContextManager.createLocalSpan(opName)
     Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
     AgentUtils.prepareAsync(span)
