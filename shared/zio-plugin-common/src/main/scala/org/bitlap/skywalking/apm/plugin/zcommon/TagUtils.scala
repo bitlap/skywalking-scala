@@ -31,6 +31,7 @@ object TagUtils:
       CustomTag.FiberStartTime.tag.set(span, formatDate(fiberId.startTimeMillis))
       CustomTag.FiberLocation.tag.set(span, fiberId.location.toString)
       CustomTag.FiberClassName.tag.set(span, objInst.getClass.getName)
+      CustomTag.CurrentThread.tag.set(span, Thread.currentThread().getName)
     } match
       case Failure(ex) => span.errorOccurred.log(ex)
       case Success(_)  =>

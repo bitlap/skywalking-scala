@@ -35,7 +35,9 @@ final class ZioUnsafeForkInterceptor extends InstanceMethodsAroundInterceptor:
     ContextManager.getRuntimeContext.put(ForkSwitch, switch)
     if switch then {
       val fiberRuntime = allArguments(2).asInstanceOf[FiberRuntime[?, ?]]
-      val currentSpan  = ContextManager.createLocalSpan(AgentUtils.generateFiberForkOperationName("ZIO"))
+      val currentSpan = ContextManager.createLocalSpan(
+        AgentUtils.generateFiberForkOperationName("ZIO", Some(fiberRuntime.id.location.toString))
+      )
       currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
       TagUtils.setZioTags(currentSpan, fiberRuntime.id, objInst)
       AgentUtils.continuedSnapshot(fiberRuntime)
