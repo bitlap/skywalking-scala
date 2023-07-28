@@ -50,13 +50,13 @@ The prefix should be added when passing command line parameters, such as: `-Dsky
 2. Enter the source file directory `cd skywalking-scala`
 3. Build plugins:
    1. Exec `sh packageJars-v1.sh` yields: 
-      - zio-v200-plugin
+      - zio-v2x-plugin
       - ziogrpc-v06testx-plugin
       - ziohttp-v2x-plugin
       - caliban-v2x-plugin
       - cats-effect-v3x-plugin
    2. Exec `sh packageJars-v2.sh` yields: 
-      - zio-v203-plugin
+      - zio-v2x-plugin
       - ziogrpc-v06rcx-plugin
       - ziohttp-v2x-plugin
       - caliban-v2x-plugin
