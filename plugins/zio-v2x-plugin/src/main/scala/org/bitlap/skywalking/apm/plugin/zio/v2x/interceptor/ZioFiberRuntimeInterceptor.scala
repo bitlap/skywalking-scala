@@ -14,12 +14,15 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
 import org.bitlap.skywalking.apm.plugin.zcommon.*
+import org.bitlap.skywalking.apm.plugin.zio.v2x.ZioPluginConfig
 
 /** @author
  *    梦境迷离
  *  @version 1.0,2023/5/16
  */
 final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
+
+  private val SpanSwitch = "spanSwitch"
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -28,11 +31,21 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val fiberRuntime = objInst.asInstanceOf[FiberRuntime[?, ?]]
-    val currentSpan  = ContextManager.createLocalSpan(AgentUtils.generateFiberOperationName("ZIO"))
-    currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
-    TagUtils.setZioTags(currentSpan, fiberRuntime.id, objInst)
-    AgentUtils.continuedSnapshot(objInst)
+    val fiberRuntime      = objInst.asInstanceOf[FiberRuntime[?, ?]]
+    val location          = fiberRuntime.location.toString
+    val mainMethodRegexes = ZioPluginConfig.Plugin.ZioV2.IGNORE_FIBER_REGEXES.split(",").toList.filter(_.nonEmpty)
+    val matchRegex        = mainMethodRegexes.map(_.r).exists(_.matches(location))
+
+    ContextManager.getRuntimeContext.put(SpanSwitch, !matchRegex)
+
+    if location != null && location != "" && !matchRegex then {
+      val currentSpan = ContextManager.createLocalSpan(
+        AgentUtils.generateFiberOperationName("ZIO", Some(fiberRuntime.location.toString))
+      )
+      currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
+      TagUtils.setZioTags(currentSpan, fiberRuntime.id, objInst)
+      AgentUtils.continuedSnapshot(objInst)
+    }
 
   override def afterMethod(
     objInst: EnhancedInstance,
@@ -41,7 +54,11 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
-    AgentUtils.stopIfActive()
+    val switch = ContextManager.getRuntimeContext.get(SpanSwitch, classOf[Boolean])
+    if switch then {
+      AgentUtils.stopIfActive()
+    }
+
     ret
 
   override def handleMethodException(

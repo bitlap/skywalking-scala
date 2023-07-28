@@ -45,14 +45,7 @@ object TracingCaliban:
   ): ZIO[R, Nothing, GraphQLResponse[CalibanError]] =
     ret.onExit {
       case Exit.Success(value) =>
-        ZIO.attempt {
-          span.foreach(a => AgentUtils.stopAsync(a))
-          if value.errors.nonEmpty then {
-            val ex: Option[CalibanError] = value.errors.headOption
-            span.foreach(_.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure"))))
-          }
-          ContextManager.stopSpan()
-        }.ignore
+        ZIO.attempt(tagCalibanError(span, value)).ignore
 
       case Exit.Failure(cause) =>
         ZIO.attempt {
@@ -82,16 +75,20 @@ object TracingCaliban:
     span: Option[AbstractSpan],
     result: GraphQLResponse[CalibanError]
   ): ZIO[Any, Nothing, Unit] =
-    ZIO.attempt {
-      span.foreach(a => AgentUtils.stopAsync(a))
+    ZIO.attempt(tagCalibanError(span, result)).ignore
 
-      if result.errors.nonEmpty then {
-        val ex: Option[CalibanError] = result.errors.headOption
-        span.foreach(_.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure"))))
-      }
+  private def tagCalibanError(span: Option[AbstractSpan], result: GraphQLResponse[CalibanError]): Unit = {
+    span.foreach(a => AgentUtils.stopAsync(a))
 
-      ContextManager.stopSpan()
-    }.ignore
+    if result.errors.nonEmpty then {
+      val ex: Option[CalibanError] = result.errors.headOption
+      span.foreach(_.log(ex.getOrElse(CalibanError.ExecutionError("Effect failure"))))
+    } else if result.data == null then {
+      span.foreach(_.log(CalibanError.ExecutionError("Effect failure")))
+    }
+
+    ContextManager.stopSpan()
+  }
 
   def beforeOverallGraphQLRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
     checkRequest(graphQLRequest) {

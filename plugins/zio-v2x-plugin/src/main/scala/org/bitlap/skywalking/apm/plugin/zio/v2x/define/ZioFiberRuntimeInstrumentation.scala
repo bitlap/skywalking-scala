@@ -58,8 +58,11 @@ object ZioFiberRuntimeInstrumentation:
 
   final val RUN_METHOD_INTERCEPTOR: String = classOf[ZioFiberRuntimeInterceptor].getTypeName
 
+  final val EXECUTOR_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
+
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(
+      EXECUTOR_INTERCEPTOR          -> named("drainQueueLaterOnExecutor").and(takesArguments(1)),
       RUN_METHOD_INTERCEPTOR + "_0" -> named("run").and(takesArguments(0)),
       RUN_METHOD_INTERCEPTOR + "_1" -> named("run").and(takesArguments(1))
     )
