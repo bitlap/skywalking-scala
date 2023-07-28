@@ -31,10 +31,10 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val fiberRuntime    = objInst.asInstanceOf[FiberRuntime[?, ?]]
-    val location        = fiberRuntime.location.toString
+    val fiberRuntime      = objInst.asInstanceOf[FiberRuntime[?, ?]]
+    val location          = fiberRuntime.location.toString
     val mainMethodRegexes = ZioPluginConfig.Plugin.ZioV2.IGNORE_FIBER_REGEXES.split(",").toList.filter(_.nonEmpty)
-    val matchRegex      = mainMethodRegexes.map(_.r).exists(_.matches(location))
+    val matchRegex        = mainMethodRegexes.map(_.r).exists(_.matches(location))
 
     ContextManager.getRuntimeContext.put(SpanSwitch, !matchRegex)
 
