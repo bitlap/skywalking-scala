@@ -1,7 +1,11 @@
 SkyWalking Extension Plugins for Scala 3
 ---
 
+[![Project stage][Badge-Stage]][Badge-Stage-Page] 
 ![CI][Badge-CI]
+
+[Badge-Stage]: https://img.shields.io/badge/Project%20Stage-Development-yellowgreen.svg
+[Badge-Stage-Page]: https://github.com/bitlap/bitlap/wiki/Project-Stages
 
 
 [Badge-CI]: https://github.com/bitlap/skywalking-scala/actions/workflows/ScalaCI.yml/badge.svg
