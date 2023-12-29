@@ -2,5 +2,4 @@ target
 .bsp
 .idea
 .DS_Store
-dist-v1
-dist-v2
+dist
