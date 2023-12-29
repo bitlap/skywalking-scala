@@ -1,8 +1,10 @@
 package org.bitlap.skywalking.apm.plugin.zio.v2x.interceptor
 
 import java.lang.reflect.Method
+import java.text.SimpleDateFormat
 
 import scala.collection.AbstractSeq
+import scala.util.*
 
 import zio.internal.FiberRuntime
 
@@ -13,8 +15,10 @@ import org.apache.skywalking.apm.agent.core.logging.api.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
-import org.bitlap.skywalking.apm.plugin.zcommon.*
 import org.bitlap.skywalking.apm.plugin.zio.v2x.ZioPluginConfig
+
+import _root_.zio.*
+import _root_.zio.internal.FiberRuntime
 
 /** @author
  *    梦境迷离
@@ -23,6 +27,22 @@ import org.bitlap.skywalking.apm.plugin.zio.v2x.ZioPluginConfig
 final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
 
   private val SpanSwitch = "spanSwitch"
+
+  final lazy val fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
+  private def formatDate(long: Long) = fmt.format(long)
+
+  def setZioTags(span: AbstractSpan, fiberId: FiberId.Runtime, objInst: EnhancedInstance): Unit =
+    Try {
+      CustomTag.FiberId.tag.set(span, fiberId.id.toString)
+      CustomTag.FiberStartTime.tag.set(span, formatDate(fiberId.startTimeMillis))
+      CustomTag.FiberLocation.tag.set(span, fiberId.location.toString)
+      CustomTag.FiberClassName.tag.set(span, objInst.getClass.getName)
+      CustomTag.CurrentThread.tag.set(span, Thread.currentThread().getName)
+    } match
+      case Failure(ex) => span.errorOccurred.log(ex)
+      case Success(_)  =>
+  end setZioTags
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -44,7 +64,7 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
         "ZIORunnableWrapper/" + Thread.currentThread().getName
       )
       currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
-      TagUtils.setZioTags(currentSpan, fiberRuntime.id, objInst)
+      setZioTags(currentSpan, fiberRuntime.id, objInst)
       AgentUtils.continuedSnapshot(objInst)
     }
 

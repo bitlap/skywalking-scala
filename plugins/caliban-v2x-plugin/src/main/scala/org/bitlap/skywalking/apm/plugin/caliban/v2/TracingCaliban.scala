@@ -19,7 +19,6 @@ import org.apache.skywalking.apm.agent.core.util.CollectionUtil
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.*
-import org.bitlap.skywalking.apm.plugin.zcommon.*
 
 /** @author
  *    梦境迷离
@@ -50,7 +49,7 @@ object TracingCaliban:
       case Exit.Failure(cause) =>
         ZIO.attempt {
           span.foreach(a => AgentUtils.stopAsync(a))
-          ZioUtils.logError(cause)
+          if ContextManager.isActive then ContextManager.activeSpan.log(cause.squash)
           ContextManager.stopSpan()
         }.ignore
     }
@@ -168,16 +167,20 @@ object TracingCaliban:
     } else tagValue
   }
 
+  def unsafeRun[A](z: ZIO[Any, Any, A]): A =
+    Try(Unsafe.unsafe { u ?=>
+      Runtime.default.unsafe.run(z).getOrThrowFiberFailure()
+    }).getOrElse(null.asInstanceOf[A])
+
   private def getOperationName(graphQLRequest: GraphQLRequest) =
     val tryOp: Try[String] = Try {
-      val docOpName = ZioUtils
-        .unsafeRun(Parser.parseQuery(graphQLRequest.query.get))
-        .operationDefinitions
-        .map(_.selectionSet.collectFirst {
-          case Selection.Field(alias, name, arguments, directives, selectionSet, index) => alias.getOrElse(name)
-        })
-        .headOption
-        .flatten
+      val docOpName =
+        unsafeRun(Parser.parseQuery(graphQLRequest.query.get)).operationDefinitions
+          .map(_.selectionSet.collectFirst {
+            case Selection.Field(alias, name, arguments, directives, selectionSet, index) => alias.getOrElse(name)
+          })
+          .headOption
+          .flatten
       val name = graphQLRequest.operationName.map(_.split("__", 2).toList).toList.flatten.headOption
       name.orElse(docOpName).getOrElse(DEFAULT_OP)
     }

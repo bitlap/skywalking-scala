@@ -17,7 +17,6 @@ import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.AgentUtils
-import org.bitlap.skywalking.apm.plugin.zcommon.ZioUtils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.listener.*
