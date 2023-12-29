@@ -80,13 +80,3 @@ object AgentUtils:
   def logError[E <: Throwable](e: E): Unit =
     LOGGER.error(s"Span Operation Error!", e)
     if ContextManager.isActive then ContextManager.activeSpan.log(e)
-
-  def generateFiberOperationName(tpe: String, id: Option[String] = None) =
-    id.fold(
-      s"$tpe/Fiber/${Thread.currentThread().getName}"
-    )(i => s"$tpe/Fiber/$i")
-
-  def generateFiberForkOperationName(tpe: String, id: Option[String] = None) =
-    id.fold(
-      s"$tpe/Fiber/${Thread.currentThread().getName}/fork"
-    )(i => s"$tpe/Fiber/$i/fork")

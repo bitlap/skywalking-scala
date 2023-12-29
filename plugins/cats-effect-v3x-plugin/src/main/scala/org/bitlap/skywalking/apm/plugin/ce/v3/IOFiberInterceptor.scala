@@ -22,7 +22,10 @@ final class IOFiberInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val currentSpan = ContextManager.createLocalSpan(AgentUtils.generateFiberOperationName("CE"))
+    if objInst.getSkyWalkingDynamicField == null then return
+    val currentSpan = ContextManager.createLocalSpan(
+      "CERunnableWrapper/" + Thread.currentThread().getName
+    )
     currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
     AgentUtils.continuedSnapshot(objInst)
 
@@ -33,6 +36,7 @@ final class IOFiberInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
+    if objInst.getSkyWalkingDynamicField == null then return ret
     AgentUtils.stopIfActive()
     ret
 

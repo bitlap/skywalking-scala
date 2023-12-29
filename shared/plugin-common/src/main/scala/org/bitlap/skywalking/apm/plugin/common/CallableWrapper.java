@@ -24,12 +24,14 @@ public class CallableWrapper<A> implements Callable<A> {
         try {
             return callable.call();
         } finally {
-            ContextManager.stopSpan();
+            if (ContextManager.isActive()) {
+                ContextManager.stopSpan();
+            }
         }
     }
 
     private String getOperationName() {
-        return "CallableWrapper/" + Thread.currentThread().getName();
+        return "SwCallableWrapper/" + Thread.currentThread().getName();
     }
 
 }

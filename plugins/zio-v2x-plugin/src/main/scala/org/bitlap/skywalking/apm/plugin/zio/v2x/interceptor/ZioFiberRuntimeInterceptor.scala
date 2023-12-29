@@ -31,6 +31,7 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
+    if objInst.getSkyWalkingDynamicField == null then return
     val fiberRuntime      = objInst.asInstanceOf[FiberRuntime[?, ?]]
     val location          = fiberRuntime.location.toString
     val mainMethodRegexes = ZioPluginConfig.Plugin.ZioV2.IGNORE_FIBER_REGEXES.split(",").toList.filter(_.nonEmpty)
@@ -40,7 +41,7 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
 
     if location != null && location != "" && !matchRegex then {
       val currentSpan = ContextManager.createLocalSpan(
-        AgentUtils.generateFiberOperationName("ZIO", Some(fiberRuntime.location.toString))
+        "ZIORunnableWrapper/" + Thread.currentThread().getName
       )
       currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
       TagUtils.setZioTags(currentSpan, fiberRuntime.id, objInst)
@@ -54,6 +55,7 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     ret: Object
   ): Object =
+    if objInst.getSkyWalkingDynamicField == null then return ret
     val switch = ContextManager.getRuntimeContext.get(SpanSwitch, classOf[Boolean])
     if switch then {
       AgentUtils.stopIfActive()

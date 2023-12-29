@@ -33,7 +33,7 @@ final class CatsEffectIOFiberInstrumentation extends ClassInstanceMethodsEnhance
       .map(kv =>
         new InstanceMethodsInterceptPoint {
           override def getMethodsMatcher: ElementMatcher[MethodDescription] = kv._2
-          override def getMethodsInterceptor: String                        = kv._1.split("_")(0)
+          override def getMethodsInterceptor: String                        = kv._1
           override def isOverrideArgs: Boolean                              = false
         }
       )
@@ -51,17 +51,6 @@ object CatsEffectIOFiberInstrumentation:
 
   final val RUN_METHOD_INTERCEPTOR: String = classOf[IOFiberInterceptor].getTypeName
 
-  final val SUSPEND_METHOD_INTERCEPTOR: String = classOf[SaveCurrentContextOnExit].getTypeName
-
-  final val RESUME_METHOD_INTERCEPTOR: String = classOf[IOFiberResumeInterceptor].getTypeName
-
-  final val SCHEDULE_METHOD_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
-
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
-    RUN_METHOD_INTERCEPTOR             -> named("run").and(takesArguments(0)),
-    SUSPEND_METHOD_INTERCEPTOR         -> named("suspend").and(takesArguments(0)),
-    RESUME_METHOD_INTERCEPTOR          -> named("resume").and(takesArguments(0)),
-    SCHEDULE_METHOD_INTERCEPTOR + "_0" -> named("rescheduleFiber").and(takesArguments(2)),
-    SCHEDULE_METHOD_INTERCEPTOR + "_1" -> named("scheduleFiber").and(takesArguments(2)),
-    SCHEDULE_METHOD_INTERCEPTOR + "_2" -> named("scheduleOnForeignEC").and(takesArguments(2))
+    RUN_METHOD_INTERCEPTOR -> named("run").and(takesArguments(0))
   )

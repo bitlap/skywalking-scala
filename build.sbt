@@ -27,9 +27,9 @@ inThisBuild(
     developers := List(
       Developer(
         id = "jxnu-liguobin",
-        name = "梦境迷离",
+        name = "jxnu-liguobin",
         email = "dreamylost@outlook.com",
-        url = url("https://blog.dreamylost.cn")
+        url = url("https://github/jxnu-liguobin")
       )
     )
   )
@@ -71,7 +71,8 @@ lazy val `skywalking-scala` = (project in file("."))
     `ziohttp-v2x-plugin`,
     `ziogrpc-plugin-common`,
     `zio-plugin-common`,
-    `cats-effect-v3x-plugin`
+    `cats-effect-v3x-plugin`,
+    `executors-plugin`
   )
   .settings(
     publish / skip := true,
@@ -91,7 +92,7 @@ lazy val `caliban-v2x-plugin` = (project in file("plugins/caliban-v2x-plugin"))
       "com.github.ghostdogpr" %% "caliban" % calibanVersion % Provided
     )
   )
-  .dependsOn(`zio-plugin-common` % "compile->compile;provided->provided")
+  .dependsOn(`zio-plugin-common`)
 
 lazy val `ziogrpc-plugin-common` = (project in file("shared/ziogrpc-plugin-common"))
   .settings(
@@ -104,7 +105,7 @@ lazy val `ziogrpc-plugin-common` = (project in file("shared/ziogrpc-plugin-commo
       "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcTestVersion % Provided
     )
   )
-  .dependsOn(`zio-plugin-common` % "compile->compile;provided->provided")
+  .dependsOn(`zio-plugin-common`)
 
 lazy val `zio-plugin-common` = (project in file("shared/zio-plugin-common"))
   .settings(
@@ -117,7 +118,7 @@ lazy val `zio-plugin-common` = (project in file("shared/zio-plugin-common"))
       "dev.zio" %% "zio" % zioVersion % Provided
     )
   )
-  .dependsOn(`plugin-common` % "compile->compile;provided->provided")
+  .dependsOn(`plugin-common`)
 
 lazy val `ziogrpc-v06rcx-plugin` = (project in file("plugins/ziogrpc-v06rcx-plugin"))
   .settings(
@@ -131,7 +132,7 @@ lazy val `ziogrpc-v06rcx-plugin` = (project in file("plugins/ziogrpc-v06rcx-plug
       "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcVersion % Provided
     )
   )
-  .dependsOn(`ziogrpc-plugin-common` % "compile->compile;provided->provided")
+  .dependsOn(`ziogrpc-plugin-common`)
 
 lazy val `ziogrpc-v06testx-plugin` = (project in file("plugins/ziogrpc-v06testx-plugin"))
   .settings(
@@ -145,7 +146,7 @@ lazy val `ziogrpc-v06testx-plugin` = (project in file("plugins/ziogrpc-v06testx-
       "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core" % zioGrpcTestVersion % Provided
     )
   )
-  .dependsOn(`ziogrpc-plugin-common` % "compile->compile;provided->provided")
+  .dependsOn(`ziogrpc-plugin-common`)
 
 lazy val `plugin-common` = (project in file("shared/plugin-common")).settings(
   commonSettings,
@@ -167,7 +168,7 @@ lazy val `cats-effect-v3x-plugin` = (project in file("plugins/cats-effect-v3x-pl
       "org.typelevel" %% "cats-effect" % catsEffectVersion % Provided
     )
   )
-  .dependsOn(`plugin-common` % "compile->compile;provided->provided")
+  .dependsOn(`plugin-common`)
 
 lazy val `zio-v2x-plugin` = (project in file("plugins/zio-v2x-plugin"))
   .settings(
@@ -181,7 +182,7 @@ lazy val `zio-v2x-plugin` = (project in file("plugins/zio-v2x-plugin"))
       "dev.zio" %% "zio" % zioVersion % Provided
     )
   )
-  .dependsOn(`zio-plugin-common` % "compile->compile;provided->provided")
+  .dependsOn(`zio-plugin-common`)
 
 lazy val `ziohttp-v2x-plugin` = (project in file("plugins/ziohttp-v2x-plugin"))
   .settings(
@@ -195,4 +196,15 @@ lazy val `ziohttp-v2x-plugin` = (project in file("plugins/ziohttp-v2x-plugin"))
       "io.d11" %% "zhttp" % zioHttp2Version % Provided
     )
   )
-  .dependsOn(`zio-plugin-common` % "compile->compile;provided->provided")
+  .dependsOn(`zio-plugin-common`)
+
+lazy val `executors-plugin` = (project in file("plugins/executors-plugin"))
+  .settings(
+    commonSettings,
+    commands ++= Commands.value,
+    name                                         := "executors-plugin",
+    assembly / assemblyJarName                   := s"apm-executors-plugin-${(ThisBuild / version).value}.jar",
+    assemblyPackageScala / assembleArtifact      := false,
+    assemblyPackageDependency / assembleArtifact := false
+  )
+  .dependsOn(`plugin-common`)

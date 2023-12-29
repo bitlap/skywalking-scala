@@ -22,12 +22,14 @@ public class RunnableWrapper implements Runnable {
         try {
             runnable.run();
         } finally {
-            ContextManager.stopSpan();
+            if (ContextManager.isActive()) {
+                ContextManager.stopSpan();
+            }
         }
     }
 
     private String getOperationName() {
-        return "RunnableWrapper/" + Thread.currentThread().getName();
+        return "SwRunnableWrapper/" + Thread.currentThread().getName();
     }
 
 }
