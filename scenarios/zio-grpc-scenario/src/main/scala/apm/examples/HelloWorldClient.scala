@@ -1,12 +1,9 @@
 package apm.examples
 
 import scalapb.zio_grpc.ZManagedChannel
-
 import io.grpc.ManagedChannelBuilder
-
 import zio.*
 import zio.Console.*
-
 import examples.helloworld.helloworld.HelloRequest
 import examples.helloworld.helloworld.ZioHelloworld.GreeterClient
 import zhttp.http.*

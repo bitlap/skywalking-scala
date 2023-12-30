@@ -190,3 +190,4 @@ Got request: HelloRequest(World,UnknownFieldSet(Map()))
 Hello, World
 Got request: HelloRequest(World,UnknownFieldSet(Map()))
 Hello, World
+scenarios/zio-grpc-scenario/target/universal/stage/bin/hello-world-client: line 61: 47967 Killed: 9               $SCRIPTPATH/zio-grpc-scenario -main apm.examples.HelloWorldClient "$@"
