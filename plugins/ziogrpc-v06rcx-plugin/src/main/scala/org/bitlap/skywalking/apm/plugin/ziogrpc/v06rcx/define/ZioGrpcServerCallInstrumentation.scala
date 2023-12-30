@@ -7,20 +7,15 @@ import net.bytebuddy.matcher.ElementMatchers.*
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.common.ZioGrpcWitnessConstant
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/13
- */
 final class ZioGrpcServerCallInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
   import ZioGrpcServerCallInstrumentation.*
 
   override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
 
-  override def witnessClasses(): Array[String] = ZioGrpcWitnessConstant.`WITNESS_TEST6-RC5_CLASS`
+  override def witnessClasses(): Array[String] = Array("scalapb.zio_grpc.ServerImpl")
 
   override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = Array(
     new ConstructorInterceptPoint:

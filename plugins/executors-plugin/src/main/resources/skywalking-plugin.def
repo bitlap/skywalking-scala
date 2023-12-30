@@ -1,1 +1,1 @@
-ExecutorService=org.bitlap.skywalking.apm.plugin.executor.define.JavaExecutorServiceInstrumentation
+ThreadPoolExecutor=org.bitlap.skywalking.apm.plugin.executor.define.ThreadPoolExecutorInstrumentation

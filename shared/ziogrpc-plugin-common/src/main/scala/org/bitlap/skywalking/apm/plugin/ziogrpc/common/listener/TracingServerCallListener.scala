@@ -14,10 +14,6 @@ import org.bitlap.skywalking.apm.plugin.common.AgentUtils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/13
- */
 final class TracingServerCallListener[Req](
   delegate: ServerCall.Listener[Req],
   method: MethodDescriptor[?, ?],

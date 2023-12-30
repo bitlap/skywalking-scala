@@ -20,10 +20,6 @@ import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/18
- */
 object TracingCaliban:
 
   private val DEFAULT_OP = "Unknown"
@@ -148,7 +144,7 @@ object TracingCaliban:
     if graphQLRequest == null || graphQLRequest.query.isEmpty then None
     else {
 
-      if AgentUtils.ignorePrefix(
+      if AgentUtils.matchPrefix(
           CalibanPluginConfig.Plugin.CalibanV2.IGNORE_URL_PREFIXES,
           getOperationName(graphQLRequest)
         )
@@ -186,6 +182,6 @@ object TracingCaliban:
     }
     tryOp match
       case Failure(e) =>
-        AgentUtils.logError(e)
+        if ContextManager.isActive then ContextManager.activeSpan.log(e)
         DEFAULT_OP
       case Success(value) => value

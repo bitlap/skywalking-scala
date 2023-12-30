@@ -14,10 +14,6 @@ import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.define.ZioGrpcServerCallI
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/11
- */
 class ZioGrpcServerCallInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "test sendMessage$extension MethodMatch" should "ok" in {

@@ -5,15 +5,10 @@ import net.bytebuddy.matcher.ElementMatcher
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanWrapperInterceptor
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/11
- */
 final class CalibanWrapperInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
   import CalibanWrapperInstrumentation.*

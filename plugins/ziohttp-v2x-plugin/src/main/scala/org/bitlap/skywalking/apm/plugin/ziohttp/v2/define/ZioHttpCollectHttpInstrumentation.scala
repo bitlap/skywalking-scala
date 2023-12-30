@@ -10,10 +10,6 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.ziohttp.v2.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/17
- */
 final class ZioHttpCollectHttpInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
   import ZioHttpCollectHttpInstrumentation.*

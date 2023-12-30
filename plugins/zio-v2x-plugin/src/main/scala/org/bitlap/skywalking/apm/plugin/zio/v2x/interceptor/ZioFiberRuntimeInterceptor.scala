@@ -20,10 +20,6 @@ import org.bitlap.skywalking.apm.plugin.zio.v2x.ZioPluginConfig
 import _root_.zio.*
 import _root_.zio.internal.FiberRuntime
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/16
- */
 final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
 
   private val SpanSwitch = "spanSwitch"
@@ -32,7 +28,7 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
 
   private def formatDate(long: Long) = fmt.format(long)
 
-  def setZioTags(span: AbstractSpan, fiberId: FiberId.Runtime, objInst: EnhancedInstance): Unit =
+  private def setZioTags(span: AbstractSpan, fiberId: FiberId.Runtime, objInst: EnhancedInstance): Unit =
     Try {
       CustomTag.FiberId.tag.set(span, fiberId.id.toString)
       CustomTag.FiberStartTime.tag.set(span, formatDate(fiberId.startTimeMillis))
@@ -89,7 +85,7 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = AgentUtils.logError(t)
+  ): Unit = if ContextManager.isActive then ContextManager.activeSpan.log(t)
 
   end handleMethodException
 

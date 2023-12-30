@@ -12,13 +12,9 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/16
- */
 final class CaptureContextOnSubmitInterceptor extends AbstractThreadingPoolInterceptor:
 
-  override def wrap(param: AnyRef): AnyRef = {
+  override def wrap(param: Any): Any = {
     if param.isInstanceOf[RunnableWrapper] || param.isInstanceOf[CallableWrapper[?]] then {
       return null
     }

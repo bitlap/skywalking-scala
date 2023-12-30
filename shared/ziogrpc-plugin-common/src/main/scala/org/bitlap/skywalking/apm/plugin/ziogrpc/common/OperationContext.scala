@@ -10,9 +10,6 @@ import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 
 /** TODO remove
- *  @author
- *    梦境迷离
- *  @version 1.0,2023/5/15
  */
 private[ziogrpc] final case class OperationContext(
   selfCall: ServerCall[?, ?] = null,

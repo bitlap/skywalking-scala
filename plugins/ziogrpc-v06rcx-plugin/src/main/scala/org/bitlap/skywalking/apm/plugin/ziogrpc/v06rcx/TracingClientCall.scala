@@ -22,10 +22,6 @@ import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.listener.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/14
- */
 final class TracingClientCall[Req, Resp](
   peer: Option[String],
   delegate: ZClientCall[Req, Resp],

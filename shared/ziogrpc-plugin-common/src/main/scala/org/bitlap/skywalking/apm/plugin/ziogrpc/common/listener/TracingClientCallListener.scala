@@ -10,10 +10,6 @@ import org.bitlap.skywalking.apm.plugin.common.AgentUtils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/14
- */
 final class TracingClientCallListener[Resp](
   delegate: ClientCall.Listener[Resp],
   method: MethodDescriptor[?, Resp],

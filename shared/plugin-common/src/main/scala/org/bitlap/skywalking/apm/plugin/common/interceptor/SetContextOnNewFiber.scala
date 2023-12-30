@@ -6,10 +6,6 @@ import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.common.AgentUtils
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/6/16
- */
 final class SetContextOnNewFiber extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
@@ -38,7 +34,7 @@ final class SetContextOnNewFiber extends InstanceMethodsAroundInterceptor:
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = AgentUtils.logError(t)
+  ): Unit = if ContextManager.isActive then ContextManager.activeSpan.log(t)
 
   end handleMethodException
 

@@ -19,10 +19,6 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.caliban.v2.TracingCaliban
 import org.bitlap.skywalking.apm.plugin.common.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/11
- */
 final class CalibanOverallWrapperInterceptor extends InstanceMethodsAroundInterceptor:
 
   private val LOGGER = LogManager.getLogger(classOf[CalibanWrapperInterceptor])
@@ -59,6 +55,6 @@ final class CalibanOverallWrapperInterceptor extends InstanceMethodsAroundInterc
     argumentsTypes: Array[Class[?]],
     t: Throwable
   ): Unit =
-    AgentUtils.logError(t)
+    if ContextManager.isActive then ContextManager.activeSpan.log(t)
 
 end CalibanOverallWrapperInterceptor

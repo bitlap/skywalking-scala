@@ -6,10 +6,6 @@ import org.apache.skywalking.apm.agent.core.context.ContextSnapshot
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.network.trace.component.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/14
- */
 object Constants:
 
   /** Operation name for client has cancelled the call.

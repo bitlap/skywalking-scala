@@ -3,7 +3,7 @@ ThisBuild / resolvers ++= Seq(
   "Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/releases"
 )
 
-lazy val scala3Version         = "3.2.2"
+lazy val scala3Version         = "3.3.0"
 lazy val scalatestVersion      = "3.2.15"
 lazy val junitVersion          = "4.12"
 lazy val mockitoVersion        = "5.0.0"
@@ -179,3 +179,21 @@ lazy val `executors-plugin` = (project in file("plugins/executors-plugin"))
     assemblyPackageDependency / assembleArtifact := false
   )
   .dependsOn(`plugin-common`)
+
+lazy val `zio-grpc-scenario` = (project in file("scenarios/zio-grpc-scenario"))
+  .settings(
+    scalaVersion := scala3Version,
+    Compile / PB.targets := Seq(
+      scalapb.gen(grpc = true)          -> (Compile / sourceManaged).value,
+      scalapb.zio_grpc.ZioCodeGenerator -> (Compile / sourceManaged).value
+    ),
+    Compile / packageDoc / mappings := Seq(),
+    Compile / mainClass             := Some("apm.examples.HelloWorldServer"),
+    libraryDependencies ++= Seq(
+      "io.d11"               %% "zhttp"                % zioHttp2Version,
+      "dev.zio"              %% "zio"                  % zioVersion,
+      "io.grpc"               % "grpc-netty"           % "1.50.1",
+      "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
+    )
+  )
+  .enablePlugins(JavaAppPackaging, JavaServerAppPackaging)

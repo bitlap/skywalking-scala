@@ -12,10 +12,6 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.ce.v3.*
 import org.bitlap.skywalking.apm.plugin.common.interceptor.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/16
- */
 final class CatsEffectIOFiberInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
   import CatsEffectIOFiberInstrumentation.*

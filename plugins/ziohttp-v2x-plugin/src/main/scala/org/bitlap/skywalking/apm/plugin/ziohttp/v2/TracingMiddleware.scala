@@ -16,10 +16,6 @@ import org.bitlap.skywalking.apm.plugin.common.*
 import zhttp.http.*
 import zhttp.http.middleware.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/17
- */
 object TracingMiddleware:
 
   final lazy val middleware: HttpMiddleware[Any, Throwable] =
@@ -43,7 +39,7 @@ object TracingMiddleware:
 
   private def beforeRequest(request: Request): AbstractSpan =
     val uri = request.url
-    if AgentUtils.ignorePrefix(ZioHttpPluginConfig.Plugin.ZioHttpV2.IGNORE_URL_PREFIXES, uri.path.encode) then {
+    if AgentUtils.matchPrefix(ZioHttpPluginConfig.Plugin.ZioHttpV2.IGNORE_URL_PREFIXES, uri.path.encode) then {
       return null
     }
     val contextCarrier = new ContextCarrier

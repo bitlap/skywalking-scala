@@ -17,10 +17,6 @@ import org.bitlap.skywalking.apm.plugin.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/15
- */
 final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
@@ -79,6 +75,6 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = AgentUtils.logError(t)
+  ): Unit = if ContextManager.isActive then ContextManager.activeSpan.log(t)
 
 end ZioGrpcServerSendMessageInterceptor

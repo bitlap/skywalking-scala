@@ -7,25 +7,19 @@ import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/13
- */
 object AgentUtils:
-
-  private val LOGGER = LogManager.getLogger(classOf[AgentUtils.type])
 
   def stopIfActive(): Unit =
     if ContextManager.isActive then ContextManager.stopSpan()
 
-  def prepareAsync(span: AbstractSpan) =
+  def prepareAsync(span: AbstractSpan): Unit =
     try
       span.prepareForAsync()
     catch {
       case _: Throwable =>
     }
 
-  def stopAsync(span: AbstractSpan) =
+  def stopAsync(span: AbstractSpan): Unit =
     try
       span.asyncFinish()
     catch {
@@ -66,17 +60,10 @@ object AgentUtils:
         if storedField != null then {
           val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
           AgentUtils.continuedSnapshot_(contextSnapshot)
-        } else {
-          LOGGER.debug(s"EnhancedInstance/getSkyWalkingDynamicField is null: ${enhanced.toString}")
         }
       case _ =>
-        LOGGER.debug(s"Invalid EnhancedInstance: ${enhanced.getClass.getName}")
     }
 
-  def ignorePrefix(ignoreUrlPrefixes: => String, uri: => String): Boolean =
+  def matchPrefix(ignoreUrlPrefixes: => String, uri: => String): Boolean =
     val prefixes = ignoreUrlPrefixes.split(",").toList.filter(_.nonEmpty)
     prefixes.nonEmpty && prefixes.exists(p => uri.startsWith(p))
-
-  def logError[E <: Throwable](e: E): Unit =
-    LOGGER.error(s"Span Operation Error!", e)
-    if ContextManager.isActive then ContextManager.activeSpan.log(e)

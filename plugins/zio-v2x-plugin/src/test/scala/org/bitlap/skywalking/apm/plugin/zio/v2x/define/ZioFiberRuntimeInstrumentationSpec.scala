@@ -9,10 +9,6 @@ import zio.internal.FiberRuntime
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/11
- */
 class ZioFiberRuntimeInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch1" should "ok" in {
