@@ -6,3 +6,4 @@ dist
 logs/
 *.log
 *.out
+scenarios/skywalking-agent/plugins/apm-lettuce-5.x-plugin-8.16.0.jar

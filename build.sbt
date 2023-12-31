@@ -17,6 +17,7 @@ lazy val zioGrpcTestVersion = "0.6.0-test4"
 lazy val zioVersion         = "2.0.3"
 lazy val zioHttp2Version    = "2.0.0-RC10"
 lazy val catsEffectVersion  = "3.4.1"
+lazy val zioCacheVersion    = "0.2.3"
 
 inThisBuild(
   List(
@@ -70,7 +71,8 @@ lazy val `skywalking-scala` = (project in file("."))
     `zio-v2x-plugin`,
     `ziohttp-v2x-plugin`,
     `cats-effect-v3x-plugin`,
-    `ziogrpc-v06rcx-plugin`
+    `ziogrpc-v06rcx-plugin`,
+    `ziocache-plugin`
   )
   .settings(
     publish / skip := true,
@@ -155,6 +157,20 @@ lazy val `zio-v2x-plugin` = (project in file("plugins/zio-v2x-plugin"))
   )
   .dependsOn(`plugin-common`)
 
+lazy val `ziocache-plugin` = (project in file("plugins/ziocache-plugin"))
+  .settings(
+    commonSettings,
+    commands ++= Commands.value,
+    name                                         := "ziocache-plugin",
+    assembly / assemblyJarName                   := s"apm-ziocache-plugin-${(ThisBuild / version).value}.jar",
+    assemblyPackageScala / assembleArtifact      := false,
+    assemblyPackageDependency / assembleArtifact := false,
+    libraryDependencies ++= Seq(
+      "dev.zio" %% "zio-cache" % zioCacheVersion % Provided
+    )
+  )
+  .dependsOn(`plugin-common`)
+
 lazy val `ziohttp-v2x-plugin` = (project in file("plugins/ziohttp-v2x-plugin"))
   .settings(
     commonSettings,
@@ -200,7 +216,8 @@ lazy val `zio-scenario` = (project in file("scenarios/zio-scenario"))
       "dev.profunktor" %% "redis4cats-streams"  % "1.3.0",
       "org.typelevel"  %% "log4cats-slf4j"      % "2.5.0",
       "dev.zio"        %% "zio-interop-cats"    % "23.0.03",
-      "ch.qos.logback"  % "logback-classic"     % "1.2.11"
+      "ch.qos.logback"  % "logback-classic"     % "1.2.11",
+      "dev.zio"        %% "zio-cache"           % zioCacheVersion
     )
   )
   .enablePlugins(JavaAppPackaging, JavaServerAppPackaging)

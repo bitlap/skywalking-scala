@@ -9,7 +9,6 @@ import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.`match`.logical.LogicalMatchOperation
-import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.ClassInstanceMethodsEnhancePluginDefine
 import org.bitlap.skywalking.apm.plugin.common.interceptor.CaptureContextOnSubmitInterceptor
@@ -27,7 +26,7 @@ class ThreadPoolExecutorInstrumentation extends ClassInstanceMethodsEnhancePlugi
       .map(kv =>
         new InstanceMethodsInterceptPoint {
           override def getMethodsMatcher: ElementMatcher[MethodDescription] = kv._2
-          override def getMethodsInterceptor: String                        = kv._1.split("_")(0)
+          override def getMethodsInterceptor: String                        = kv._1
           override def isOverrideArgs: Boolean                              = true
         }
       )
@@ -48,30 +47,52 @@ object ThreadPoolExecutorInstrumentation:
     LogicalMatchOperation.and(
       HierarchyMatch.byHierarchyMatch("java.util.concurrent.AbstractExecutorService"),
       LogicalMatchOperation.not(
-        PrefixMatch.nameStartsWith("java.util.concurrent.ThreadPoolExecutor")
+        PrefixMatch.nameStartsWith("java.util.concurrent.ThreadPoolExecutor", "java.util.concurrent.ForkJoinPool")
       )
     )
   )
 
-  final val EXECUTE_RUNNABLE_INTERCEPTOR: String  = classOf[CaptureContextOnSubmitInterceptor].getTypeName
-  final val SUBMIT_RUNNABLE_INTERCEPTOR: String   = classOf[CaptureContextOnSubmitInterceptor].getTypeName
-  final val SUBMIT_CALLABLE_INTERCEPTOR: String   = classOf[CaptureContextOnSubmitInterceptor].getTypeName
-  final val SCHEDULE_RUNNABLE_INTERCEPTOR: String = classOf[CaptureContextOnSubmitInterceptor].getTypeName
-  final val SCHEDULE_CALLABLE_INTERCEPTOR: String = classOf[CaptureContextOnSubmitInterceptor].getTypeName
+  final val CAPTURE_ON_SUBMIT_INTERCEPTOR: String = classOf[CaptureContextOnSubmitInterceptor].getTypeName
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(
-      SUBMIT_RUNNABLE_INTERCEPTOR + "_0" -> named("submit")
-        .and(takesArguments(1).and(takesArgument(0, classOf[Runnable]))),
-      SUBMIT_RUNNABLE_INTERCEPTOR + "_1" -> named("submit")
-        .and(takesArguments(2).and(takesArgument(0, classOf[Runnable]))),
-      SUBMIT_CALLABLE_INTERCEPTOR + "_2" -> named("submit")
-        .and(takesArguments(1).and(takesArgument(0, classOf[Callable[?]]))),
-      EXECUTE_RUNNABLE_INTERCEPTOR + "_3" -> named("execute").and(takesArguments(1)),
-      SCHEDULE_RUNNABLE_INTERCEPTOR + "_4" -> named("schedule").and(
-        takesArguments(3).and(takesArgument(0, classOf[Runnable]))
-      ),
-      SCHEDULE_CALLABLE_INTERCEPTOR + "_5" -> named("schedule").and(
-        takesArguments(3).and(takesArgument(0, classOf[Callable[?]]))
-      )
+      CAPTURE_ON_SUBMIT_INTERCEPTOR ->
+        named("submit")
+          .or(
+            takesArguments(1).and(takesArgument(0, classOf[Runnable]))
+          )
+          .or(
+            takesArguments(2).and(takesArgument(0, classOf[Runnable]))
+          )
+          .or(
+            takesArguments(1).and(takesArgument(0, classOf[Callable[?]]))
+          )
+          .or(
+            named("execute").and(takesArguments(1).and(takesArgument(0, classOf[Runnable])))
+          )
+          .or(
+            named("schedule").and(takesArguments(3).and(takesArgument(0, classOf[Runnable])))
+          )
+          .or(
+            named("schedule").and(takesArguments(3).and(takesArgument(0, classOf[Callable[?]])))
+          )
     )
+
+//    SUBMIT_RUNNABLE_INTERCEPTOR + "_0" -> named("submit")
+//      .and(takesArguments(1).and(takesArgument(0, classOf[Runnable])))
+//  ,
+//  SUBMIT_RUNNABLE_INTERCEPTOR + "_1" -> named("submit")
+//    .and(takesArguments(2).and(takesArgument(0, classOf[Runnable])))
+//  ,
+//  SUBMIT_CALLABLE_INTERCEPTOR + "_2" -> named("submit")
+//    .and(takesArguments(1).and(takesArgument(0, classOf[Callable[?]])))
+//  ,
+//  EXECUTE_RUNNABLE_INTERCEPTOR + "_3" -> named("execute").and(takesArguments(1))
+//  ,
+//  SCHEDULE_RUNNABLE_INTERCEPTOR + "_4" -> named("schedule").and(
+//    takesArguments(3).and(takesArgument(0, classOf[Runnable]))
+//  )
+//  ,
+//  SCHEDULE_CALLABLE_INTERCEPTOR + "_5" -> named("schedule").and(
+//    takesArguments(3).and(takesArgument(0, classOf[Callable[?]]))
+//  )

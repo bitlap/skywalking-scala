@@ -9,7 +9,6 @@ import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
-import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.common.interceptor.*
@@ -37,7 +36,7 @@ final class ZioFiberRuntimeInstrumentation extends ClassInstanceMethodsEnhancePl
       .map(kv =>
         new InstanceMethodsInterceptPoint {
           override def getMethodsMatcher: ElementMatcher[MethodDescription] = kv._2
-          override def getMethodsInterceptor: String                        = kv._1.split("_")(0)
+          override def getMethodsInterceptor: String                        = kv._1
           override def isOverrideArgs: Boolean                              = false
         }
       )
@@ -55,11 +54,10 @@ object ZioFiberRuntimeInstrumentation:
 
   final val RUN_METHOD_INTERCEPTOR: String = classOf[ZioFiberRuntimeInterceptor].getTypeName
 
-  final val EXECUTOR_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
+//  final val EXECUTOR_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(
-      EXECUTOR_INTERCEPTOR          -> named("drainQueueLaterOnExecutor").and(takesArguments(1)),
-      RUN_METHOD_INTERCEPTOR + "_0" -> named("run").and(takesArguments(0)),
-      RUN_METHOD_INTERCEPTOR + "_1" -> named("run").and(takesArguments(1))
+//      EXECUTOR_INTERCEPTOR   -> named("drainQueueLaterOnExecutor").and(takesArguments(1)),
+      RUN_METHOD_INTERCEPTOR -> named("run")
     )

@@ -1,10 +1,7 @@
 package org.bitlap.skywalking.apm.plugin.common
 
-import scala.util.Try
-
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
-import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance
 
 object AgentUtils:

@@ -25,6 +25,7 @@ SkyWalking Extension Plugins for Scala 3
 | ziohttp-v2x-plugin     | zio-http (`Http#collectHttp`)   | 2.0.0-RC2 ~ 2.0.0-RC11  | 2.0.0-RC10     |
 | caliban-v2x-plugin     | caliban (`GraphQL#interpreter`) | 2.0.0 ~ 2.0.2           | 2.0.1          |
 | executors-plugin       | `java.util.concurrent`          | -                       | -              |
+| ziocache-plugin        | zio-cache                       | Not Available           | Not Available  |
 
 
 > Other small versions of the library supported by this plugin may also work, but they have not been tested.
@@ -33,7 +34,7 @@ SkyWalking Extension Plugins for Scala 3
 
 - Class `java.util.concurrent.ScheduledThreadPoolExecutor`
 - Subclasses of `java.util.concurrent.ThreadPoolExecutor`
-- Subclasses of `java.util.concurrent.AbstractExecutorService`, except `java.util.concurrent.ThreadPoolExecutor` due to plugin restrictions
+- Subclasses of `java.util.concurrent.AbstractExecutorService`, except `java.util.concurrent.ThreadPoolExecutor` and `java.util.concurrent.ForkJoinPool` due to plugin restrictions
 
 Enhance via methods:
 - `submit(Runnable)`

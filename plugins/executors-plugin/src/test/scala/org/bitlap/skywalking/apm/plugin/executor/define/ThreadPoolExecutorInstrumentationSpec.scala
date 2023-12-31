@@ -4,7 +4,6 @@ import java.util.concurrent.*
 
 import net.bytebuddy.description.`type`.TypeDescription
 import net.bytebuddy.description.method.MethodDescription
-import net.bytebuddy.matcher.ElementMatcher
 
 import org.apache.skywalking.apm.dependencies.io.netty.channel.SingleThreadEventLoop
 import org.apache.skywalking.apm.dependencies.io.netty.util.concurrent.DefaultEventExecutor
@@ -17,6 +16,9 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
     val matcher            = ThreadPoolExecutorInstrumentation.ENHANCE_CLASS
     val threadPoolExecutor = matcher.isMatch(new TypeDescription.ForLoadedType(classOf[ThreadPoolExecutor]))
     assert(!threadPoolExecutor)
+
+    val forkJoinPool = matcher.isMatch(new TypeDescription.ForLoadedType(classOf[ForkJoinPool]))
+    assert(!forkJoinPool)
 
     val scheduledThreadPoolExecutor =
       matcher.isMatch(new TypeDescription.ForLoadedType(classOf[ScheduledThreadPoolExecutor]))
@@ -33,7 +35,7 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch submit1" should "ok" in {
     val matcher = ThreadPoolExecutorInstrumentation.methodInterceptors(
-      ThreadPoolExecutorInstrumentation.SUBMIT_RUNNABLE_INTERCEPTOR + "_0"
+      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[AbstractExecutorService].getMethod(
@@ -46,7 +48,7 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch submit2" should "ok" in {
     val matcher = ThreadPoolExecutorInstrumentation.methodInterceptors(
-      ThreadPoolExecutorInstrumentation.SUBMIT_RUNNABLE_INTERCEPTOR + "_1"
+      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[AbstractExecutorService].getMethod(
@@ -60,7 +62,7 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch submit3" should "ok" in {
     val matcher = ThreadPoolExecutorInstrumentation.methodInterceptors(
-      ThreadPoolExecutorInstrumentation.SUBMIT_CALLABLE_INTERCEPTOR + "_2"
+      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[AbstractExecutorService].getMethod(
@@ -73,7 +75,7 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch execute" should "ok" in {
     val matcher = ThreadPoolExecutorInstrumentation.methodInterceptors(
-      ThreadPoolExecutorInstrumentation.EXECUTE_RUNNABLE_INTERCEPTOR + "_3"
+      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[AbstractExecutorService].getMethod(
@@ -86,7 +88,7 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch schedule1" should "ok" in {
     val matcher = ThreadPoolExecutorInstrumentation.methodInterceptors(
-      ThreadPoolExecutorInstrumentation.SCHEDULE_RUNNABLE_INTERCEPTOR + "_4"
+      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ScheduledThreadPoolExecutor].getMethod(
@@ -101,7 +103,7 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch schedule2" should "ok" in {
     val matcher = ThreadPoolExecutorInstrumentation.methodInterceptors(
-      ThreadPoolExecutorInstrumentation.SCHEDULE_RUNNABLE_INTERCEPTOR + "_5"
+      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ScheduledThreadPoolExecutor].getMethod(

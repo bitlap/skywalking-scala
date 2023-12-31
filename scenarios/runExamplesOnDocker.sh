@@ -17,7 +17,7 @@ if [[ $? -eq 0 ]]; then
   nohup scenarios/zio-scenario/target/universal/stage/bin/hello-world-client \
   -Dskywalking.collector.backend_service=localhost:11800 \
   -Dskywalking.agent.service_name=hello-client \
-  -J-javaagent:scenarios/skywalking-agent/skywalking-agent.jar > /dev/null 2>&1 &
+  -J-javaagent:scenarios/skywalking-agent/skywalking-agent.jar \ > /dev/null 2>&1 &
     
   nohup scenarios/zio-scenario/target/universal/stage/bin/zio-scenario \
   -Dskywalking.collector.backend_service=localhost:11800 \

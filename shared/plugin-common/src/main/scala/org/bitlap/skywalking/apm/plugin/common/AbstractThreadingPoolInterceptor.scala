@@ -3,7 +3,7 @@ package org.bitlap.skywalking.apm.plugin.common
 import java.lang.reflect.Method
 
 import org.apache.skywalking.apm.agent.core.context.*
-import org.apache.skywalking.apm.agent.core.logging.api.{ ILog, LogManager }
+import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 
 abstract class AbstractThreadingPoolInterceptor extends InstanceMethodsAroundInterceptor {

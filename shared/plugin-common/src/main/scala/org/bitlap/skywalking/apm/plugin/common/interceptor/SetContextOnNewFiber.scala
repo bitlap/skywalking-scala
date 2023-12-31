@@ -4,7 +4,6 @@ import java.lang.reflect.Method
 
 import org.apache.skywalking.apm.agent.core.context.ContextManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.common.AgentUtils
 
 final class SetContextOnNewFiber extends InstanceMethodsAroundInterceptor:
 
