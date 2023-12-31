@@ -60,10 +60,10 @@ The prefix should be added when passing command line parameters, such as: `-Dsky
 
 ## How to use?
 
-1. Clone code `git clone https://github.com/bitlap/skywalking-scala.git`
-2. Enter the source file directory `cd skywalking-scala`
-3. Build plugins: `sh scenarios/packageJars.sh` 
-4. Copy the `scenarios/skywalking-agent/plugins/*.jar` to skywalking plugins folder
+1. Clone code `git clone https://github.com/bitlap/skywalking-scala.git`.
+2. Enter the source file directory `cd skywalking-scala`.
+3. Build plugins: `sh scenarios/packageJars.sh`. 
+4. Copy the `scenarios/skywalking-agent/plugins/*.jar` to skywalking plugins folder. (Copy on demand)
 
 Please check the official documents for specific information
 [skywalking.apache.org/docs](https://skywalking.apache.org/docs/skywalking-java/v8.15.0/en/setup/service-agent/java-agent/readme/)
