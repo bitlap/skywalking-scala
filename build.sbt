@@ -180,7 +180,7 @@ lazy val `executors-plugin` = (project in file("plugins/executors-plugin"))
   )
   .dependsOn(`plugin-common`)
 
-lazy val `zio-grpc-scenario` = (project in file("scenarios/zio-grpc-scenario"))
+lazy val `zio-scenario` = (project in file("scenarios/zio-scenario"))
   .settings(
     scalaVersion := scala3Version,
     Compile / PB.targets := Seq(
@@ -194,6 +194,13 @@ lazy val `zio-grpc-scenario` = (project in file("scenarios/zio-grpc-scenario"))
       "dev.zio"              %% "zio"                  % zioVersion,
       "io.grpc"               % "grpc-netty"           % "1.50.1",
       "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
+    ) ++ Seq(
+      "dev.profunktor" %% "redis4cats-effects"  % "1.3.0",
+      "dev.profunktor" %% "redis4cats-log4cats" % "1.3.0",
+      "dev.profunktor" %% "redis4cats-streams"  % "1.3.0",
+      "org.typelevel"  %% "log4cats-slf4j"      % "2.5.0",
+      "dev.zio"        %% "zio-interop-cats"    % "23.0.03",
+      "ch.qos.logback"  % "logback-classic"     % "1.2.11"
     )
   )
   .enablePlugins(JavaAppPackaging, JavaServerAppPackaging)
