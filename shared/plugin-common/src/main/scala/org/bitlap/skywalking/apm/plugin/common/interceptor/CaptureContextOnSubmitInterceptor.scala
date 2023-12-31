@@ -8,10 +8,9 @@ import org.bitlap.skywalking.apm.plugin.common.*
 final class CaptureContextOnSubmitInterceptor extends AbstractThreadingPoolInterceptor:
 
   override def wrap(param: Any): Any = {
-    if param.isInstanceOf[RunnableWrapper] || param.isInstanceOf[CallableWrapper[?]] then {
-      return null
-    }
     param match
+      case _: RunnableWrapper | _: CallableWrapper[?] =>
+        return null
       case callable: Callable[?] =>
         return new CallableWrapper(callable, ContextManager.capture())
       case runnable: Runnable =>

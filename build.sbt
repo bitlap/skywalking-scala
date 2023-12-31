@@ -59,7 +59,10 @@ lazy val commonSettings =
       "com.github.sbt"        % "junit-interface" % junitInterfaceVersion % Test
     ),
     crossPaths         := false,
-    Test / testOptions := Seq(Tests.Argument(TestFrameworks.JUnit, "-a"))
+    Test / testOptions := Seq(Tests.Argument(TestFrameworks.JUnit, "-a")),
+    run / fork               := true,
+    Test / fork              := true,
+    Test / parallelExecution := true
   )
 
 lazy val `skywalking-scala` = (project in file("."))

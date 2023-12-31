@@ -43,11 +43,14 @@ object ThreadPoolExecutorInstrumentation:
     MultiClassNameMatch.byMultiClassMatch("java.util.concurrent.ScheduledThreadPoolExecutor"),
     // match subclasses of ThreadPoolExecutor
     HierarchyMatch.byHierarchyMatch("java.util.concurrent.ThreadPoolExecutor"),
-    // match subclasses of AbstractExecutorService exclude ThreadPoolExecutor
+    // match subclasses of AbstractExecutorService exclude ThreadPoolExecutor and ForkJoinPool
     LogicalMatchOperation.and(
       HierarchyMatch.byHierarchyMatch("java.util.concurrent.AbstractExecutorService"),
       LogicalMatchOperation.not(
-        PrefixMatch.nameStartsWith("java.util.concurrent.ThreadPoolExecutor", "java.util.concurrent.ForkJoinPool")
+        PrefixMatch.nameStartsWith("java.util.concurrent.ThreadPoolExecutor")
+      ),
+      LogicalMatchOperation.not(
+        PrefixMatch.nameStartsWith("java.util.concurrent.ForkJoinPool")
       )
     )
   )

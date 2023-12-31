@@ -28,7 +28,7 @@ service Greeter {
 
 service Welcomer {
   // Sends a welcome message
-  rpc Welcome (HelloRequest) returns (HelloReply) {}
+  rpc Welcome (HelloRequest) returns ( stream HelloReply) {}
 }
 
 // The request message containing the user's name.

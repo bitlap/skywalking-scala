@@ -7,13 +7,13 @@ import io.grpc.protobuf.services.ProtoReflectionService
 
 import zio.*
 
-import examples.helloworld.helloworld.ZioHelloworld.Greeter
+import examples.helloworld.helloworld.ZioHelloworld.*
 
 object HelloWorldServer extends ZIOAppDefault {
 
   private lazy val grpcApp = ServerLayer.fromServiceList(
     ServerBuilder.forPort(9000).addService(ProtoReflectionService.newInstance()),
-    ServiceList.addFromEnvironment[Greeter]
+    ServiceList.addFromEnvironment[Greeter].addFromEnvironment[Welcomer]
   )
 
   override val run: ZIO[Any, Any, Unit] = (for {
@@ -21,6 +21,7 @@ object HelloWorldServer extends ZIOAppDefault {
     _ <- ZIO.never
   } yield {}).provide(
     RedisService.live,
-    GreeterImpl.live
+    GreeterImpl.live,
+    WelcomerImpl.live,
   )
 }
