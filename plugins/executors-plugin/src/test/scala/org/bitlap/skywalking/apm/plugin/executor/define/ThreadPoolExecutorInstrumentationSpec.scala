@@ -22,7 +22,7 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
 
     val scheduledThreadPoolExecutor =
       matcher.isMatch(new TypeDescription.ForLoadedType(classOf[ScheduledThreadPoolExecutor]))
-    assert(scheduledThreadPoolExecutor)
+    assert(!scheduledThreadPoolExecutor)
 
     val defaultEventExecutor =
       matcher.isMatch(new TypeDescription.ForLoadedType(classOf[DefaultEventExecutor]))

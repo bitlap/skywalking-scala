@@ -51,7 +51,7 @@ final class FiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
 
     ContextManager.getRuntimeContext.put(SpanSwitch, !matchRegex)
 
-    if location != null && location != "" && !matchRegex then {
+    if location != null && location.nonEmpty && !matchRegex then {
       val currentSpan = ContextManager.createLocalSpan(
         "ZIO/" + Thread.currentThread().getName
       )

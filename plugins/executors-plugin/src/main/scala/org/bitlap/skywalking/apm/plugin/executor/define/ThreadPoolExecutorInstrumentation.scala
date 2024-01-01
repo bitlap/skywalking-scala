@@ -38,22 +38,19 @@ end ThreadPoolExecutorInstrumentation
 
 object ThreadPoolExecutorInstrumentation:
 
-  final val ENHANCE_CLASS = LogicalMatchOperation.or(
-    // match ScheduledThreadPoolExecutor
-    MultiClassNameMatch.byMultiClassMatch("java.util.concurrent.ScheduledThreadPoolExecutor"),
-    // match subclasses of ThreadPoolExecutor
-    HierarchyMatch.byHierarchyMatch("java.util.concurrent.ThreadPoolExecutor"),
-    // match subclasses of AbstractExecutorService exclude ThreadPoolExecutor and ForkJoinPool
+  final val ENHANCE_CLASS =
+    // match subclasses of Executor exclude java.util.concurrent.*
     LogicalMatchOperation.and(
-      HierarchyMatch.byHierarchyMatch("java.util.concurrent.AbstractExecutorService"),
-      LogicalMatchOperation.not(
-        PrefixMatch.nameStartsWith("java.util.concurrent.ThreadPoolExecutor")
+      LogicalMatchOperation.or(
+        HierarchyMatch.byHierarchyMatch("java.util.concurrent.AbstractExecutorService")
       ),
       LogicalMatchOperation.not(
-        PrefixMatch.nameStartsWith("java.util.concurrent.ForkJoinPool")
+        RegexMatch.byRegexMatch("javax.*")
+      ),
+      LogicalMatchOperation.not(
+        RegexMatch.byRegexMatch("java.util.concurrent.*")
       )
     )
-  )
 
   final val CAPTURE_ON_SUBMIT_INTERCEPTOR: String = classOf[CaptureContextOnSubmitInterceptor].getTypeName
 
@@ -80,22 +77,3 @@ object ThreadPoolExecutorInstrumentation:
             named("schedule").and(takesArguments(3).and(takesArgument(0, classOf[Callable[?]])))
           )
     )
-
-//    SUBMIT_RUNNABLE_INTERCEPTOR + "_0" -> named("submit")
-//      .and(takesArguments(1).and(takesArgument(0, classOf[Runnable])))
-//  ,
-//  SUBMIT_RUNNABLE_INTERCEPTOR + "_1" -> named("submit")
-//    .and(takesArguments(2).and(takesArgument(0, classOf[Runnable])))
-//  ,
-//  SUBMIT_CALLABLE_INTERCEPTOR + "_2" -> named("submit")
-//    .and(takesArguments(1).and(takesArgument(0, classOf[Callable[?]])))
-//  ,
-//  EXECUTE_RUNNABLE_INTERCEPTOR + "_3" -> named("execute").and(takesArguments(1))
-//  ,
-//  SCHEDULE_RUNNABLE_INTERCEPTOR + "_4" -> named("schedule").and(
-//    takesArguments(3).and(takesArgument(0, classOf[Runnable]))
-//  )
-//  ,
-//  SCHEDULE_CALLABLE_INTERCEPTOR + "_5" -> named("schedule").and(
-//    takesArguments(3).and(takesArgument(0, classOf[Callable[?]]))
-//  )
