@@ -12,15 +12,12 @@ import io.grpc.ClientCall.Listener
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
-import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
-import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.AgentUtils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.listener.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.*
 
 final class TracingClientCall[Req, Resp](
   peer: Option[String],

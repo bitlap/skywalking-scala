@@ -8,8 +8,6 @@ import zio.stream.ZStream
 import examples.helloworld.helloworld.{HelloReply, HelloRequest}
 import examples.helloworld.helloworld.ZioHelloworld.Welcomer
 
-import scala.concurrent.Future
-
 object WelcomerImpl {
 
   val live = ZLayer.fromZIO(

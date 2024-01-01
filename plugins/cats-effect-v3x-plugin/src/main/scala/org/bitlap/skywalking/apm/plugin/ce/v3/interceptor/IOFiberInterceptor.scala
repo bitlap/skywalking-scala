@@ -16,7 +16,8 @@ final class IOFiberInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    if objInst.getSkyWalkingDynamicField == null then return
+    if !AgentUtils.isValidCurrent(objInst) then return
+
     val currentSpan = ContextManager.createLocalSpan(
       "CE/" + Thread.currentThread().getName
     )

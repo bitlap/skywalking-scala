@@ -43,7 +43,7 @@ final class FiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    if objInst.getSkyWalkingDynamicField == null then return
+    if !AgentUtils.isValidCurrent(objInst) then return
     val fiberRuntime      = objInst.asInstanceOf[FiberRuntime[?, ?]]
     val location          = fiberRuntime.location.toString
     val mainMethodRegexes = ZioPluginConfig.Plugin.ZioV2.IGNORE_FIBER_REGEXES.split(",").toList.filter(_.nonEmpty)

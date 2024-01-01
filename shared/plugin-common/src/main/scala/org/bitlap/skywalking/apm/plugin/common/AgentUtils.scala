@@ -50,6 +50,14 @@ object AgentUtils:
         ContextManager.activeSpan.log(t)
     } finally AgentUtils.stopIfActive()
 
+  def isValidCurrent(enhanced: EnhancedInstance): Boolean =
+    val storedField = enhanced.getSkyWalkingDynamicField
+    if storedField != null && storedField.isInstanceOf[ContextSnapshot] then {
+      true
+    } else {
+      false
+    }
+
   def continuedSnapshot(enhanced: Object): Unit =
     enhanced match {
       case enhancedInstance: EnhancedInstance =>

@@ -2,21 +2,15 @@ package org.bitlap.skywalking.apm.plugin.caliban.v2
 
 import java.lang.reflect.Method
 
-import scala.util.*
-
 import caliban.*
 import caliban.execution.ExecutionRequest
-import caliban.parsing.adt.Document
 import caliban.wrappers.Wrapper.*
 
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
-import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
-import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.caliban.v2.TracingCaliban
 import org.bitlap.skywalking.apm.plugin.common.*
 
 final class CalibanExecutorInterceptor extends InstanceMethodsAroundInterceptor:

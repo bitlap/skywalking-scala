@@ -1,9 +1,5 @@
 package org.bitlap.skywalking.apm.plugin.ziogrpc.common
 
-import io.grpc.Context
-
-import org.apache.skywalking.apm.agent.core.context.ContextSnapshot
-import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.network.trace.component.*
 
 object Constants:

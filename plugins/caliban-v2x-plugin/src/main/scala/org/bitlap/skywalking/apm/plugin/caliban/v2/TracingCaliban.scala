@@ -4,7 +4,7 @@ import scala.jdk.CollectionConverters.*
 import scala.util.*
 
 import caliban.*
-import caliban.execution.{ ExecutionRequest, QueryExecution }
+import caliban.execution.ExecutionRequest
 import caliban.parsing.Parser
 import caliban.parsing.adt.{ Document, Selection }
 import caliban.wrappers.Wrapper.*
