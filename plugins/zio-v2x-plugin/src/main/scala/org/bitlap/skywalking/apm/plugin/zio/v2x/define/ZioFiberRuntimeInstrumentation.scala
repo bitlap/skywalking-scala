@@ -1,14 +1,10 @@
 package org.bitlap.skywalking.apm.plugin.zio.v2x.define
 
-import java.util
-import java.util.{ Collections, List as JList }
-
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.matcher.*
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.common.interceptor.*
@@ -19,11 +15,6 @@ final class ZioFiberRuntimeInstrumentation extends ClassInstanceMethodsEnhancePl
   import ZioFiberRuntimeInstrumentation.*
 
   override def enhanceClass(): ClassMatch = ENHANCE_CLASS
-
-  override protected def witnessMethods: JList[WitnessMethod] =
-    Collections.singletonList(
-      new WitnessMethod("zio.internal.FiberRunnable", ElementMatchers.named("run").and(takesArguments(1)))
-    )
 
   override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = Array(
     new ConstructorInterceptPoint:

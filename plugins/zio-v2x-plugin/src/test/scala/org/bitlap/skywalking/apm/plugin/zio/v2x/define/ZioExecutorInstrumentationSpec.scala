@@ -1,10 +1,8 @@
 package org.bitlap.skywalking.apm.plugin.zio.v2x.define
 
 import net.bytebuddy.description.method.MethodDescription
-import net.bytebuddy.matcher.ElementMatcher
 
 import zio.*
-import zio.internal.FiberRuntime
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

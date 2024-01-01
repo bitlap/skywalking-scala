@@ -17,7 +17,7 @@ abstract class AbstractThreadingPoolInterceptor extends InstanceMethodsAroundInt
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit = {
-    LOGGER.info(s"ThreadingPool name: ${objInst.getClass.getName}, method: ${method.getName}")
+    LOGGER.debug(s"Class name: ${objInst.getClass.getName}, method name: ${method.getName}")
     if !ContextManager.isActive then return
     if allArguments == null || allArguments.length < 1 then return
     val argument = allArguments(0)

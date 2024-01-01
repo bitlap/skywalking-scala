@@ -41,6 +41,7 @@ final case class WelcomerImpl(redis: RedisService, cacheRef: Ref[Cache[String, T
           _     <- printLine(s"Got stream request: $value").ignoreLogged
           size  <- cache.size
           _     <- printLine(s"Cache size: $size").ignoreLogged
+          _ <- ZIO.blocking(redis.use(_.get("key"))).ignoreLogged
         } yield HelloReply(s"Hello, ${request.name} - $i")
       )
 }
