@@ -17,7 +17,7 @@ abstract class AbstractThreadingPoolInterceptor extends InstanceMethodsAroundInt
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit = {
-    LOGGER.info(s"ThreadingPool name: ${objInst.getClass.getName}, method: ${method.getName}")
+    LOGGER.debug(s"ThreadingPool name: ${objInst.getClass.getName}, method: ${method.getName}")
     if !ContextManager.isActive then return
     if allArguments == null || allArguments.length < 1 then return
     val argument = allArguments(0)
@@ -25,11 +25,11 @@ abstract class AbstractThreadingPoolInterceptor extends InstanceMethodsAroundInt
     argument match
       case instance: EnhancedInstance if instance.getSkyWalkingDynamicField.isInstanceOf[ContextSnapshot] => return
       case _                                                                                              =>
-    val wrappedObject = wrap(argument)
+    val wrappedObject = wrap(argument, objInst.getClass.getName, method.getName)
     if wrappedObject != null then allArguments.update(0, wrappedObject)
   }
 
-  def wrap(param: Any): Any
+  def wrap(param: Any, className: String, methodName: String): Any
 
   override def afterMethod(
     objInst: EnhancedInstance,

@@ -1,13 +1,11 @@
-package org.bitlap.skywalking.apm.plugin.ce.v3
+package org.bitlap.skywalking.apm.plugin.ce.v3.interceptor
 
 import java.lang.reflect.Method
 
 import org.apache.skywalking.apm.agent.core.context.ContextManager
-import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.AgentUtils
-import org.bitlap.skywalking.apm.plugin.common.CustomTag
 
 final class IOFiberInterceptor extends InstanceMethodsAroundInterceptor:
 
@@ -20,7 +18,7 @@ final class IOFiberInterceptor extends InstanceMethodsAroundInterceptor:
   ): Unit =
     if objInst.getSkyWalkingDynamicField == null then return
     val currentSpan = ContextManager.createLocalSpan(
-      "CERunnableWrapper/" + Thread.currentThread().getName
+      "CE/" + Thread.currentThread().getName
     )
     currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
     AgentUtils.continuedSnapshot(objInst)

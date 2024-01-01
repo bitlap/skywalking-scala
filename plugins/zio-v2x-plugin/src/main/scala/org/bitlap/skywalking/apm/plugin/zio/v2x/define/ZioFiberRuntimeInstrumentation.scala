@@ -12,7 +12,7 @@ import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.common.interceptor.*
-import org.bitlap.skywalking.apm.plugin.zio.v2x.interceptor.ZioFiberRuntimeInterceptor
+import org.bitlap.skywalking.apm.plugin.zio.v2x.interceptor.FiberRuntimeInterceptor
 
 final class ZioFiberRuntimeInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
@@ -52,7 +52,7 @@ object ZioFiberRuntimeInstrumentation:
 
   final val CLASS_INTERCEPTOR: String = classOf[ConstructorInterceptor].getTypeName
 
-  final val RUN_METHOD_INTERCEPTOR: String = classOf[ZioFiberRuntimeInterceptor].getTypeName
+  final val RUN_METHOD_INTERCEPTOR: String = classOf[FiberRuntimeInterceptor].getTypeName
 
 //  final val EXECUTOR_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
 

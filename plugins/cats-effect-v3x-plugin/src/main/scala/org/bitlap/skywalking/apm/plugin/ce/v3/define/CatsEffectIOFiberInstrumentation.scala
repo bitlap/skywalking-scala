@@ -5,11 +5,10 @@ import net.bytebuddy.matcher.*
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.apache.skywalking.apm.agent.core.plugin.WitnessMethod
-import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.ce.v3.*
+import org.bitlap.skywalking.apm.plugin.ce.v3.interceptor.IOFiberInterceptor
 import org.bitlap.skywalking.apm.plugin.common.interceptor.*
 
 final class CatsEffectIOFiberInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:

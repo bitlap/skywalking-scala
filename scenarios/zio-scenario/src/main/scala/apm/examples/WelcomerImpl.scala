@@ -1,14 +1,14 @@
 package apm.examples
 
 import io.grpc.StatusException
-
 import zio.*
 import zio.Console.*
-import zio.cache.{ Cache, Lookup }
+import zio.cache.{Cache, Lookup}
 import zio.stream.ZStream
-
-import examples.helloworld.helloworld.{ HelloReply, HelloRequest }
+import examples.helloworld.helloworld.{HelloReply, HelloRequest}
 import examples.helloworld.helloworld.ZioHelloworld.Welcomer
+
+import scala.concurrent.Future
 
 object WelcomerImpl {
 
@@ -43,6 +43,6 @@ final case class WelcomerImpl(redis: RedisService, cacheRef: Ref[Cache[String, T
           _     <- printLine(s"Got stream request: $value").ignoreLogged
           size  <- cache.size
           _     <- printLine(s"Cache size: $size").ignoreLogged
-        } yield HelloReply(s"Hello, ${request.name}")
+        } yield HelloReply(s"Hello, ${request.name} - $i")
       )
 }

@@ -3,24 +3,20 @@ package org.bitlap.skywalking.apm.plugin.zio.v2x.interceptor
 import java.lang.reflect.Method
 import java.text.SimpleDateFormat
 
-import scala.collection.AbstractSeq
 import scala.util.*
 
 import zio.internal.FiberRuntime
 
 import org.apache.skywalking.apm.agent.core.context.*
-import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
-import org.apache.skywalking.apm.agent.core.logging.api.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
 import org.bitlap.skywalking.apm.plugin.zio.v2x.ZioPluginConfig
 
 import _root_.zio.*
-import _root_.zio.internal.FiberRuntime
 
-final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
+final class FiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
 
   private val SpanSwitch = "spanSwitch"
 
@@ -57,7 +53,7 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
 
     if location != null && location != "" && !matchRegex then {
       val currentSpan = ContextManager.createLocalSpan(
-        "ZIORunnableWrapper/" + Thread.currentThread().getName
+        "ZIO/" + Thread.currentThread().getName
       )
       currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
       setZioTags(currentSpan, fiberRuntime.id, objInst)
@@ -89,4 +85,4 @@ final class ZioFiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
 
   end handleMethodException
 
-end ZioFiberRuntimeInterceptor
+end FiberRuntimeInterceptor
