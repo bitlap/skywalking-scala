@@ -30,7 +30,7 @@ end CalibanExecutorInstrumentation
 
 object CalibanExecutorInstrumentation:
 
-  final val INTERCEPTOR_CLASS: String = classOf[CalibanExecutorInterceptor].getTypeName
+  final val INTERCEPTOR_CLASS: String = "org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanExecutorInterceptor"
   final val ENHANCE_CLASS             = NameMatch.byName("caliban.execution.Executor$")
 
   def getMethod: ElementMatcher[MethodDescription] = named("executeRequest")

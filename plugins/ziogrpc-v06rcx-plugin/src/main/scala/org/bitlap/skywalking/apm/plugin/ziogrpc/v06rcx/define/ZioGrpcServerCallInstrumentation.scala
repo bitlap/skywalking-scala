@@ -39,11 +39,14 @@ end ZioGrpcServerCallInstrumentation
 
 object ZioGrpcServerCallInstrumentation:
 
-  final val CLASS_INTERCEPTOR = classOf[ZioGrpcServerCallConstructorInterceptor].getTypeName
+  final val CLASS_INTERCEPTOR =
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerCallConstructorInterceptor"
 
-  final val CLOSE_METHOD_INTERCEPTOR = classOf[ZioGrpcServerCloseInterceptor].getTypeName
+  final val CLOSE_METHOD_INTERCEPTOR =
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerCloseInterceptor"
 
-  final val SEND_MESSAGE_METHOD_INTERCEPTOR = classOf[ZioGrpcServerSendMessageInterceptor].getTypeName
+  final val SEND_MESSAGE_METHOD_INTERCEPTOR =
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerSendMessageInterceptor"
 
   private final val ENHANCE_CLASS: String = "scalapb.zio_grpc.server.ZServerCall"
 

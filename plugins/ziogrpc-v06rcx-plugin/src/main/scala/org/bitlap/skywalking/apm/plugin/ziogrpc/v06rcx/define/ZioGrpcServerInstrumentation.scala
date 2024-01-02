@@ -5,7 +5,7 @@ import net.bytebuddy.matcher.ElementMatcher
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ArgumentTypeNameMatch.takesArgumentWithType
+import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ArgumentTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.*
@@ -33,10 +33,11 @@ end ZioGrpcServerInstrumentation
 
 object ZioGrpcServerInstrumentation:
 
-  private final val INTERCEPTOR_CLASS     = classOf[ZioGrpcServerInterceptor].getTypeName
+  private final val INTERCEPTOR_CLASS =
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerInterceptor"
   private final val ENHANCE_CLASS: String = "scalapb.zio_grpc.server.ZServerCallHandler"
 
   def getMethod: ElementMatcher[MethodDescription] =
-    named("startCall").and(takesArgumentWithType(1, "io.grpc.Metadata"))
+    named("startCall").and(ArgumentTypeNameMatch.takesArgumentWithType(1, "io.grpc.Metadata"))
 
 end ZioGrpcServerInstrumentation

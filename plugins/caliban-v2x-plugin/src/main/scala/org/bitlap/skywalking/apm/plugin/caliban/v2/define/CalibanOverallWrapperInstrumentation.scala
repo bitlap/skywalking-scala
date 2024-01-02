@@ -30,7 +30,7 @@ end CalibanOverallWrapperInstrumentation
 
 object CalibanOverallWrapperInstrumentation:
 
-  final val INTERCEPTOR_CLASS: String = classOf[CalibanOverallWrapperInterceptor].getTypeName
+  final val INTERCEPTOR_CLASS: String = "org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanOverallWrapperInterceptor"
   final val ENHANCE_CLASS             = NameMatch.byName("caliban.wrappers.ApolloTracing$")
 
   def getMethod: ElementMatcher[MethodDescription] = named("apolloTracing")

@@ -7,7 +7,6 @@ import net.bytebuddy.matcher.ElementMatchers.*
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanWrapperInterceptor
 
 final class CalibanWrapperInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
@@ -30,7 +29,7 @@ end CalibanWrapperInstrumentation
 
 object CalibanWrapperInstrumentation:
 
-  final val INTERCEPTOR_CLASS: String = classOf[CalibanWrapperInterceptor].getTypeName
+  final val INTERCEPTOR_CLASS: String = "org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanWrapperInterceptor"
   final val ENHANCE_CLASS             = NameMatch.byName("caliban.wrappers.Wrapper$")
 
   def getMethod: ElementMatcher[MethodDescription] = named("wrap")

@@ -11,7 +11,6 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.`match`.logical.LogicalMatchOperation
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.ClassInstanceMethodsEnhancePluginDefine
-import org.bitlap.skywalking.apm.plugin.common.interceptor.CaptureContextOnSubmitInterceptor
 
 class ThreadPoolExecutorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
@@ -27,45 +26,38 @@ class ThreadPoolExecutorInstrumentation extends ClassInstanceMethodsEnhancePlugi
         new InstanceMethodsInterceptPoint {
           override def getMethodsMatcher: ElementMatcher[MethodDescription] = kv._2
           override def getMethodsInterceptor: String                        = kv._1
-          override def isOverrideArgs: Boolean                              = true
+          override def isOverrideArgs: Boolean                              = false
         }
       )
       .toArray
 
   end getInstanceMethodsInterceptPoints
 
+  override def isBootstrapInstrumentation: Boolean = true
+
 end ThreadPoolExecutorInstrumentation
 
 object ThreadPoolExecutorInstrumentation:
 
   final val ENHANCE_CLASS =
-    // match subclasses of Executor exclude java.util.concurrent.*
-    LogicalMatchOperation.and(
-      LogicalMatchOperation.or(
-        HierarchyMatch.byHierarchyMatch("java.util.concurrent.AbstractExecutorService")
-      ),
-      LogicalMatchOperation.not(
-        RegexMatch.byRegexMatch("javax.*")
-      ),
-      LogicalMatchOperation.not(
-        RegexMatch.byRegexMatch("java.util.concurrent.*")
-      )
+    LogicalMatchOperation.or(
+      HierarchyMatch.byHierarchyMatch("java.util.concurrent.ThreadPoolExecutor"),
+      MultiClassNameMatch.byMultiClassMatch("java.util.concurrent.ThreadPoolExecutor")
     )
 
-  final val CAPTURE_ON_SUBMIT_INTERCEPTOR: String = classOf[CaptureContextOnSubmitInterceptor].getTypeName
+  final val CAPTURE_ON_SUBMIT_INTERCEPTOR: String =
+    "org.bitlap.skywalking.apm.plugin.common.interceptor.CaptureContextOnSubmitInterceptor"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(
       CAPTURE_ON_SUBMIT_INTERCEPTOR ->
         named("submit")
+          .and(takesArguments(1).and(takesArgument(0, classOf[Runnable])))
           .or(
-            takesArguments(1).and(takesArgument(0, classOf[Runnable]))
+            named("submit").and(takesArguments(2).and(takesArgument(0, classOf[Runnable])))
           )
           .or(
-            takesArguments(2).and(takesArgument(0, classOf[Runnable]))
-          )
-          .or(
-            takesArguments(1).and(takesArgument(0, classOf[Callable[?]]))
+            named("submit").and(takesArguments(1).and(takesArgument(0, classOf[Callable[?]])))
           )
           .or(
             named("execute").and(takesArguments(1).and(takesArgument(0, classOf[Runnable])))

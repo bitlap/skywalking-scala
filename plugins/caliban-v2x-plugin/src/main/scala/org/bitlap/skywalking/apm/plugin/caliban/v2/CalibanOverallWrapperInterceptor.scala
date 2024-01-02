@@ -13,7 +13,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 
 final class CalibanOverallWrapperInterceptor extends InstanceMethodsAroundInterceptor:
 
-  private val LOGGER = LogManager.getLogger(classOf[CalibanWrapperInterceptor])
+  private val LOGGER = LogManager.getLogger(classOf[CalibanOverallWrapperInterceptor])
 
   override def beforeMethod(
     objInst: EnhancedInstance,

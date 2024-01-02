@@ -1,11 +1,17 @@
 package apm.examples
 
+import java.util.concurrent.Executors
+
+import scala.concurrent.{ Await, Future }
+
 import io.grpc.StatusException
+
 import zio.*
 import zio.Console.*
-import zio.cache.{Cache, Lookup}
+import zio.cache.{ Cache, Lookup }
 import zio.stream.ZStream
-import examples.helloworld.helloworld.{HelloReply, HelloRequest}
+
+import examples.helloworld.helloworld.{ HelloReply, HelloRequest }
 import examples.helloworld.helloworld.ZioHelloworld.Welcomer
 
 object WelcomerImpl {
@@ -30,18 +36,25 @@ final case class WelcomerImpl(redis: RedisService, cacheRef: Ref[Cache[String, T
   def welcome(
     request: HelloRequest
   ): ZStream[Any, StatusException, HelloReply] =
+    import scala.concurrent.ExecutionContext.Implicits.global
+    val es = Executors.newCachedThreadPool()
+    es.execute { () =>
+      Unsafe.unsafe { implicit runtime =>
+        zio.Runtime.default.unsafe.run(redis.use(_.hGetAll(request.name)).ignoreLogged).getOrThrowFiberFailure()
+      }
+    }
     ZStream
-      .fromChunk(Chunk(0 to 10*))
+      .fromChunk(Chunk(0 to 2*))
       .mapZIO(i =>
         for {
           // TODO cats effect cross thread by executor
-//        _     <- redis.use(_.set(request.name, request.name)).ignoreLogged
+          _     <- redis.use(_.set(request.name, request.name)).ignoreLogged
           cache <- cacheRef.get
           value <- cache.get(request.name).orDie
           _     <- printLine(s"Got stream request: $value").ignoreLogged
           size  <- cache.size
           _     <- printLine(s"Cache size: $size").ignoreLogged
-          _ <- redis.use(_.get("key")).ignoreLogged
+          _     <- ZIO.blocking(redis.use(_.get(request.name))).ignoreLogged
         } yield HelloReply(s"Hello, ${request.name} - $i")
       )
 }

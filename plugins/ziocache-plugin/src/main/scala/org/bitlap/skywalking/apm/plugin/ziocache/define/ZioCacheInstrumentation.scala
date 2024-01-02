@@ -8,7 +8,6 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.`match`.logical.LogicalMatchOperation
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.ziocache.interceptor.ZioCacheInterceptor
 
 final class ZioCacheInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
@@ -37,7 +36,8 @@ object ZioCacheInstrumentation:
 
   final val ENHANCE_CLASS = HierarchyMatch.byHierarchyMatch("zio.cache.Cache")
 
-  final val CACHE_METHOD_INTERCEPTOR: String = classOf[ZioCacheInterceptor].getTypeName
+  final val CACHE_METHOD_INTERCEPTOR: String =
+    "org.bitlap.skywalking.apm.plugin.ziocache.interceptor.ZioCacheInterceptor"
 
   // ERROR 2023-12-31 18:08:51.022 ZScheduler-Worker-8 SkyWalkingAgent : Enhance class zio.cache.Cache$$anon$1 error.
   // java.lang.IllegalArgumentException: Cannot resolve In from class zio.cache.Cache$$anon$1

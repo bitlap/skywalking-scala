@@ -8,7 +8,6 @@ import org.apache.skywalking.apm.agent.core.plugin.`match`.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.ce.v3.*
-import org.bitlap.skywalking.apm.plugin.ce.v3.interceptor.IOFiberInterceptor
 import org.bitlap.skywalking.apm.plugin.common.interceptor.*
 
 final class CatsEffectIOFiberInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
@@ -42,9 +41,9 @@ object CatsEffectIOFiberInstrumentation:
 
   final val ENHANCE_CLASS = NameMatch.byName("cats.effect.IOFiber")
 
-  final val CLASS_INTERCEPTOR: String = classOf[ConstructorInterceptor].getTypeName
+  final val CLASS_INTERCEPTOR: String = "org.bitlap.skywalking.apm.plugin.common.interceptor.ConstructorInterceptor"
 
-  final val RUN_METHOD_INTERCEPTOR: String = classOf[IOFiberInterceptor].getTypeName
+  final val RUN_METHOD_INTERCEPTOR: String = "org.bitlap.skywalking.apm.plugin.ce.v3.interceptor.IOFiberInterceptor"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
     RUN_METHOD_INTERCEPTOR -> named("run").and(takesArguments(0))

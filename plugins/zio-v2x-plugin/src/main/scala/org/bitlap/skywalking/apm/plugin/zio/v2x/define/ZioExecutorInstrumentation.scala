@@ -40,7 +40,8 @@ object ZioExecutorInstrumentation:
     MultiClassNameMatch.byMultiClassMatch("zio.Executor")
   )
 
-  final val SUBMIT_METHOD_INTERCEPTOR: String = classOf[CaptureContextOnSubmitInterceptor].getTypeName
+  final val SUBMIT_METHOD_INTERCEPTOR: String =
+    "org.bitlap.skywalking.apm.plugin.common.interceptor.CaptureContextOnSubmitInterceptor"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(

@@ -9,7 +9,7 @@ lazy val junitVersion          = "4.12"
 lazy val mockitoVersion        = "5.0.0"
 lazy val junitInterfaceVersion = "0.12"
 
-lazy val skywalkingVersion = "8.16.0"
+lazy val skywalkingVersion = "9.1.0"
 
 lazy val calibanVersion     = "2.0.1"
 lazy val zioGrpcVersion     = "0.6.0-rc5"
@@ -60,7 +60,7 @@ lazy val commonSettings =
     ),
     crossPaths               := false,
     Test / testOptions       := Seq(Tests.Argument(TestFrameworks.JUnit, "-a")),
-    run / fork               := true,
+    run / fork               := false,
     Test / fork              := true,
     Test / parallelExecution := true
   )

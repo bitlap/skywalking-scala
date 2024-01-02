@@ -11,22 +11,22 @@ SkyWalking Extension Plugins for Scala 3
 
 - Java 11
 - Scala 3.3.0
-- SkyWalking 8.16.0
+- SkyWalking 9.1.0
 
 ## Introduction
 
 [SkyWalking Scala](https://github.com/bitlap/skywalking-scala) is a SkyWalking Extension (Agent) Plugins for Scala 3.
 
 
-| plugin                 | library                                        | Enhance Targets                                                                                                     | maybe support version   | tested version |
-|------------------------|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-------------------------|----------------|
-| cats-effect-v3x-plugin | cats-effect                                    | `cats.effect.IOFiber`                                                                                               | 3.4.0-RC1 ~ 3.5.x       | 3.4.1          |
-| zio-v2x-plugin         | zio                                            | `zio.internal.FiberRuntime`                                                                                         | 2.0.3 ~ 2.0.x           | 2.0.9,2.0.13   |
-| ziogrpc-v06rcx-plugin  | zio-grpc                                       | 1. Client: `scalapb.zio_grpc.ZChannel`<br/> 2. Server: `scalapb.zio_grpc.ServerImpl`, `scalapb.zio_grpc.ServerImpl` | 0.6.0-test6 ~ 0.6.0-RC5 | 0.6.0-RC5      |
-| ziohttp-v2x-plugin     | zio-http                                       | `zhttp.http.Http$PartialCollectHttp$`                                                                               | 2.0.0-RC2 ~ 2.0.0-RC11  | 2.0.0-RC10     |
-| caliban-v2x-plugin     | caliban                                        | `caliban.GraphQLInterpreter`                                                                                        | 2.0.0 ~ 2.0.2           | 2.0.1          |
-| executors-plugin       | `java.util.concurrent.AbstractExecutorService` | Except `java.util.concurrent.*` and `javax.*` due to plugin restrictions                                            | -                       | -              |
-| ziocache-plugin        | zio-cache                                      | `zio.cache.Cache`                                                                                                   | Not Available           | Not Available  |
+| plugin                 | library                                                                                               | Enhance Targets                                                                                                     | maybe support version   | tested version |
+|------------------------|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-------------------------|----------------|
+| cats-effect-v3x-plugin | cats-effect                                                                                           | `cats.effect.IOFiber`                                                                                               | 3.4.0-RC1 ~ 3.5.x       | 3.4.1          |
+| zio-v2x-plugin         | zio                                                                                                   | `zio.internal.FiberRuntime`                                                                                         | 2.0.3 ~ 2.0.x           | 2.0.9,2.0.13   |
+| ziogrpc-v06rcx-plugin  | zio-grpc                                                                                              | 1. Client: `scalapb.zio_grpc.ZChannel`<br/> 2. Server: `scalapb.zio_grpc.ServerImpl`, `scalapb.zio_grpc.ServerImpl` | 0.6.0-test6 ~ 0.6.0-RC5 | 0.6.0-RC5      |
+| ziohttp-v2x-plugin     | zio-http                                                                                              | `zhttp.http.Http$PartialCollectHttp$`                                                                               | 2.0.0-RC2 ~ 2.0.0-RC11  | 2.0.0-RC10     |
+| caliban-v2x-plugin     | caliban                                                                                               | `caliban.GraphQLInterpreter`                                                                                        | 2.0.0 ~ 2.0.2           | 2.0.1          |
+| executors-plugin       | `java.util.concurrent.ThreadPoolExecutor` and Subclasses of `java.util.concurrent.ThreadPoolExecutor` | -                                                                                                                   | -                       | -              |
+| ziocache-plugin        | zio-cache                                                                                             | `zio.cache.Cache`                                                                                                   | Not Available           | Not Available  |
 
 > Other small versions of the library supported by this plugin may also work, but they have not been tested.
 

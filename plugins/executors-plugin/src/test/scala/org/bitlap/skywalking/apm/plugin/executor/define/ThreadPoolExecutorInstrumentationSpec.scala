@@ -15,22 +15,14 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
   "testClassMatch ThreadPoolExecutor" should "ok" in {
     val matcher            = ThreadPoolExecutorInstrumentation.ENHANCE_CLASS
     val threadPoolExecutor = matcher.isMatch(new TypeDescription.ForLoadedType(classOf[ThreadPoolExecutor]))
-    assert(!threadPoolExecutor)
+    assert(threadPoolExecutor)
 
     val forkJoinPool = matcher.isMatch(new TypeDescription.ForLoadedType(classOf[ForkJoinPool]))
     assert(!forkJoinPool)
 
     val scheduledThreadPoolExecutor =
       matcher.isMatch(new TypeDescription.ForLoadedType(classOf[ScheduledThreadPoolExecutor]))
-    assert(!scheduledThreadPoolExecutor)
-
-    val defaultEventExecutor =
-      matcher.isMatch(new TypeDescription.ForLoadedType(classOf[DefaultEventExecutor]))
-    assert(defaultEventExecutor)
-
-    val singleThreadEventLoop =
-      matcher.isMatch(new TypeDescription.ForLoadedType(classOf[SingleThreadEventLoop]))
-    assert(singleThreadEventLoop)
+    assert(scheduledThreadPoolExecutor)
   }
 
   "testMethodMatch submit1" should "ok" in {
