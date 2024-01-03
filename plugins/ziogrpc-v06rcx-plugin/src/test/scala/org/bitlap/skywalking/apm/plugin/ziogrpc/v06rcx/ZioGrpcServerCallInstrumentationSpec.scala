@@ -4,11 +4,8 @@ import scalapb.zio_grpc.*
 import scalapb.zio_grpc.server.*
 
 import net.bytebuddy.description.method.MethodDescription
-import net.bytebuddy.matcher.ElementMatcher
 
 import io.grpc.*
-
-import zio.Trace
 
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.define.ZioGrpcServerCallInstrumentation
 import org.scalatest.flatspec.AnyFlatSpec

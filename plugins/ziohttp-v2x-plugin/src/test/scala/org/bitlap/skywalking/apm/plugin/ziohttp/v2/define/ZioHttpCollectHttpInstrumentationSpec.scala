@@ -1,9 +1,6 @@
 package org.bitlap.skywalking.apm.plugin.ziohttp.v2.define
 
 import net.bytebuddy.description.method.MethodDescription
-import net.bytebuddy.matcher.ElementMatcher
-
-import zio.*
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

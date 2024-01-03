@@ -5,7 +5,6 @@ import net.bytebuddy.matcher.*
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.apache.skywalking.apm.agent.core.plugin.`match`.logical.LogicalMatchOperation
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 
@@ -23,7 +22,7 @@ final class ZioCacheInstrumentation extends ClassInstanceMethodsEnhancePluginDef
         new InstanceMethodsInterceptPoint {
           override def getMethodsMatcher: ElementMatcher[MethodDescription] = kv._2
           override def getMethodsInterceptor: String                        = kv._1
-          override def isOverrideArgs: Boolean                              = true
+          override def isOverrideArgs: Boolean                              = false
         }
       )
       .toArray
