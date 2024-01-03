@@ -1,9 +1,12 @@
 SkyWalking Extension Plugins for Scala 3
 ---
 
+[![Project stage][Badge-Stage]][Badge-Stage-Page] 
 ![CI][Badge-CI]
 
 [Badge-CI]: https://github.com/hjfruit/skywalking-scala/actions/workflows/ScalaCI.yml/badge.svg
+[Badge-Stage]: https://img.shields.io/badge/Project%20Stage-Development-yellowgreen.svg
+[Badge-Stage-Page]: https://github.com/bitlap/bitlap/wiki/Project-Stages
 
 > Still in the experimental stage, there may be some minor issues related to work steal, especially for ZIO and Cats-Effect.
 
