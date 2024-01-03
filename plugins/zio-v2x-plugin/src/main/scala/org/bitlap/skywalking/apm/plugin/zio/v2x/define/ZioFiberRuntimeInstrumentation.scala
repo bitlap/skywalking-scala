@@ -45,10 +45,7 @@ object ZioFiberRuntimeInstrumentation:
   final val RUN_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.zio.v2x.interceptor.FiberRuntimeInterceptor"
 
-//  final val EXECUTOR_INTERCEPTOR: String = classOf[SetContextOnNewFiber].getTypeName
-
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(
-//      EXECUTOR_INTERCEPTOR   -> named("drainQueueLaterOnExecutor").and(takesArguments(1)),
       RUN_METHOD_INTERCEPTOR -> named("run")
     )
