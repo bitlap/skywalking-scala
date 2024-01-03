@@ -51,24 +51,26 @@ These plugins can be used together with the following plugins, tested by me:
 - `apm-pulsar-common-*.jar`
 - and so on ...
 
->  `apm-ziogrpc-v06rcx-plugin-*.jar` should never be used together with `apm-grpc-1.x-plugin-*.jar`.
+NOTE: `apm-ziogrpc-v06rcx-plugin-*.jar` should never be used together with `apm-grpc-1.x-plugin-*.jar`.
 
 ## How to start
 
-1. Clone code `git clone https://github.com/bitlap/skywalking-scala.git`.
-2. Enter the source file directory `cd skywalking-scala`.
+1. Clone code: `git clone https://github.com/bitlap/skywalking-scala.git`.
+2. Enter the source file directory: `cd skywalking-scala`.
 3. Build plugins: `sh scenarios/packageJars.sh`. 
 4. Copy the `scenarios/skywalking-agent/plugins/*.jar` to skywalking plugins folder. (Copy on demand)
 
 Please check the official documents for specific information
 [skywalking.apache.org/docs](https://skywalking.apache.org/docs/skywalking-java/v8.15.0/en/setup/service-agent/java-agent/readme/)
 
+To use the plugin quickly, you can download it from [Release Assets](https://github.com/bitlap/skywalking-scala/releases)
+
 ## Scenarios
 
 > It needs docker & docker-compose
 
-1. `sh scenarios/runExamplesOnDocker.sh`
-2. `curl http://localhost:8090/hello`
+1. Run two services `hello-server` and `hello-client`: `sh scenarios/runExamplesOnDocker.sh`
+2. Send a request: `curl http://localhost:8090/hello`
 3. Open in browser: `http://localhost:8080/general`
 
 ##  More information
