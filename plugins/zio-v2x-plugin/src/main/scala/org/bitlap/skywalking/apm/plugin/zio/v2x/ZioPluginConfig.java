@@ -6,7 +6,7 @@ public class ZioPluginConfig {
     public static class Plugin {
         @PluginConfig(root = ZioPluginConfig.class)
         public static class ZioV2 {
-            public static String IGNORE_FIBER_REGEXES = ".*Application\\.run.*,.*ZHttpServer\\.start.*";
+            public static String IGNORE_FIBER_REGEXES = "";
 
         }
     }

@@ -51,16 +51,16 @@ These plugins can be used together with the following plugins, tested by me:
 >  `apm-ziogrpc-v06rcx-plugin-*.jar` should never be used together with `apm-grpc-1.x-plugin-*.jar`.
 
 ## Available Configurations
-| key                                             | description                                                                                                                                                                                    |
-|-------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `plugin.ziov2.ignore_fiber_regexes`             | Ignore ZIO Fibers by `FiberId.location` which match this regex, i.e. no span will be created, default is `.*Application\.run.*,.*ZHttpServer\.start.*`. **Allow commas to separate multiple**. |
-| `plugin.calibanv2.url_prefix`                   | Add a custom prefix to the graphql operation, default is `Caliban/GraphQL/`.                                                                                                                   |
-| `plugin.calibanv2.ignore_url_prefixes`          | Ignore operation names starting with this prefix, i.e. no span will be created. **Allow commas to separate multiple**.                                                                         |
-| `plugin.calibanv2.collect_variables`            | Collect request variables.                                                                                                                                                                     |
-| `plugin.calibanv2.variables_length_threshold`   | How many characters to keep and send to the OAP backend.                                                                                                                                       |
-| `plugin.ziohttpv2.ignore_url_prefixes`          | Ignore request paths starting with this prefix, i.e. no span will be created. **Allow commas to separate multiple**.                                                                           |
-| `plugin.ziohttpv2.collect_http_params`          | Collect http query params.                                                                                                                                                                     |
-| `plugin.ziohttpv2.http_params_length_threshold` | How many characters to keep and send to the OAP backend.                                                                                                                                       |
+| key                                             | description                                                                                                                                            |
+|-------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `plugin.ziov2.ignore_fiber_regexes`             | Ignore ZIO Fibers by `FiberId.location` which match this regex, i.e. no span will be created, default is empty. **Allow commas to separate multiple**. |
+| `plugin.calibanv2.url_prefix`                   | Add a custom prefix to the graphql operation, default is `Caliban/GraphQL/`.                                                                           |
+| `plugin.calibanv2.ignore_url_prefixes`          | Ignore operation names starting with this prefix, i.e. no span will be created. **Allow commas to separate multiple**.                                 |
+| `plugin.calibanv2.collect_variables`            | Collect request variables.                                                                                                                             |
+| `plugin.calibanv2.variables_length_threshold`   | How many characters to keep and send to the OAP backend.                                                                                               |
+| `plugin.ziohttpv2.ignore_url_prefixes`          | Ignore request paths starting with this prefix, i.e. no span will be created. **Allow commas to separate multiple**.                                   |
+| `plugin.ziohttpv2.collect_http_params`          | Collect http query params.                                                                                                                             |
+| `plugin.ziohttpv2.http_params_length_threshold` | How many characters to keep and send to the OAP backend.                                                                                               |
 
 The prefix should be added when passing command line parameters, such as: `-Dskywalking.plugin.calibanv2.url_prefix=GQL/`
 
