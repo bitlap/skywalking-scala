@@ -14,7 +14,7 @@ final class SetContextOnNewFiber extends InstanceMethodsAroundInterceptor:
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    if ContextManager.isActive then {
+    if ContextManager.isActive && objInst.getSkyWalkingDynamicField == null then {
       objInst.setSkyWalkingDynamicField(ContextManager.capture())
     }
 

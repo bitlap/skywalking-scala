@@ -30,7 +30,7 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
       ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
-      classOf[AbstractExecutorService].getMethod(
+      classOf[ThreadPoolExecutor].getMethod(
         "submit",
         classOf[Runnable]
       )
@@ -43,7 +43,7 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
       ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
-      classOf[AbstractExecutorService].getMethod(
+      classOf[ThreadPoolExecutor].getMethod(
         "submit",
         classOf[Runnable],
         classOf[Object]
@@ -65,22 +65,9 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
     matcher.matches(method) shouldEqual true
   }
 
-  "testMethodMatch execute" should "ok" in {
-    val matcher = ThreadPoolExecutorInstrumentation.methodInterceptors(
-      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
-    )
-    val method = new MethodDescription.ForLoadedMethod(
-      classOf[AbstractExecutorService].getMethod(
-        "execute",
-        classOf[Runnable]
-      )
-    )
-    matcher.matches(method) shouldEqual true
-  }
-
   "testMethodMatch schedule1" should "ok" in {
     val matcher = ThreadPoolExecutorInstrumentation.methodInterceptors(
-      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
+      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SCHEDULE_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ScheduledThreadPoolExecutor].getMethod(
@@ -95,7 +82,7 @@ class ThreadPoolExecutorInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch schedule2" should "ok" in {
     val matcher = ThreadPoolExecutorInstrumentation.methodInterceptors(
-      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SUBMIT_INTERCEPTOR
+      ThreadPoolExecutorInstrumentation.CAPTURE_ON_SCHEDULE_INTERCEPTOR
     )
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ScheduledThreadPoolExecutor].getMethod(

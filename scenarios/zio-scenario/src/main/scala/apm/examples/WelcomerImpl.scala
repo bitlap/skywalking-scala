@@ -36,13 +36,7 @@ final case class WelcomerImpl(redis: RedisService, cacheRef: Ref[Cache[String, T
   def welcome(
     request: HelloRequest
   ): ZStream[Any, StatusException, HelloReply] =
-    import scala.concurrent.ExecutionContext.Implicits.global
     val es = Executors.newCachedThreadPool()
-    es.execute { () =>
-      Unsafe.unsafe { implicit runtime =>
-        zio.Runtime.default.unsafe.run(redis.use(_.hGetAll(request.name)).ignoreLogged).getOrThrowFiberFailure()
-      }
-    }
     ZStream
       .fromChunk(Chunk(0 to 2*))
       .mapZIO(i =>
@@ -54,6 +48,13 @@ final case class WelcomerImpl(redis: RedisService, cacheRef: Ref[Cache[String, T
           _     <- printLine(s"Got stream request: $value").ignoreLogged
           size  <- cache.size
           _     <- printLine(s"Cache size: $size").ignoreLogged
+          _ <- ZIO.attempt {
+            es.execute { () =>
+              Unsafe.unsafe { implicit runtime =>
+                zio.Runtime.default.unsafe.run(redis.use(_.del(request.name)).ignoreLogged).getOrThrowFiberFailure()
+              }
+            }
+          }.ignoreLogged
           _     <- ZIO.blocking(redis.use(_.get(request.name))).ignoreLogged
         } yield HelloReply(s"Hello, ${request.name} - $i")
       )

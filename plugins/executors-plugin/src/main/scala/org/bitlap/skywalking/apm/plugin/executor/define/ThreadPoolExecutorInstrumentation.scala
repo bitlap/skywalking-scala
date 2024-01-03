@@ -4,7 +4,7 @@ import java.util.Collections
 import java.util.concurrent.*
 
 import net.bytebuddy.description.method.MethodDescription
-import net.bytebuddy.matcher.ElementMatcher
+import net.bytebuddy.matcher.{ ElementMatcher, ElementMatchers }
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
@@ -26,7 +26,7 @@ class ThreadPoolExecutorInstrumentation extends ClassInstanceMethodsEnhancePlugi
         new InstanceMethodsInterceptPoint {
           override def getMethodsMatcher: ElementMatcher[MethodDescription] = kv._2
           override def getMethodsInterceptor: String                        = kv._1
-          override def isOverrideArgs: Boolean                              = false
+          override def isOverrideArgs: Boolean                              = true
         }
       )
       .toArray
@@ -45,27 +45,18 @@ object ThreadPoolExecutorInstrumentation:
       MultiClassNameMatch.byMultiClassMatch("java.util.concurrent.ThreadPoolExecutor")
     )
 
+  final val CAPTURE_ON_SCHEDULE_INTERCEPTOR: String =
+    "org.bitlap.skywalking.apm.plugin.common.interceptor.CaptureContextOnScheduleInterceptor"
+
   final val CAPTURE_ON_SUBMIT_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.common.interceptor.CaptureContextOnSubmitInterceptor"
 
+  final val CAPTURE_ON_EXECUTE_INTERCEPTOR: String =
+    "org.bitlap.skywalking.apm.plugin.common.interceptor.CaptureContextOnExecuteInterceptor"
+
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(
-      CAPTURE_ON_SUBMIT_INTERCEPTOR ->
-        named("submit")
-          .and(takesArguments(1).and(takesArgument(0, classOf[Runnable])))
-          .or(
-            named("submit").and(takesArguments(2).and(takesArgument(0, classOf[Runnable])))
-          )
-          .or(
-            named("submit").and(takesArguments(1).and(takesArgument(0, classOf[Callable[?]])))
-          )
-          .or(
-            named("execute").and(takesArguments(1).and(takesArgument(0, classOf[Runnable])))
-          )
-          .or(
-            named("schedule").and(takesArguments(3).and(takesArgument(0, classOf[Runnable])))
-          )
-          .or(
-            named("schedule").and(takesArguments(3).and(takesArgument(0, classOf[Callable[?]])))
-          )
+      CAPTURE_ON_SUBMIT_INTERCEPTOR   -> ElementMatchers.named("submit"),
+      CAPTURE_ON_EXECUTE_INTERCEPTOR  -> ElementMatchers.named("execute"),
+      CAPTURE_ON_SCHEDULE_INTERCEPTOR -> ElementMatchers.named("schedule")
     )

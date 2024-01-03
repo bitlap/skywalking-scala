@@ -57,7 +57,7 @@ final class FiberRuntimeInterceptor extends InstanceMethodsAroundInterceptor:
       )
       currentSpan.setComponent(ComponentsDefine.JDK_THREADING)
       setZioTags(currentSpan, fiberRuntime.id, objInst)
-      AgentUtils.continuedSnapshot(objInst)
+      AgentUtils.continuedSnapshot_(objInst.getSkyWalkingDynamicField.asInstanceOf[ContextSnapshot])
     }
 
   override def afterMethod(

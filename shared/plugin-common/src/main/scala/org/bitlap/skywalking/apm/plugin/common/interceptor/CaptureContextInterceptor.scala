@@ -8,11 +8,18 @@ import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.InstanceMethodsAroundInterceptor
+import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
 
-final class CaptureContextOnSubmitInterceptor extends InstanceMethodsAroundInterceptor:
+final class CaptureContextOnScheduleInterceptor extends CaptureContextInterceptor
 
-  private lazy val LOGGER = LogManager.getLogger(classOf[CaptureContextOnSubmitInterceptor])
+final class CaptureContextOnSubmitInterceptor extends CaptureContextInterceptor
+
+final class CaptureContextOnExecuteInterceptor extends CaptureContextInterceptor
+
+open class CaptureContextInterceptor extends InstanceMethodsAroundInterceptor:
+
+  private lazy val LOGGER = LogManager.getLogger(classOf[CaptureContextInterceptor])
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -28,11 +35,8 @@ final class CaptureContextOnSubmitInterceptor extends InstanceMethodsAroundInter
     if allArguments == null || allArguments.length < 1 then return
     val argument = allArguments(0)
     // Avoid duplicate enhancement, such as the case where it has already been enhanced by RunnableWrapper or CallableWrapper with toolkit.
-    val isZioFiber = argument.getClass.getName == "zio.internal.FiberRuntime"
-    val isCeFiber  = argument.getClass.getName == "cats.effect.IOFiber"
     argument match
-      case instance: EnhancedInstance
-          if !isZioFiber && !isCeFiber && instance.getSkyWalkingDynamicField.isInstanceOf[ContextSnapshot] =>
+      case instance: EnhancedInstance if instance.getSkyWalkingDynamicField.isInstanceOf[ContextSnapshot] =>
         return
       case _ =>
     val wrappedObject = wrap(argument, objInst.getClass.getName, method.getName)
@@ -68,4 +72,4 @@ final class CaptureContextOnSubmitInterceptor extends InstanceMethodsAroundInter
       case _ =>
     null
   }
-end CaptureContextOnSubmitInterceptor
+end CaptureContextInterceptor

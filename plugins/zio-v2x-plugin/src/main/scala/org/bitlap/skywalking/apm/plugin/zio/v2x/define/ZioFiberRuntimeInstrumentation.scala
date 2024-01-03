@@ -27,7 +27,7 @@ final class ZioFiberRuntimeInstrumentation extends ClassInstanceMethodsEnhancePl
         new InstanceMethodsInterceptPoint {
           override def getMethodsMatcher: ElementMatcher[MethodDescription] = kv._2
           override def getMethodsInterceptor: String                        = kv._1
-          override def isOverrideArgs: Boolean                              = false
+          override def isOverrideArgs: Boolean                              = true
         }
       )
       .toArray
@@ -40,12 +40,14 @@ object ZioFiberRuntimeInstrumentation:
 
   final val ENHANCE_CLASS = NameMatch.byName("zio.internal.FiberRuntime")
 
-  final val CLASS_INTERCEPTOR: String = "org.bitlap.skywalking.apm.plugin.common.interceptor.ConstructorInterceptor"
+  final val CLASS_INTERCEPTOR: String    = "org.bitlap.skywalking.apm.plugin.common.interceptor.ConstructorInterceptor"
+  final val EXECUTOR_INTERCEPTOR: String = "org.bitlap.skywalking.apm.plugin.common.interceptor.SetContextOnNewFiber"
 
   final val RUN_METHOD_INTERCEPTOR: String =
     "org.bitlap.skywalking.apm.plugin.zio.v2x.interceptor.FiberRuntimeInterceptor"
 
   final val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] =
     Map(
+//      EXECUTOR_INTERCEPTOR   -> named("drainQueueLaterOnExecutor").and(takesArguments(1)),
       RUN_METHOD_INTERCEPTOR -> named("run")
     )

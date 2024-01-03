@@ -3,9 +3,9 @@ SkyWalking Extension Plugins for Scala 3
 
 ![CI][Badge-CI]
 
-[Badge-CI]: https://github.com/bitlap/skywalking-scala/actions/workflows/ScalaCI.yml/badge.svg
+[Badge-CI]: https://github.com/hjfruit/skywalking-scala/actions/workflows/ScalaCI.yml/badge.svg
 
-> Still in the experimental stage, there are issues related to work steal and ForkJoinPool, especially for ZIO and Cats-Effect.
+> Still in the experimental stage, there may be some minor issues related to work steal, especially for ZIO and Cats-Effect.
 
 ## Environment
 
@@ -13,22 +13,42 @@ SkyWalking Extension Plugins for Scala 3
 - Scala 3.3.0
 - SkyWalking 9.1.0
 
-## Introduction
+## Example
+
+![](skywalking-scala-preview.jpg)
+
+## Available Plugins
 
 [SkyWalking Scala](https://github.com/bitlap/skywalking-scala) is a SkyWalking Extension (Agent) Plugins for Scala 3.
 
 
-| plugin                 | library                                                                                               | Enhance Targets                                                                                                     | maybe support version   | tested version |
-|------------------------|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-------------------------|----------------|
-| cats-effect-v3x-plugin | cats-effect                                                                                           | `cats.effect.IOFiber`                                                                                               | 3.4.0-RC1 ~ 3.5.x       | 3.4.1          |
-| zio-v2x-plugin         | zio                                                                                                   | `zio.internal.FiberRuntime`                                                                                         | 2.0.3 ~ 2.0.x           | 2.0.9,2.0.13   |
-| ziogrpc-v06rcx-plugin  | zio-grpc                                                                                              | 1. Client: `scalapb.zio_grpc.ZChannel`<br/> 2. Server: `scalapb.zio_grpc.ServerImpl`, `scalapb.zio_grpc.ServerImpl` | 0.6.0-test6 ~ 0.6.0-RC5 | 0.6.0-RC5      |
-| ziohttp-v2x-plugin     | zio-http                                                                                              | `zhttp.http.Http$PartialCollectHttp$`                                                                               | 2.0.0-RC2 ~ 2.0.0-RC11  | 2.0.0-RC10     |
-| caliban-v2x-plugin     | caliban                                                                                               | `caliban.GraphQLInterpreter`                                                                                        | 2.0.0 ~ 2.0.2           | 2.0.1          |
-| executors-plugin       | `java.util.concurrent.ThreadPoolExecutor` and Subclasses of `java.util.concurrent.ThreadPoolExecutor` | -                                                                                                                   | -                       | -              |
-| ziocache-plugin        | zio-cache                                                                                             | `zio.cache.Cache`                                                                                                   | Not Available           | Not Available  |
+| plugin                 | library                                   | Enhance Targets                                                                                                                            | maybe support version   | tested version     |
+|------------------------|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|--------------------|
+| cats-effect-v3x-plugin | cats-effect                               | `cats.effect.IOFiber`                                                                                                                      | 3.4.0-RC1 ~ 3.5.x       | 3.4.1              |
+| zio-v2x-plugin         | zio                                       | `zio.internal.FiberRuntime`, `zio.Executor`                                                                                                | 2.0.3 ~ 2.0.x           | 2.0.9,2.0.13       |
+| ziogrpc-v06rcx-plugin  | zio-grpc                                  | 1. Client: `scalapb.zio_grpc.ZChannel`<br/> 2. Server: `scalapb.zio_grpc.server.ZServerCall`, `scalapb.zio_grpc.server.ZServerCallHandler` | 0.6.0-test6 ~ 0.6.0-RC5 | 0.6.0-RC5          |
+| ziohttp-v2x-plugin     | zio-http                                  | `zhttp.http.Http$PartialCollectHttp$`                                                                                                      | 2.0.0-RC2 ~ 2.0.0-RC11  | 2.0.0-RC10         |
+| caliban-v2x-plugin     | caliban                                   | `caliban.GraphQLInterpreter`, `caliban.wrappers.Wrapper`                                                                                   | 2.0.0 ~ 2.0.2           | 2.0.1              |
+| executors-plugin       | `java.util.concurrent.ThreadPoolExecutor` | `submit`, `schedule`, `schedule`                                                                                                           | -                       | -                  |
+| ziocache-plugin        | zio-cache                                 | `zio.cache.Cache`                                                                                                                          | Not Implementation      | Not Implementation |
 
 > Other small versions of the library supported by this plugin may also work, but they have not been tested.
+
+These plugins can be used together with the following plugins, tested by me:
+- `apm-hikaricp-3.x-4.x-plugin-*.jar`
+- `apm-jackson-2.x-plugin-*.jar`
+- `apm-jdbc-commons-*.jar`
+- `apm-jdk-forkjoinpool-plugin-*.jar`
+- `apm-jdk-threading-plugin-*.jar`
+- `apm-lettuce-5.x-plugin-*.jar`
+- `apm-mysql-8.x-plugin-*.jar`
+- `apm-mysql-commons-*.jar`
+- `apm-postgresql-8.x-plugin-*.jar`
+- `apm-pulsar-2.8.x-plugin-*.jar`
+- `apm-pulsar-common-*.jar`
+- and so on ...
+
+>  `apm-ziogrpc-v06rcx-plugin-*.jar` should never be used together with `apm-grpc-1.x-plugin-*.jar`.
 
 ## Available Configurations
 | key                                             | description                                                                                                                                                                                    |
@@ -44,7 +64,7 @@ SkyWalking Extension Plugins for Scala 3
 
 The prefix should be added when passing command line parameters, such as: `-Dskywalking.plugin.calibanv2.url_prefix=GQL/`
 
-## How to use?
+## How to start
 
 1. Clone code `git clone https://github.com/bitlap/skywalking-scala.git`.
 2. Enter the source file directory `cd skywalking-scala`.
@@ -54,7 +74,7 @@ The prefix should be added when passing command line parameters, such as: `-Dsky
 Please check the official documents for specific information
 [skywalking.apache.org/docs](https://skywalking.apache.org/docs/skywalking-java/v8.15.0/en/setup/service-agent/java-agent/readme/)
 
-## Explore scenarios
+## Scenarios
 
 > It needs docker & docker-compose
 

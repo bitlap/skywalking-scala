@@ -76,7 +76,7 @@ final class TracingClientCall[Req, Resp](
       unsafePut.append(headerKey -> contextItem.getHeadValue)
     }
     val putInto    = unsafePut.result().map(kv => headers.put(kv._1, kv._2))
-    val setHeaders = ZIO.collectAll(putInto).ignore
+    val setHeaders = ZIO.collectAll(putInto).ignoreLogged
 
     // ZioUtils.unsafeRun(ZIO.collectAll(putInto))
 
@@ -84,7 +84,7 @@ final class TracingClientCall[Req, Resp](
     span.prepareForAsync()
     setHeaders *> delegate
       .start(new TracingClientCallListener(responseListener, method, snapshot, span), headers)
-      .ensuring(ZIO.attempt(ContextManager.stopSpan()).ignore)
+      .ensuring(ZIO.attempt(ContextManager.stopSpan()).ignoreLogged)
   end start
 
   override def request(numMessages: Int): IO[StatusException, Unit] = delegate.request(numMessages)
@@ -130,7 +130,7 @@ final class TracingClientCall[Req, Resp](
     }.ensuring(ZIO.attempt {
       AgentUtils.stopAsync(summon[AbstractSpan])
       ContextManager.stopSpan()
-    }.ignore)
+    }.ignoreLogged)
 
     result.mapError(e => new StatusException(Status.fromThrowable(e)))
 

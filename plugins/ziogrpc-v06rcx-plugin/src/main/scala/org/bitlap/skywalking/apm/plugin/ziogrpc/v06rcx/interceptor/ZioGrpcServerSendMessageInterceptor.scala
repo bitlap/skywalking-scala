@@ -64,7 +64,9 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
 
     if ctx.activeSpan == null then return ret
 
-    ret.asInstanceOf[GIO[Unit]].ensuring(ZIO.attempt { ctx.activeSpan.asyncFinish(); ContextManager.stopSpan() }.ignore)
+    ret
+      .asInstanceOf[GIO[Unit]]
+      .ensuring(ZIO.attempt { ctx.activeSpan.asyncFinish(); ContextManager.stopSpan() }.ignoreLogged)
   end afterMethod
 
   override def handleMethodException(

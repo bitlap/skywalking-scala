@@ -25,7 +25,7 @@ object AgentUtils:
 
   def continuedSnapshot_(contextSnapshot: ContextSnapshot): Unit =
     try
-      ContextManager.continued(contextSnapshot)
+      if contextSnapshot != null then ContextManager.continued(contextSnapshot)
     catch {
       case t: Throwable =>
         ContextManager.activeSpan.log(t)
@@ -33,7 +33,7 @@ object AgentUtils:
 
   def continuedSnapshot(contextSnapshot: ContextSnapshot)(effect: => Unit): Unit =
     try
-      ContextManager.continued(contextSnapshot)
+      if contextSnapshot != null then ContextManager.continued(contextSnapshot)
       effect
     catch {
       case t: Throwable =>
@@ -42,7 +42,7 @@ object AgentUtils:
 
   def continuedSnapshot(contextSnapshot: ContextSnapshot, asyncSpan: AbstractSpan)(effect: => Unit): Unit =
     try
-      ContextManager.continued(contextSnapshot)
+      if contextSnapshot != null then ContextManager.continued(contextSnapshot)
       AgentUtils.stopAsync(asyncSpan)
       effect
     catch {
@@ -56,17 +56,6 @@ object AgentUtils:
       true
     } else {
       false
-    }
-
-  def continuedSnapshot(enhanced: Object): Unit =
-    enhanced match {
-      case enhancedInstance: EnhancedInstance =>
-        val storedField = enhancedInstance.getSkyWalkingDynamicField
-        if storedField != null then {
-          val contextSnapshot = storedField.asInstanceOf[ContextSnapshot]
-          AgentUtils.continuedSnapshot_(contextSnapshot)
-        }
-      case _ =>
     }
 
   def matchPrefix(ignoreUrlPrefixes: => String, uri: => String): Boolean =
