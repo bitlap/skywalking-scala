@@ -4,7 +4,7 @@ SkyWalking Extension Plugins for Scala 3
 [![Project stage][Badge-Stage]][Badge-Stage-Page] 
 ![CI][Badge-CI]
 
-[Badge-CI]: https://github.com/hjfruit/skywalking-scala/actions/workflows/ScalaCI.yml/badge.svg
+[Badge-CI]: https://github.com/bitlap/skywalking-scala/actions/workflows/ScalaCI.yml/badge.svg
 [Badge-Stage]: https://img.shields.io/badge/Project%20Stage-Development-yellowgreen.svg
 [Badge-Stage-Page]: https://github.com/bitlap/bitlap/wiki/Project-Stages
 
@@ -25,15 +25,15 @@ SkyWalking Extension Plugins for Scala 3
 [SkyWalking Scala](https://github.com/bitlap/skywalking-scala) is a SkyWalking Extension (Agent) Plugins for Scala 3.
 
 
-| plugin                 | library                                   | Enhance Targets                                                                                                                            | maybe support version   | tested version     |
-|------------------------|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|--------------------|
-| cats-effect-v3x-plugin | cats-effect                               | `cats.effect.IOFiber`                                                                                                                      | 3.4.0-RC1 ~ 3.5.x       | 3.4.1              |
-| zio-v2x-plugin         | zio                                       | `zio.internal.FiberRuntime`, `zio.Executor`                                                                                                | 2.0.3 ~ 2.0.x           | 2.0.9,2.0.13       |
-| ziogrpc-v06rcx-plugin  | zio-grpc                                  | 1. Client: `scalapb.zio_grpc.ZChannel`<br/> 2. Server: `scalapb.zio_grpc.server.ZServerCall`, `scalapb.zio_grpc.server.ZServerCallHandler` | 0.6.0-test6 ~ 0.6.0-RC5 | 0.6.0-RC5          |
-| ziohttp-v2x-plugin     | zio-http                                  | `zhttp.http.Http$PartialCollectHttp$`                                                                                                      | 2.0.0-RC2 ~ 2.0.0-RC11  | 2.0.0-RC10         |
-| caliban-v2x-plugin     | caliban                                   | `caliban.GraphQLInterpreter`, `caliban.wrappers.Wrapper`                                                                                   | 2.0.0 ~ 2.0.2           | 2.0.1              |
-| executors-plugin       | `java.util.concurrent.ThreadPoolExecutor` | `submit`, `schedule`, `schedule`                                                                                                           | -                       | -                  |
-| ziocache-plugin        | zio-cache                                 | `zio.cache.Cache`                                                                                                                          | Not Implementation      | Not Implementation |
+| plugin                 | library                                   | Enhance Targets                                                                                                        | maybe support version   | tested version     |
+|------------------------|-------------------------------------------|------------------------------------------------------------------------------------------------------------------------|-------------------------|--------------------|
+| cats-effect-v3x-plugin | cats-effect                               | `cats.effect.IOFiber`                                                                                                  | 3.4.0-RC1 ~ 3.5.x       | 3.4.1              |
+| zio-v2x-plugin         | zio                                       | `zio.internal.FiberRuntime`, `zio.Executor`                                                                            | 2.0.3 ~ 2.0.x           | 2.0.9,2.0.13       |
+| ziogrpc-v06rcx-plugin  | zio-grpc                                  | `scalapb.zio_grpc.ZChannel`<br/>`scalapb.zio_grpc.server.ZServerCall`<br/>`scalapb.zio_grpc.server.ZServerCallHandler` | 0.6.0-test6 ~ 0.6.0-RC5 | 0.6.0-RC5          |
+| ziohttp-v2x-plugin     | zio-http                                  | `zhttp.http.Http$PartialCollectHttp$`                                                                                  | 2.0.0-RC2 ~ 2.0.0-RC11  | 2.0.0-RC10         |
+| caliban-v2x-plugin     | caliban                                   | `caliban.GraphQLInterpreter`, `caliban.wrappers.Wrapper`                                                               | 2.0.0 ~ 2.0.2           | 2.0.1              |
+| executors-plugin       | `java.util.concurrent.ThreadPoolExecutor` | `submit`, `schedule`, `schedule`                                                                                       | -                       | -                  |
+| ziocache-plugin        | zio-cache                                 | `zio.cache.Cache`                                                                                                      | Not Implementation      | Not Implementation |
 
 > Other small versions of the library supported by this plugin may also work, but they have not been tested.
 
