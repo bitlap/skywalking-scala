@@ -1,0 +1,1 @@
+ziocache=org.bitlap.skywalking.apm.plugin.ziocache.define.ZioCacheInstrumentation

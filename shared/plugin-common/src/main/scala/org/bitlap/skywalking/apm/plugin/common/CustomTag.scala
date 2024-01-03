@@ -2,11 +2,7 @@ package org.bitlap.skywalking.apm.plugin.common
 
 import org.apache.skywalking.apm.agent.core.context.tag.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/6/2
- */
-enum CustomTag[T](val tag: StringTag):
+enum CustomTag(val tag: StringTag) extends Enum[CustomTag]:
   case FiberId          extends CustomTag(new StringTag(100, "zio.fiber.id"))
   case FiberStartTime   extends CustomTag(new StringTag(101, "zio.fiber.startTime"))
   case FiberLocation    extends CustomTag(new StringTag(102, "zio.fiber.location"))

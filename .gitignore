@@ -2,5 +2,8 @@ target
 .bsp
 .idea
 .DS_Store
-dist-v1
-dist-v2
+dist
+logs/
+*.log
+*.out
+scenarios/skywalking-agent/plugins/apm-lettuce-5.x-plugin-8.16.0.jar

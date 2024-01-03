@@ -2,10 +2,6 @@ package org.bitlap.skywalking.apm.plugin.ziogrpc.common
 
 import io.grpc.MethodDescriptor
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/12
- */
 object OperationNameFormatUtils:
 
   def formatOperationName(methodDescriptor: MethodDescriptor[?, ?]): String = {

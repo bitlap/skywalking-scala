@@ -14,10 +14,6 @@ import org.bitlap.skywalking.apm.plugin.caliban.v2.define.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/11
- */
 class CalibanInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "test apolloTracing" should "ok" in {
@@ -25,36 +21,6 @@ class CalibanInstrumentationSpec extends AnyFlatSpec with Matchers {
     val method = new MethodDescription.ForLoadedMethod(
       classOf[ApolloTracing.type].getMethod(
         "apolloTracing"
-      )
-    )
-
-    matcher.matches(method) shouldEqual true
-  }
-
-  "test executor" should "ok" in {
-    val matcher = CalibanExecutorInstrumentation.getMethod
-    val method = new MethodDescription.ForLoadedMethod(
-      classOf[caliban.execution.Executor.type].getMethod(
-        "executeRequest",
-        classOf[caliban.execution.ExecutionRequest],
-        classOf[caliban.schema.Step[?]],
-        classOf[List[?]],
-        classOf[QueryExecution],
-        classOf[Object]
-      )
-    )
-
-    matcher.matches(method) shouldEqual true
-  }
-
-  "test wrapper" should "ok" in {
-    val matcher = CalibanWrapperInstrumentation.getMethod
-    val method = new MethodDescription.ForLoadedMethod(
-      classOf[caliban.wrappers.Wrapper.type].getMethod(
-        "wrap",
-        classOf[Function1[?, ?]],
-        classOf[List[?]],
-        classOf[Object]
       )
     )
 

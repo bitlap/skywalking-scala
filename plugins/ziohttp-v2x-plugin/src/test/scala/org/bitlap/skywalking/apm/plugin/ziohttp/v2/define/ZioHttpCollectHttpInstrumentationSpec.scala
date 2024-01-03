@@ -10,10 +10,6 @@ import org.scalatest.matchers.should.Matchers
 
 import zhttp.http.Http.PartialCollectHttp
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/11
- */
 class ZioHttpCollectHttpInstrumentationSpec extends AnyFlatSpec with Matchers {
 
   "testMethodMatch" should "ok" in {

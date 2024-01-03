@@ -9,18 +9,12 @@ import io.grpc.*
 import zio.ZIO
 
 import org.apache.skywalking.apm.agent.core.context.*
-import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/15
- */
 final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInterceptor:
 
   override def beforeMethod(
@@ -70,7 +64,9 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
 
     if ctx.activeSpan == null then return ret
 
-    ret.asInstanceOf[GIO[Unit]].ensuring(ZIO.attempt { ctx.activeSpan.asyncFinish(); ContextManager.stopSpan() }.ignore)
+    ret
+      .asInstanceOf[GIO[Unit]]
+      .ensuring(ZIO.attempt { ctx.activeSpan.asyncFinish(); ContextManager.stopSpan() }.ignoreLogged)
   end afterMethod
 
   override def handleMethodException(
@@ -79,6 +75,6 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     allArguments: Array[Object],
     argumentsTypes: Array[Class[?]],
     t: Throwable
-  ): Unit = AgentUtils.logError(t)
+  ): Unit = if ContextManager.isActive then ContextManager.activeSpan.log(t)
 
 end ZioGrpcServerSendMessageInterceptor

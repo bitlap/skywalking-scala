@@ -5,15 +5,10 @@ import io.grpc.*
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
-import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.AgentUtils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/14
- */
 final class TracingClientCallListener[Resp](
   delegate: ClientCall.Listener[Resp],
   method: MethodDescriptor[?, Resp],

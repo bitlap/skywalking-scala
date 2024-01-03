@@ -5,15 +5,10 @@ import net.bytebuddy.matcher.ElementMatcher
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ArgumentTypeNameMatch.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.ziohttp.v2.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/17
- */
 final class ZioHttpCollectHttpInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
   import ZioHttpCollectHttpInstrumentation.*
@@ -35,8 +30,10 @@ final class ZioHttpCollectHttpInstrumentation extends ClassInstanceMethodsEnhanc
 object ZioHttpCollectHttpInstrumentation:
 
   // PartialCollectHttp is a AnyVal!!!
-  final val ENHANCE_CLASS             = NameMatch.byName("zhttp.http.Http$PartialCollectHttp$")
-  final val INTERCEPTOR_CLASS: String = classOf[ZioHttpCollectHttpInterceptor].getTypeName
+  final val ENHANCE_CLASS = NameMatch.byName("zhttp.http.Http$PartialCollectHttp$")
+
+  final val INTERCEPTOR_CLASS: String =
+    "org.bitlap.skywalking.apm.plugin.ziohttp.v2.interceptor.ZioHttpCollectHttpInterceptor"
 
   def getMethod: ElementMatcher[MethodDescription] =
     named("apply$extension").and(takesArguments(2))

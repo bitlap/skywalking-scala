@@ -5,23 +5,17 @@ import net.bytebuddy.matcher.ElementMatcher
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ArgumentTypeNameMatch.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.common.ZioGrpcWitnessConstant
 import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/11
- */
 final class ZioGrpcClientInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
   import ZioGrpcClientInstrumentation.*
 
   override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
 
-  override def witnessClasses(): Array[String] = ZioGrpcWitnessConstant.`WITNESS_TEST6-RC5_CLASS`
+  override def witnessClasses(): Array[String] = Array("scalapb.zio_grpc.ServerImpl")
 
   override def getInstanceMethodsInterceptPoints: Array[InstanceMethodsInterceptPoint] = Array(
     new InstanceMethodsInterceptPoint:
@@ -40,8 +34,9 @@ end ZioGrpcClientInstrumentation
 
 object ZioGrpcClientInstrumentation:
 
-  private final val INTERCEPTOR_CLASS: String = classOf[ZioGrpcClientInterceptor].getTypeName
-  private final val ENHANCE_CLASS: String     = "scalapb.zio_grpc.ZChannel"
+  private final val INTERCEPTOR_CLASS: String =
+    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcClientInterceptor"
+  private final val ENHANCE_CLASS: String = "scalapb.zio_grpc.ZChannel"
 
   def getMethod: ElementMatcher[MethodDescription] =
     named("newCall")

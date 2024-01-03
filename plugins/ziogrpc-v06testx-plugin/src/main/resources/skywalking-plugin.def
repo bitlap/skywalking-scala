@@ -1,3 +1,0 @@
-zio-grpc-0.6.0-testx-client=org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.define.ZioGrpcClientInstrumentation
-zio-grpc-0.6.0-testx-server=org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.define.ZioGrpcServerInstrumentation
-zio-grpc-0.6.0-testx-server-call=org.bitlap.skywalking.apm.plugin.ziogrpc.v06testx.define.ZioGrpcServerCallInstrumentation

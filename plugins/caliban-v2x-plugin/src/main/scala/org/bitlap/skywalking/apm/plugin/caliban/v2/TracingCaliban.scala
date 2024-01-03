@@ -4,7 +4,7 @@ import scala.jdk.CollectionConverters.*
 import scala.util.*
 
 import caliban.*
-import caliban.execution.{ ExecutionRequest, QueryExecution }
+import caliban.execution.ExecutionRequest
 import caliban.parsing.Parser
 import caliban.parsing.adt.{ Document, Selection }
 import caliban.wrappers.Wrapper.*
@@ -19,12 +19,7 @@ import org.apache.skywalking.apm.agent.core.util.CollectionUtil
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.*
-import org.bitlap.skywalking.apm.plugin.zcommon.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/18
- */
 object TracingCaliban:
 
   private val DEFAULT_OP = "Unknown"
@@ -37,7 +32,7 @@ object TracingCaliban:
       ): GraphQLRequest => ZIO[R1, Nothing, GraphQLResponse[CalibanError]] =
         (request: GraphQLRequest) =>
           val span = beforeOverallGraphQLRequest(request)
-          process(request).tap(result => afterGraphQLRequest(span, result).ignore)
+          afterRequest(span, process(request))
 
   def afterRequest[R](
     span: Option[AbstractSpan],
@@ -45,14 +40,13 @@ object TracingCaliban:
   ): ZIO[R, Nothing, GraphQLResponse[CalibanError]] =
     ret.onExit {
       case Exit.Success(value) =>
-        ZIO.attempt(tagCalibanError(span, value)).ignore
-
+        ZIO.attempt(tagCalibanError(span, value)).ignoreLogged
       case Exit.Failure(cause) =>
         ZIO.attempt {
+          if ContextManager.isActive then ContextManager.activeSpan.log(cause.squash)
           span.foreach(a => AgentUtils.stopAsync(a))
-          ZioUtils.logError(cause)
           ContextManager.stopSpan()
-        }.ignore
+        }.ignoreLogged
     }
 
   def beforeRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
@@ -71,12 +65,6 @@ object TracingCaliban:
       Some(span)
     }
 
-  private def afterGraphQLRequest(
-    span: Option[AbstractSpan],
-    result: GraphQLResponse[CalibanError]
-  ): ZIO[Any, Nothing, Unit] =
-    ZIO.attempt(tagCalibanError(span, result)).ignore
-
   private def tagCalibanError(span: Option[AbstractSpan], result: GraphQLResponse[CalibanError]): Unit = {
     span.foreach(a => AgentUtils.stopAsync(a))
 
@@ -90,10 +78,10 @@ object TracingCaliban:
     ContextManager.stopSpan()
   }
 
-  def beforeOverallGraphQLRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
+  private def beforeOverallGraphQLRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
     checkRequest(graphQLRequest) {
       val opName =
-        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-overall"
+        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "Overall"
       val span = ContextManager.createLocalSpan(opName)
       Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
       AgentUtils.prepareAsync(span)
@@ -101,55 +89,12 @@ object TracingCaliban:
       span.setComponent(ComponentsDefine.GRAPHQL)
       Some(span)
     }
-
-  def beforeGraphQLRequest(graphQLRequest: GraphQLRequest): Option[AbstractSpan] =
-    checkRequest(graphQLRequest) {
-      val opName =
-        CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-request"
-      val span = ContextManager.createLocalSpan(opName)
-      Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
-      AgentUtils.prepareAsync(span)
-      SpanLayer.asHttp(span)
-      span.setComponent(ComponentsDefine.GRAPHQL)
-      Some(span)
-    }
-
-  def beforeParseQuery(query: String): Option[AbstractSpan] =
-    val opName =
-      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-parse"
-    val span = ContextManager.createLocalSpan(opName)
-    Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
-    AgentUtils.prepareAsync(span)
-
-    SpanLayer.asHttp(span)
-    span.setComponent(ComponentsDefine.GRAPHQL)
-    Some(span)
-
-  def beforeValidate(doc: Document): Option[AbstractSpan] =
-    val opName =
-      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-validate"
-    val span = ContextManager.createLocalSpan(opName)
-    Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
-    AgentUtils.prepareAsync(span)
-    SpanLayer.asHttp(span)
-    span.setComponent(ComponentsDefine.GRAPHQL)
-    Some(span)
-
-  def beforeExecutorExecuteRequest(executionRequest: ExecutionRequest): Option[AbstractSpan] =
-    val opName =
-      CalibanPluginConfig.Plugin.CalibanV2.URL_PREFIX + "wrap-executeRequest"
-    val span = ContextManager.createLocalSpan(opName)
-    Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT)
-    AgentUtils.prepareAsync(span)
-    SpanLayer.asHttp(span)
-    span.setComponent(ComponentsDefine.GRAPHQL)
-    Some(span)
 
   private def checkRequest(graphQLRequest: GraphQLRequest)(effect: => Option[AbstractSpan]): Option[AbstractSpan] =
     if graphQLRequest == null || graphQLRequest.query.isEmpty then None
     else {
 
-      if AgentUtils.ignorePrefix(
+      if AgentUtils.matchPrefix(
           CalibanPluginConfig.Plugin.CalibanV2.IGNORE_URL_PREFIXES,
           getOperationName(graphQLRequest)
         )
@@ -168,21 +113,25 @@ object TracingCaliban:
     } else tagValue
   }
 
+  private def unsafeRun[A](z: ZIO[Any, Any, A]): A =
+    Try(Unsafe.unsafe { u ?=>
+      Runtime.default.unsafe.run(z).getOrThrowFiberFailure()
+    }).getOrElse(null.asInstanceOf[A])
+
   private def getOperationName(graphQLRequest: GraphQLRequest) =
     val tryOp: Try[String] = Try {
-      val docOpName = ZioUtils
-        .unsafeRun(Parser.parseQuery(graphQLRequest.query.get))
-        .operationDefinitions
-        .map(_.selectionSet.collectFirst {
-          case Selection.Field(alias, name, arguments, directives, selectionSet, index) => alias.getOrElse(name)
-        })
-        .headOption
-        .flatten
+      val docOpName =
+        unsafeRun(Parser.parseQuery(graphQLRequest.query.get)).operationDefinitions
+          .map(_.selectionSet.collectFirst { case Selection.Field(alias, name, _, _, _, _) =>
+            alias.getOrElse(name)
+          })
+          .headOption
+          .flatten
       val name = graphQLRequest.operationName.map(_.split("__", 2).toList).toList.flatten.headOption
       name.orElse(docOpName).getOrElse(DEFAULT_OP)
     }
     tryOp match
       case Failure(e) =>
-        AgentUtils.logError(e)
+        if ContextManager.isActive then ContextManager.activeSpan.log(e)
         DEFAULT_OP
       case Success(value) => value

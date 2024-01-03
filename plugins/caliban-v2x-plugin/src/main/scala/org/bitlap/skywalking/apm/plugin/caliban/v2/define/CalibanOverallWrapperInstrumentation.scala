@@ -5,15 +5,10 @@ import net.bytebuddy.matcher.ElementMatcher
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
-import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.ReturnTypeNameMatch
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 import org.bitlap.skywalking.apm.plugin.caliban.v2.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/11
- */
 final class CalibanOverallWrapperInstrumentation extends ClassInstanceMethodsEnhancePluginDefine:
 
   import CalibanOverallWrapperInstrumentation.*
@@ -34,8 +29,7 @@ final class CalibanOverallWrapperInstrumentation extends ClassInstanceMethodsEnh
 end CalibanOverallWrapperInstrumentation
 
 object CalibanOverallWrapperInstrumentation:
-
-  final val INTERCEPTOR_CLASS: String = classOf[CalibanOverallWrapperInterceptor].getTypeName
+  final val INTERCEPTOR_CLASS: String = "org.bitlap.skywalking.apm.plugin.caliban.v2.CalibanOverallWrapperInterceptor"
   final val ENHANCE_CLASS             = NameMatch.byName("caliban.wrappers.ApolloTracing$")
 
   def getMethod: ElementMatcher[MethodDescription] = named("apolloTracing")

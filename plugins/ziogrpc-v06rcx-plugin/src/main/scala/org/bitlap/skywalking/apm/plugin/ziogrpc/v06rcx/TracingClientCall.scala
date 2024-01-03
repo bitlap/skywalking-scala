@@ -12,21 +12,13 @@ import io.grpc.ClientCall.Listener
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
-import org.apache.skywalking.apm.agent.core.context.tag.Tags
 import org.apache.skywalking.apm.agent.core.context.trace.*
-import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.apache.skywalking.apm.util.StringUtil
 import org.bitlap.skywalking.apm.plugin.common.AgentUtils
-import org.bitlap.skywalking.apm.plugin.zcommon.ZioUtils
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.Constants.*
 import org.bitlap.skywalking.apm.plugin.ziogrpc.common.listener.*
-import org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/14
- */
 final class TracingClientCall[Req, Resp](
   peer: Option[String],
   delegate: ZClientCall[Req, Resp],
@@ -84,7 +76,7 @@ final class TracingClientCall[Req, Resp](
       unsafePut.append(headerKey -> contextItem.getHeadValue)
     }
     val putInto    = unsafePut.result().map(kv => headers.put(kv._1, kv._2))
-    val setHeaders = ZIO.collectAll(putInto).ignore
+    val setHeaders = ZIO.collectAll(putInto).ignoreLogged
 
     // ZioUtils.unsafeRun(ZIO.collectAll(putInto))
 
@@ -92,7 +84,7 @@ final class TracingClientCall[Req, Resp](
     span.prepareForAsync()
     setHeaders *> delegate
       .start(new TracingClientCallListener(responseListener, method, snapshot, span), headers)
-      .ensuring(ZIO.attempt(ContextManager.stopSpan()).ignore)
+      .ensuring(ZIO.attempt(ContextManager.stopSpan()).ignoreLogged)
   end start
 
   override def request(numMessages: Int): IO[StatusException, Unit] = delegate.request(numMessages)
@@ -138,7 +130,7 @@ final class TracingClientCall[Req, Resp](
     }.ensuring(ZIO.attempt {
       AgentUtils.stopAsync(summon[AbstractSpan])
       ContextManager.stopSpan()
-    }.ignore)
+    }.ignoreLogged)
 
     result.mapError(e => new StatusException(Status.fromThrowable(e)))
 

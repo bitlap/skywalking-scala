@@ -2,31 +2,18 @@ package org.bitlap.skywalking.apm.plugin.caliban.v2
 
 import java.lang.reflect.Method
 
-import scala.util.*
-
 import caliban.*
-import caliban.execution.ExecutionRequest
-import caliban.parsing.adt.Document
 import caliban.wrappers.Wrapper.*
 
 import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
-import org.apache.skywalking.apm.agent.core.context.tag.Tags
-import org.apache.skywalking.apm.agent.core.context.trace.*
 import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.bitlap.skywalking.apm.plugin.caliban.v2.TracingCaliban
-import org.bitlap.skywalking.apm.plugin.common.*
-import org.bitlap.skywalking.apm.plugin.zcommon.*
 
-/** @author
- *    梦境迷离
- *  @version 1.0,2023/5/11
- */
 final class CalibanOverallWrapperInterceptor extends InstanceMethodsAroundInterceptor:
 
-  private val LOGGER = LogManager.getLogger(classOf[CalibanWrapperInterceptor])
+  private val LOGGER = LogManager.getLogger(classOf[CalibanOverallWrapperInterceptor])
 
   override def beforeMethod(
     objInst: EnhancedInstance,
@@ -60,6 +47,6 @@ final class CalibanOverallWrapperInterceptor extends InstanceMethodsAroundInterc
     argumentsTypes: Array[Class[?]],
     t: Throwable
   ): Unit =
-    AgentUtils.logError(t)
+    if ContextManager.isActive then ContextManager.activeSpan.log(t)
 
 end CalibanOverallWrapperInterceptor
