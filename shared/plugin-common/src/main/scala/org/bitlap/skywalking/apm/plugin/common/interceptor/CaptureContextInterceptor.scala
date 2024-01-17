@@ -1,14 +1,11 @@
 package org.bitlap.skywalking.apm.plugin.common.interceptor
 
 import java.lang.reflect.Method
-import java.util.concurrent.Callable
-import java.util.concurrent.RunnableFuture
+import java.util.concurrent.{ Callable, RunnableFuture }
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.logging.api.LogManager
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
-import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.InstanceMethodsAroundInterceptor
-import org.apache.skywalking.apm.network.trace.component.ComponentsDefine
 import org.bitlap.skywalking.apm.plugin.common.*
 
 final class CaptureContextOnScheduleInterceptor extends CaptureContextInterceptor
@@ -36,8 +33,9 @@ open class CaptureContextInterceptor extends InstanceMethodsAroundInterceptor:
     val argument = allArguments(0)
     // Avoid duplicate enhancement, such as the case where it has already been enhanced by RunnableWrapper or CallableWrapper with toolkit.
     argument match
-      case instance: EnhancedInstance if instance.getSkyWalkingDynamicField.isInstanceOf[ContextSnapshot] =>
-        return
+      case instance: EnhancedInstance =>
+        val ctx = instance.getSkyWalkingDynamicField
+        if ctx != null && ctx.isInstanceOf[ContextSnapshot] then return
       case _ =>
     val wrappedObject = wrap(argument, objInst.getClass.getName, method.getName)
     if wrappedObject != null then allArguments.update(0, wrappedObject)
