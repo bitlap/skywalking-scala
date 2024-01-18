@@ -27,7 +27,7 @@ SkyWalking Plugins for Scala
 | plugin                 | maybe support version                                                           | tested version                                                                  |
 |------------------------|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
 | cats-effect-v3x-plugin | 3.4.x                                                                           | 3.4.1                                                                           |
-| zio-v2x-plugin         | 2.x                                                                             | 2.0.9,2.0.13,2.0.15                                                             |
+| zio-v2x-plugin         | 2.0.x                                                                           | 2.0.9,2.0.13,2.0.15                                                             |
 | ziogrpc-v06rcx-plugin  | 0.6.0-test6 ~ 0.6.0-RC5                                                         | 0.6.0-RC5                                                                       |
 | ziohttp-v2x-plugin     | 2.0.0-RC2 ~ 2.0.0-RC11                                                          | 2.0.0-RC10                                                                      |
 | caliban-v2x-plugin     | 2.0.0 ~ 2.0.2                                                                   | 2.0.1                                                                           |
