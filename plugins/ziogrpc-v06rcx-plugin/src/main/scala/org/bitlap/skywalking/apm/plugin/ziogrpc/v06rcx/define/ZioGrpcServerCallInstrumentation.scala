@@ -41,7 +41,7 @@ object ZioGrpcServerCallInstrumentation:
     "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerSendMessageInterceptor"
 
   // see issue: https://github.com/scalapb/zio-grpc/issues/501, we cannot use Server Interceptor
-  // Because the server stream call calls `ServerCall.sendMessage` and `ServerCall.close`, and we intercept grpc directly.
+  // Because the server stream calls `ServerCall.sendMessage` and `ServerCall.close`, and we intercept grpc directly.
   private final val ENHANCE_CLASS = LogicalMatchOperation.or(
     HierarchyMatch.byHierarchyMatch("io.grpc.ServerCall"),
     MultiClassNameMatch.byMultiClassMatch("io.grpc.ServerCall")
