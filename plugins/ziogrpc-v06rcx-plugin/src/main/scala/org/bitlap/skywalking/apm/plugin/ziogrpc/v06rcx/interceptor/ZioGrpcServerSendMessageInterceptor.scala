@@ -2,11 +2,7 @@ package org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor
 
 import java.lang.reflect.Method
 
-import scalapb.zio_grpc.*
-
 import io.grpc.*
-
-import zio.ZIO
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.trace.*
@@ -24,11 +20,8 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val ctx = objInst.getSkyWalkingDynamicField
-    if ctx == null || !ctx.isInstanceOf[OperationContext] then return
-
-    val cx      = ctx.asInstanceOf[OperationContext]
-    val context = OperationContext.get(cx.selfCall)
+    val call    = objInst.asInstanceOf[ServerCall[?, ?]]
+    val context = OperationContext.get(call)
     if context == null then return
     val span = beforeSendMessage(context.contextSnapshot, context.methodDescriptor)
     span.foreach(s => objInst.setSkyWalkingDynamicField(context.copy(activeSpan = s)))
@@ -61,12 +54,10 @@ final class ZioGrpcServerSendMessageInterceptor extends InstanceMethodsAroundInt
     if context == null || !context.isInstanceOf[OperationContext] then return ret
 
     val ctx = context.asInstanceOf[OperationContext]
-
-    if ctx.activeSpan == null then return ret
-
+    AgentUtils.stopAsync(ctx.activeSpan)
+    ContextManager.stopSpan()
     ret
-      .asInstanceOf[GIO[Unit]]
-      .ensuring(ZIO.attempt { ctx.activeSpan.asyncFinish(); ContextManager.stopSpan() }.ignoreLogged)
+
   end afterMethod
 
   override def handleMethodException(

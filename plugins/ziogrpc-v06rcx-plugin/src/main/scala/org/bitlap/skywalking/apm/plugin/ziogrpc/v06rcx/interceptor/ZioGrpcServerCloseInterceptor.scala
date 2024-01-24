@@ -2,13 +2,8 @@ package org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor
 
 import java.lang.reflect.Method
 
-import scala.util.*
-import scalapb.zio_grpc.*
-
 import io.grpc.*
 import io.grpc.Status.*
-
-import zio.*
 
 import org.apache.skywalking.apm.agent.core.context.*
 import org.apache.skywalking.apm.agent.core.context.tag.Tags
@@ -28,11 +23,8 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     argumentsTypes: Array[Class[?]],
     result: MethodInterceptResult
   ): Unit =
-    val ctx = objInst.getSkyWalkingDynamicField
-    if ctx == null || !ctx.isInstanceOf[OperationContext] then return
-
-    val cx      = ctx.asInstanceOf[OperationContext]
-    val context = OperationContext.remove(cx.selfCall)
+    val call    = objInst.asInstanceOf[ServerCall[?, ?]]
+    val context = OperationContext.remove(call)
     if context == null then return
 
     val span = beforeClose(context.contextSnapshot, context.methodDescriptor)
@@ -63,31 +55,22 @@ final class ZioGrpcServerCloseInterceptor extends InstanceMethodsAroundIntercept
     if span == null || !span.isInstanceOf[AbstractSpan] then return ret
 
     val status = allArguments(0).asInstanceOf[Status]
-    ret.asInstanceOf[GIO[Unit]].ensuring(ZIO.attempt(afterClose(status, ctx.asyncSpan, span)).ignoreLogged)
+    afterClose(status, ctx.asyncSpan, span)
+    ret
   end afterMethod
 
   private def afterClose(status: Status, asyncSpan: AbstractSpan, span: AbstractSpan): Unit =
     status match {
-      case OK      =>
-      case UNKNOWN =>
-      case INTERNAL =>
+      case UNKNOWN | INTERNAL =>
         if status.getCause == null then span.log(status.asRuntimeException)
         else span.log(status.getCause)
       case _ =>
         if status.getCause != null then span.log(status.getCause)
     }
     Tags.RPC_RESPONSE_STATUS_CODE.set(span, status.getCode.name)
-    try span.asyncFinish
-    catch {
-      case t: Throwable =>
-        ContextManager.activeSpan.log(t)
-    } finally
-      try
-        asyncSpan.asyncFinish()
-      catch {
-        case ignore: Throwable =>
-      }
-      ContextManager.stopSpan()
+    AgentUtils.stopAsync(span)
+    AgentUtils.stopAsync(asyncSpan)
+    ContextManager.stopSpan()
 
   override def handleMethodException(
     objInst: EnhancedInstance,

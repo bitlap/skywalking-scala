@@ -5,6 +5,7 @@ import net.bytebuddy.matcher.ElementMatcher
 import net.bytebuddy.matcher.ElementMatchers.*
 
 import org.apache.skywalking.apm.agent.core.plugin.`match`.*
+import org.apache.skywalking.apm.agent.core.plugin.`match`.logical.LogicalMatchOperation
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.*
 
@@ -12,16 +13,11 @@ final class ZioGrpcServerCallInstrumentation extends ClassInstanceMethodsEnhance
 
   import ZioGrpcServerCallInstrumentation.*
 
-  override def enhanceClass(): ClassMatch = NameMatch.byName(ENHANCE_CLASS)
+  override def enhanceClass(): ClassMatch = ENHANCE_CLASS
 
   override def witnessClasses(): Array[String] = Array("scalapb.zio_grpc.ServerImpl")
 
-  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = Array(
-    new ConstructorInterceptPoint:
-      override def getConstructorMatcher: ElementMatcher[MethodDescription] = takesArguments(2)
-
-      override def getConstructorInterceptor: String = CLASS_INTERCEPTOR
-  )
+  override def getConstructorsInterceptPoints: Array[ConstructorInterceptPoint] = null
 
   override def getInstanceMethodsInterceptPoints: Array[InstanceMethodsInterceptPoint] =
     methodInterceptors
@@ -38,16 +34,18 @@ end ZioGrpcServerCallInstrumentation
 
 object ZioGrpcServerCallInstrumentation:
 
-  final val CLASS_INTERCEPTOR =
-    "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerCallConstructorInterceptor"
-
   final val CLOSE_METHOD_INTERCEPTOR =
     "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerCloseInterceptor"
 
   final val SEND_MESSAGE_METHOD_INTERCEPTOR =
     "org.bitlap.skywalking.apm.plugin.ziogrpc.v06rcx.interceptor.ZioGrpcServerSendMessageInterceptor"
 
-  private final val ENHANCE_CLASS: String = "scalapb.zio_grpc.server.ZServerCall"
+  // see issue: https://github.com/scalapb/zio-grpc/issues/501, we cannot use Server Interceptor
+  // Because the server stream calls `ServerCall.sendMessage` and `ServerCall.close`, and we intercept grpc directly.
+  private final val ENHANCE_CLASS = LogicalMatchOperation.or(
+    HierarchyMatch.byHierarchyMatch("io.grpc.ServerCall"),
+    MultiClassNameMatch.byMultiClassMatch("io.grpc.ServerCall")
+  )
 
   val methodInterceptors: Map[String, ElementMatcher[MethodDescription]] = Map(
     CLOSE_METHOD_INTERCEPTOR        -> named("close"),
