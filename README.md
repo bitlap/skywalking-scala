@@ -76,15 +76,15 @@ To use the plugin quickly, you can download it from [Release Assets](https://git
 ##  More information
 
 ### How to realize it
-| plugin                 | library                                                      | Enhance Targets                                                                                                        | 
-|------------------------|--------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| cats-effect-v3x-plugin | cats-effect                                                  | `cats.effect.IOFiber`                                                                                                  |
-| zio-v2x-plugin         | zio                                                          | `zio.internal.FiberRuntime`, `zio.Executor`                                                                            |
-| ziogrpc-v06rcx-plugin  | zio-grpc                                                     | `scalapb.zio_grpc.ZChannel`<br/>`scalapb.zio_grpc.server.ZServerCall`<br/>`scalapb.zio_grpc.server.ZServerCallHandler` |
-| ziohttp-v2x-plugin     | zio-http                                                     | `zhttp.http.Http$PartialCollectHttp$`                                                                                  |
-| caliban-v2x-plugin     | caliban                                                      | `caliban.GraphQLInterpreter`, `caliban.wrappers.Wrapper`                                                               |
-| executors-plugin       | `java.util.concurrent.ThreadPoolExecutor` and its subclasses | `submit`, `schedule`, `execute`                                                                                        |
-| ziocache-plugin        | zio-cache                                                    | `zio.cache.Cache`                                                                                                      |
+| plugin                 | library                                                      | Enhance Targets                                                                                       | 
+|------------------------|--------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| cats-effect-v3x-plugin | cats-effect                                                  | `cats.effect.IOFiber`                                                                                 |
+| zio-v2x-plugin         | zio                                                          | `zio.internal.FiberRuntime`, `zio.Executor`                                                           |
+| ziogrpc-v06rcx-plugin  | zio-grpc                                                     | `scalapb.zio_grpc.ZChannel`<br/>`io.grpc.ServerCall`<br/>`scalapb.zio_grpc.server.ZServerCallHandler` |
+| ziohttp-v2x-plugin     | zio-http                                                     | `zhttp.http.Http$PartialCollectHttp$`                                                                 |
+| caliban-v2x-plugin     | caliban                                                      | `caliban.GraphQLInterpreter`, `caliban.wrappers.Wrapper`                                              |
+| executors-plugin       | `java.util.concurrent.ThreadPoolExecutor` and its subclasses | `submit`, `schedule`, `execute`                                                                       |
+| ziocache-plugin        | zio-cache                                                    | `zio.cache.Cache`                                                                                     |
 
 ### Available configurations
 | key                                             | description                                                                                                                                            |
